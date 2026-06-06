@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -6,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- ספרייה להפיכת אלמנטים לתמונה לשיתוף בוואטסאפ -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap');
@@ -35,6 +35,9 @@
             opacity: 0.8;
         }
 
+        /* מנגנון הסתרת אלמנטים של לוגיסטיקה למשתמשים רגילים */
+        body:not(.is-admin) .logistics-only { display: none !important; }
+
         @media print {
             body * { visibility: hidden; }
             #modal-form-print, #modal-form-print * { visibility: visible; }
@@ -54,7 +57,10 @@
                 <i class="fa-solid fa-shield-halved text-3xl text-blue-300"></i>
                 <div>
                     <h1 class="text-2xl font-bold tracking-tight">מערכת גדודית מתקדמת</h1>
-                    <p class="text-green-400 text-xs mt-1" id="connection-status"><i class="fa-solid fa-lock"></i> מחובר בהצפנה מקצה לקצה</p>
+                    <div class="flex items-center gap-2 cursor-pointer mt-1" onclick="toggleAdminMode()" title="לחץ לנעילה/פתיחה של מודול הלוגיסטיקה">
+                        <i id="admin-lock-icon" class="fa-solid fa-lock text-red-400"></i>
+                        <p class="text-green-400 text-xs" id="connection-status">מחובר בהצפנה מקצה לקצה</p>
+                    </div>
                 </div>
             </div>
             
@@ -67,7 +73,7 @@
             <button onclick="switchAppModule('attendance')" id="nav-attendance" class="py-3 px-2 sm:px-4 border-b-4 border-blue-400 font-bold text-white transition-all">
                 <i class="fa-solid fa-clipboard-user ml-1"></i> דוח נוכחות
             </button>
-            <button onclick="switchAppModule('logistics')" id="nav-logistics" class="py-3 px-2 sm:px-4 border-b-4 border-transparent text-blue-200 hover:text-white transition-all">
+            <button onclick="switchAppModule('logistics')" id="nav-logistics" class="logistics-only py-3 px-2 sm:px-4 border-b-4 border-transparent text-blue-200 hover:text-white transition-all">
                 <i class="fa-solid fa-warehouse ml-1"></i> מחסן ואפסנאות
             </button>
         </div>
@@ -137,6 +143,11 @@
                                 <tr><td colspan="7" class="p-8 text-center text-gray-500">טוען נתונים מהשרת...</td></tr>
                             </tbody>
                         </table>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-4 border-t border-gray-200 flex justify-between items-center text-sm rounded-b-xl">
+                        <span class="text-gray-600">מציג: <strong id="total-count" class="text-gray-900">0</strong> חיילים</span>
+                        <span class="text-gray-600">דווחו היום מתוכם: <strong id="reported-count" class="text-blue-600">0</strong></span>
                     </div>
                 </div>
             </main>
@@ -252,9 +263,7 @@
         <option value="חלפ''ס">
     </datalist>
 
-    <datalist id="issuers-list">
-        <!-- Will be populated dynamically + defaults -->
-    </datalist>
+    <datalist id="issuers-list"></datalist>
 
     <!-- ================= MODALS ================= -->
 
@@ -279,8 +288,8 @@
             
             <div class="p-5 flex-grow overflow-y-auto bg-gray-50 flex flex-col lg:flex-row gap-5">
                 
-                <!-- Right Side: Assigning new gear -->
-                <div class="w-full lg:w-1/3 flex flex-col gap-4">
+                <!-- Right Side: Assigning new gear (Logistics Only) -->
+                <div class="w-full lg:w-1/3 flex flex-col gap-4 logistics-only">
                     <div class="bg-white p-4 rounded-xl border border-blue-100 shadow-sm">
                         <h4 class="font-bold text-blue-900 mb-3 text-sm">החתמה ממלאי גדודי:</h4>
                         <div class="space-y-3">
@@ -319,7 +328,7 @@
                 </div>
 
                 <!-- Left Side: Assigned Items Table -->
-                <div class="w-full lg:w-2/3">
+                <div class="w-full lg:flex-grow">
                     <div class="flex justify-between items-end mb-3">
                         <h4 class="font-bold text-gray-800 text-lg">ציוד שמונפק כרגע לחייל:</h4>
                     </div>
@@ -328,7 +337,7 @@
                         <table class="w-full text-right text-sm">
                             <thead class="bg-gray-50 border-b border-gray-200">
                                 <tr>
-                                    <th class="p-3 w-8"><input type="checkbox" id="selectAllCheckbox" onchange="toggleAllCheckboxes(this)"></th>
+                                    <th class="p-3 w-8 logistics-only"><input type="checkbox" id="selectAllCheckbox" onchange="toggleAllCheckboxes(this)"></th>
                                     <th class="p-3 text-gray-600">שם פריט</th>
                                     <th class="p-3 text-gray-600">מספר צ'</th>
                                     <th class="p-3 text-gray-600">ת. ניפוק</th>
@@ -338,7 +347,7 @@
                         </table>
                     </div>
                     
-                    <div class="flex justify-between items-center bg-white p-3 rounded-xl border border-gray-200">
+                    <div class="flex justify-between items-center bg-white p-3 rounded-xl border border-gray-200 logistics-only">
                         <button onclick="returnSelectedItems()" class="bg-orange-100 hover:bg-orange-200 text-orange-800 px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2">
                             <i class="fa-solid fa-arrow-rotate-left"></i> הזדכה על מסומנים
                         </button>
@@ -368,7 +377,6 @@
                 </div>
             </div>
             
-            <!-- Target for screenshot -->
             <div id="print-target-area" class="p-8 sm:p-12 bg-white flex-grow overflow-y-auto text-black font-serif relative">
                 <div class="border-b-2 border-black pb-4 mb-6 flex justify-between items-end">
                     <div>
@@ -395,9 +403,7 @@
                             <th class="p-2 border border-black">שם המנפק / המזכה</th>
                         </tr>
                     </thead>
-                    <tbody id="print-table-body">
-                        <!-- Populated by JS -->
-                    </tbody>
+                    <tbody id="print-table-body"></tbody>
                 </table>
 
                 <div class="mt-auto grid grid-cols-2 gap-8 text-center pt-10 relative">
@@ -409,7 +415,6 @@
                     <div class="relative">
                         <div class="mb-2">___________________________</div>
                         <div class="font-bold">חתימת קצין לוגיסטיקה</div>
-                        <!-- Auto Stamp Layer -->
                         <div id="print-issuer-stamp" class="absolute bottom-6 left-1/2 transform -translate-x-1/2 auto-stamp hidden">
                             אושר במערכת<br><span id="stamp-name" class="text-sm"></span>
                         </div>
@@ -419,72 +424,14 @@
         </div>
     </div>
 
-    <!-- ADD INVENTORY ITEM MODAL (Main Armory) -->
-    <div id="add-inventory-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 no-print">
-        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">קליטת פריט למחסן הגדוד</h3>
-            <div class="space-y-4 mb-6">
-                <div><select id="new-inv-cat" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"><option value="נשק">נשק אישי/כיתתי</option><option value="אופטיקה">אופטיקה</option><option value="אמרל">אמר"לים</option><option value="כללי">אחר (צל"מ/רכב)</option></select></div>
-                <div><input type="text" id="new-inv-name" list="standard-items-list" placeholder="שם הפריט" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></div>
-                <div><input type="text" id="new-inv-serial" dir="ltr" placeholder="מספר צ'" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-right font-mono"></div>
-            </div>
-            <div class="flex justify-end gap-3"><button onclick="closeAddInventoryModal()" class="px-4 py-2 bg-gray-100 rounded-lg">ביטול</button><button onclick="submitNewInventoryItem()" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold">שמור במחסן</button></div>
-        </div>
-    </div>
+    <!-- OTHER MODALS (Armory, Ammo, etc.) - Preserved -->
+    <div id="add-inventory-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 no-print"><div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6"><h3 class="text-xl font-bold text-gray-800 mb-4">קליטת פריט למחסן הגדוד</h3><div class="space-y-4 mb-6"><div><select id="new-inv-cat" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"><option value="נשק">נשק אישי/כיתתי</option><option value="אופטיקה">אופטיקה</option><option value="אמרל">אמר"לים</option><option value="כללי">אחר (צל"מ/רכב)</option></select></div><div><input type="text" id="new-inv-name" list="standard-items-list" placeholder="שם הפריט" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></div><div><input type="text" id="new-inv-serial" dir="ltr" placeholder="מספר צ'" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-right font-mono"></div></div><div class="flex justify-end gap-3"><button onclick="closeAddInventoryModal()" class="px-4 py-2 bg-gray-100 rounded-lg">ביטול</button><button onclick="submitNewInventoryItem()" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold">שמור במחסן</button></div></div></div>
+    <div id="ammo-update-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 no-print"><div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6"><h3 class="text-xl font-bold text-gray-800 mb-4">עדכון/קליטת תחמושת</h3><div class="space-y-4 mb-6"><div><input type="text" id="upd-ammo-type" placeholder="סוג תחמושת" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></div><div><input type="number" id="upd-ammo-qty" placeholder="כמות ספירה כוללת" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500" dir="ltr"></div></div><div class="flex justify-end gap-3"><button onclick="closeAmmoUpdateModal()" class="px-4 py-2 bg-gray-100 rounded-lg">ביטול</button><button onclick="submitAmmoUpdate()" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold">עדכן</button></div></div></div>
+    <div id="shoot-report-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 no-print"><div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 border-t-8 border-orange-500"><h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-fire text-orange-500"></i> דיווח ירי / בלאי</h3><div class="space-y-4 mb-6"><div><select id="shoot-ammo-type" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500"></select></div><div><input type="number" id="shoot-ammo-qty" placeholder="כמות שנורתה" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500" dir="ltr"></div><div><input type="text" id="shoot-ammo-reason" placeholder="תיאור אימון" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500"></div></div><div class="flex justify-end gap-3"><button onclick="closeShootReportModal()" class="px-4 py-2 bg-gray-100 rounded-lg">ביטול</button><button onclick="submitShootReport()" class="px-4 py-2 bg-orange-500 text-white rounded-lg font-bold">קזז מלאי</button></div></div></div>
+    <div id="export-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4 no-print"><div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6"><h3 class="text-xl font-bold text-gray-800 mb-5">ייצוא דוח טווח נוכחות</h3><div class="mb-4"><input type="date" id="export-start" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></div><div class="mb-6"><input type="date" id="export-end" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></div><div class="flex justify-end gap-3"><button onclick="closeExportModal()" class="px-4 py-2 bg-gray-100 rounded-lg">ביטול</button><button onclick="executeRangeExport()" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold">הורד</button></div></div></div>
+    <div id="add-soldier-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4 no-print"><div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6"><h3 id="modal-title" class="text-xl font-bold mb-4">הוספת חייל לגדוד</h3><form id="add-soldier-form" onsubmit="submitSoldierForm(event)"><div class="mb-3"><input type="text" id="new-soldier-name" placeholder="שם מלא *" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 outline-none"></div><div class="mb-3 flex gap-3"><input type="text" id="new-soldier-id" placeholder="מספר אישי" class="w-1/2 px-3 py-2 border rounded-lg focus:ring-2 outline-none"><input type="text" id="new-soldier-phone" placeholder="טלפון" dir="ltr" class="w-1/2 px-3 py-2 border rounded-lg text-right focus:ring-2 outline-none"></div><div class="mb-3"><input type="text" id="new-soldier-role" placeholder="תפקיד" class="w-full px-3 py-2 border rounded-lg focus:ring-2 outline-none"></div><div class="mb-5"><input type="text" id="new-soldier-dept" required list="dept-options" placeholder="מחלקה *" class="w-full px-3 py-2 border rounded-lg focus:ring-2 outline-none"><datalist id="dept-options"></datalist></div><div class="flex justify-end gap-3"><button type="button" onclick="closeAddSoldierModal()" class="px-4 py-2 bg-gray-100 rounded-lg">ביטול</button><button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold">שמור</button></div></form></div></div>
 
-    <!-- UPDATE AMMO MODAL -->
-    <div id="ammo-update-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 no-print">
-        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">עדכון/קליטת תחמושת</h3>
-            <div class="space-y-4 mb-6">
-                <div><input type="text" id="upd-ammo-type" placeholder="סוג תחמושת" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></div>
-                <div><input type="number" id="upd-ammo-qty" placeholder="כמות ספירה כוללת" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500" dir="ltr"></div>
-            </div>
-            <div class="flex justify-end gap-3"><button onclick="closeAmmoUpdateModal()" class="px-4 py-2 bg-gray-100 rounded-lg">ביטול</button><button onclick="submitAmmoUpdate()" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold">עדכן</button></div>
-        </div>
-    </div>
-
-    <!-- REPORT SHOOTING MODAL -->
-    <div id="shoot-report-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 no-print">
-        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 border-t-8 border-orange-500">
-            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-fire text-orange-500"></i> דיווח ירי / בלאי</h3>
-            <div class="space-y-4 mb-6">
-                <div><select id="shoot-ammo-type" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500"></select></div>
-                <div><input type="number" id="shoot-ammo-qty" placeholder="כמות שנורתה" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500" dir="ltr"></div>
-                <div><input type="text" id="shoot-ammo-reason" placeholder="תיאור אימון" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500"></div>
-            </div>
-            <div class="flex justify-end gap-3"><button onclick="closeShootReportModal()" class="px-4 py-2 bg-gray-100 rounded-lg">ביטול</button><button onclick="submitShootReport()" class="px-4 py-2 bg-orange-500 text-white rounded-lg font-bold">קזז מלאי</button></div>
-        </div>
-    </div>
-
-    <!-- EXPORT MODAL -->
-    <div id="export-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4 no-print">
-        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6">
-            <h3 class="text-xl font-bold text-gray-800 mb-5">ייצוא דוח טווח נוכחות</h3>
-            <div class="mb-4"><input type="date" id="export-start" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></div>
-            <div class="mb-6"><input type="date" id="export-end" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></div>
-            <div class="flex justify-end gap-3"><button onclick="closeExportModal()" class="px-4 py-2 bg-gray-100 rounded-lg">ביטול</button><button onclick="executeRangeExport()" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold">הורד</button></div>
-        </div>
-    </div>
-
-    <!-- ADD SOLDIER MODAL -->
-    <div id="add-soldier-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4 no-print">
-        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
-            <h3 id="modal-title" class="text-xl font-bold mb-4">הוספת חייל לגדוד</h3>
-            <form id="add-soldier-form" onsubmit="submitSoldierForm(event)">
-                <div class="mb-3"><input type="text" id="new-soldier-name" placeholder="שם מלא *" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 outline-none"></div>
-                <div class="mb-3 flex gap-3"><input type="text" id="new-soldier-id" placeholder="מספר אישי" class="w-1/2 px-3 py-2 border rounded-lg focus:ring-2 outline-none"><input type="text" id="new-soldier-phone" placeholder="טלפון" dir="ltr" class="w-1/2 px-3 py-2 border rounded-lg text-right focus:ring-2 outline-none"></div>
-                <div class="mb-3"><input type="text" id="new-soldier-role" placeholder="תפקיד" class="w-full px-3 py-2 border rounded-lg focus:ring-2 outline-none"></div>
-                <div class="mb-5"><input type="text" id="new-soldier-dept" required list="dept-options" placeholder="מחלקה *" class="w-full px-3 py-2 border rounded-lg focus:ring-2 outline-none"><datalist id="dept-options"></datalist></div>
-                <div class="flex justify-end gap-3"><button type="button" onclick="closeAddSoldierModal()" class="px-4 py-2 bg-gray-100 rounded-lg">ביטול</button><button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold">שמור</button></div>
-            </form>
-        </div>
-    </div>
-
-    <!-- TOAST -->
-    <div id="toast" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none z-50 flex items-center gap-2 no-print">
-        <i class="fa-solid fa-circle-info"></i><span id="toast-msg">הודעה</span>
-    </div>
+    <div id="toast" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none z-50 flex items-center gap-2 no-print"><i class="fa-solid fa-circle-info"></i><span id="toast-msg">הודעה</span></div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -516,13 +463,39 @@
         }
         window.clearSignature = () => { if(ctx) ctx.clearRect(0,0,canvas.width,canvas.height); };
         function getSignatureData() {
-            // Only return if actually drawn (simplified check: is it empty?)
             const blank = document.createElement('canvas'); blank.width = canvas.width; blank.height = canvas.height;
             return canvas.toDataURL() === blank.toDataURL() ? null : canvas.toDataURL();
         }
 
+        // --- ADMIN / LOGISTICS LOCK MODE ---
+        window.toggleAdminMode = () => {
+            const isAdm = document.body.classList.contains('is-admin');
+            if (isAdm) {
+                document.body.classList.remove('is-admin');
+                localStorage.removeItem('logisticsPIN');
+                document.getElementById('admin-lock-icon').className = 'fa-solid fa-lock text-red-400';
+                showToast("מצב לוגיסטיקה ננעל", false);
+            } else {
+                const pin = prompt("הכנס קוד לוגיסטיקה (ברירת מחדל: 1894):");
+                if (pin === "1894") {
+                    document.body.classList.add('is-admin');
+                    localStorage.setItem('logisticsPIN', '1894');
+                    document.getElementById('admin-lock-icon').className = 'fa-solid fa-lock-open text-green-400';
+                    showToast("מצב לוגיסטיקה נפתח!", false);
+                } else if (pin !== null) {
+                    showToast("קוד שגוי", true);
+                }
+            }
+        };
+
         async function init() {
             try {
+                if (localStorage.getItem('logisticsPIN') === '1894') {
+                    document.body.classList.add('is-admin');
+                    const icon = document.getElementById('admin-lock-icon');
+                    if(icon) icon.className = 'fa-solid fa-lock-open text-green-400';
+                }
+
                 const app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app);
                 currentUser = (await signInAnonymously(auth)).user;
                 const today = new Date(); document.getElementById('date-picker').value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
@@ -579,7 +552,7 @@
         function renderTable() {
             const tbody = document.getElementById('soldiers-table-body'); tbody.innerHTML = ''; let f = activeTab === "הכל" ? soldiers : soldiers.filter(s => s.department === activeTab); if (searchQuery) f = f.filter(s => (s.name||"").includes(searchQuery) || (s.personalId||"").includes(searchQuery)); let rC = 0;
             if (f.length === 0) tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500">אין נתונים</td></tr>`;
-            else { f.forEach((s, idx) => { const st = dailyStatusMap[s.id] || "לא דווח"; if (st !== "לא דווח") rC++; const opt = STATUS_OPTIONS.find(o => o.val === st) || STATUS_OPTIONS[0]; const stHtml = s.streak > 0 ? `<span class="ml-2 inline-flex items-center gap-1 text-[10px] bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full border border-orange-200" title="${s.streak} ימים ברצף"><i class="fa-solid fa-fire text-orange-500"></i> ${s.streak}</span>` : ''; let sH = `<div class="flex items-center gap-2 justify-center"><button onclick="updateStatus('${s.id}', 'נוכח')" class="w-9 h-9 rounded-full flex items-center justify-center transition border focus:outline-none ${st==='נוכח'?'bg-green-500 text-white border-green-600':'bg-white text-gray-300 border-gray-200 hover:text-green-500'}"><i class="fa-solid fa-check"></i></button><select onchange="updateStatus('${s.id}', this.value)" class="w-full min-w-[120px] p-2 border rounded-lg shadow-sm text-sm outline-none ${opt.color}">`; STATUS_OPTIONS.forEach(o => sH += `<option value="${o.val}" ${o.val===st?'selected':''}>${o.emoji} ${o.val}</option>`); sH += `</select></div>`; tbody.innerHTML += `<tr class="hover:bg-blue-50/50 border-b border-gray-100"><td class="p-3 text-center text-gray-400 text-xs">${idx + 1}</td><td class="p-3 font-medium text-blue-700 hover:underline whitespace-nowrap cursor-pointer" onclick="openEquipmentModal('${s.id}')" title="לציוד חתום">${escapeHTML(s.name)}${stHtml}</td><td class="p-3">${sH}</td><td class="p-3 text-gray-600 text-xs"><span class="bg-gray-100 px-2 py-1 rounded">${escapeHTML(s.role||'-')}</span></td><td class="p-3 text-gray-600 text-xs" dir="ltr">${escapeHTML(s.phone||'-')}</td><td class="p-3 text-gray-600 text-xs">${escapeHTML(s.personalId||'-')}</td><td class="p-3 text-center"><div class="flex justify-center gap-1"><button onclick="openEditSoldierModal('${s.id}')" class="text-blue-400 hover:bg-blue-50 p-2 rounded transition"><i class="fa-solid fa-pen"></i></button><button onclick="confirmDelete('${s.id}', '${escapeHTML(s.name).replace(/'/g, "\\'")}')" class="text-red-400 hover:bg-red-50 p-2 rounded transition"><i class="fa-solid fa-trash"></i></button></div></td></tr>`; }); }
+            else { f.forEach((s, idx) => { const st = dailyStatusMap[s.id] || "לא דווח"; if (st !== "לא דווח") rC++; const opt = STATUS_OPTIONS.find(o => o.val === st) || STATUS_OPTIONS[0]; const stHtml = s.streak > 0 ? `<span class="ml-2 inline-flex items-center gap-1 text-[10px] bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full border border-orange-200" title="${s.streak} ימים ברצף"><i class="fa-solid fa-fire text-orange-500"></i> ${s.streak}</span>` : ''; let sH = `<div class="flex items-center gap-2 justify-center"><button onclick="updateStatus('${s.id}', 'נוכח')" class="w-9 h-9 rounded-full flex items-center justify-center transition border focus:outline-none ${st==='נוכח'?'bg-green-500 text-white border-green-600':'bg-white text-gray-300 border-gray-200 hover:text-green-500'}"><i class="fa-solid fa-check"></i></button><select onchange="updateStatus('${s.id}', this.value)" class="w-full min-w-[120px] p-2 border rounded-lg shadow-sm text-sm outline-none ${opt.color}">`; STATUS_OPTIONS.forEach(o => sH += `<option value="${o.val}" ${o.val===st?'selected':''}>${o.emoji} ${o.val}</option>`); sH += `</select></div>`; tbody.innerHTML += `<tr class="hover:bg-blue-50/50 border-b border-gray-100"><td class="p-3 text-center text-gray-400 text-xs">${idx + 1}</td><td class="p-3 font-medium text-blue-700 hover:underline whitespace-nowrap cursor-pointer" onclick="openEquipmentModal('${s.id}')" title="לציוד חתום">${escapeHTML(s.name)}${stHtml}</td><td class="p-3">${sH}</td><td class="p-3 text-gray-600 text-xs"><span class="bg-gray-100 px-2 py-1 rounded">${escapeHTML(s.role||'-')}</span></td><td class="p-3 text-gray-600 text-xs" dir="ltr">${escapeHTML(s.phone||'-')}</td><td class="p-3 text-gray-600 text-xs">${escapeHTML(s.personalId||'-')}</td><td class="p-3 text-center"><div class="flex justify-center gap-1"><button onclick="openEquipmentModal('${s.id}')" class="text-emerald-500 hover:bg-emerald-50 p-2 rounded transition" title="1008"><i class="fa-solid fa-backpack"></i></button><button onclick="openEditSoldierModal('${s.id}')" class="text-blue-400 hover:bg-blue-50 p-2 rounded transition"><i class="fa-solid fa-pen"></i></button><button onclick="confirmDelete('${s.id}', '${escapeHTML(s.name).replace(/'/g, "\\'")}')" class="text-red-400 hover:bg-red-50 p-2 rounded transition"><i class="fa-solid fa-trash"></i></button></div></td></tr>`; }); }
             document.getElementById('total-count').textContent = f.length; document.getElementById('reported-count').textContent = `${rC} / ${f.length}`;
         }
         window.updateStatus = async (id, st) => { if(currentUser) await setDoc(doc(db, `daily_status/${document.getElementById('date-picker').value}/statuses`, id), { status: st }); };
@@ -597,7 +570,7 @@
         window.submitNewInventoryItem=async()=>{ const c=document.getElementById('new-inv-cat').value, n=document.getElementById('new-inv-name').value.trim(), s=document.getElementById('new-inv-serial').value.trim(); if(!n||!s)return showToast("נא למלא הכל",true); if(inventory.find(i=>i.serial===s))return showToast("מס צ קיים!",true); try{ await addDoc(collection(db,'inventory'),{category:c,name:n,serial:s,status:'available',assignedTo:null,addedAt:new Date().toISOString()}); showToast("נקלט"); closeAddInventoryModal(); }catch(e){} }; window.deleteInventoryItem=async(id)=>{ if(confirm("למחוק פריט מהמחסן?")) await deleteDoc(doc(db,'inventory',id)); }; window.exportArmory=()=>{ let c="קטגוריה,שם פריט,מספר צ,סטטוס,חייל חתום\n"; inventory.forEach(i=>{const sn=i.assignedTo?(soldiers.find(s=>s.id===i.assignedTo)?.name||""):"";const st=i.status==='available'?'במחסן':'מונפק';c+=`"${i.category||''}","${i.name||''}","${i.serial||''}","${st}","${sn}"\n`;}); const u=URL.createObjectURL(new Blob(["\uFEFF"+c],{type:'text/csv;charset=utf-8;'})); const l=document.createElement("a");l.href=u;l.download="מלאי_מחסן.csv";document.body.appendChild(l);l.click();document.body.removeChild(l); }; window.importArmoryExcel=async(e)=>{ const f=e.target.files[0];if(!f)return;showToast("קורא מחסן...");const r=new FileReader(); r.onload=async(ev)=>{try{const rows=XLSX.utils.sheet_to_json(XLSX.read(new Uint8Array(ev.target.result),{type:'array'}).Sheets[XLSX.read(new Uint8Array(ev.target.result),{type:'array'}).SheetNames[0]],{header:1,defval:""});let a=0;if(rows.length>0){let ci=0,ni=1,si=2;const h=rows[0].map(x=>String(x).trim());const hc=h.findIndex(x=>x.includes('קטגוריה')),hn=h.findIndex(x=>x.includes('שם')||x.includes('פריט')),hs=h.findIndex(x=>x.includes('צ')||x.includes('סידורי'));if(hn>-1&&hs>-1){ci=Math.max(0,hc);ni=hn;si=hs;}for(let i=1;i<rows.length;i++){const n=String(rows[i][ni]||'').replace(/["']/g,'').trim(),s=String(rows[i][si]||'').replace(/["']/g,'').trim(),c=String(rows[i][ci]||'כללי').trim();if(!n||!s||n==='שם הפריט'||inventory.find(iv=>iv.serial===s))continue;await addDoc(collection(db,'inventory'),{category:c,name:n,serial:s,status:'available',assignedTo:null,addedAt:new Date().toISOString()});a++;}}showToast(`${a} פריטים נוספו.`);}catch(err){}e.target.value='';};r.readAsArrayBuffer(f); };
 
         // ================= LOGISTICS: AMMO =================
-        function renderLogisticsAmmo() { const g=document.getElementById('ammo-grid');g.innerHTML='';const t=Object.keys(ammoData);if(t.length===0)g.innerHTML=`<div class="col-span-4 p-4 text-center text-gray-500 border border-dashed rounded-lg">אין מלאי</div>`;else t.forEach(k=>{g.innerHTML+=`<div class="bg-white border border-gray-200 p-4 rounded-xl shadow-sm text-center relative group"><button onclick="deleteAmmoType('${escapeHTML(k)}')" class="absolute top-2 left-2 text-red-300 hover:text-red-500 hidden group-hover:block transition"><i class="fa-solid fa-trash text-sm"></i></button><div class="text-gray-500 text-sm font-bold mb-1">${escapeHTML(k)}</div><div class="text-3xl font-black text-gray-800" dir="ltr">${ammoData[k]}</div></div>`;}); const lB=document.getElementById('ammo-logs-body');let lh='';ammoLogs.forEach(lg=>{lh+=`<tr><td class="p-3 text-xs text-gray-500">${new Date(lg.date).toLocaleDateString('he-IL')} ${new Date(lg.date).toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})}</td><td class="p-3 font-bold">${escapeHTML(lg.type)}</td><td class="p-3 font-mono text-red-600" dir="ltr">-${lg.amount}</td><td class="p-3 text-gray-600 text-sm">${escapeHTML(lg.reason)}</td><td class="p-3 text-center"><button onclick="deleteAmmoLog('${lg.id}','${escapeHTML(lg.type)}',${lg.amount})" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button></td></tr>`;});lB.innerHTML=lh||`<tr><td colspan="5" class="p-6 text-center text-gray-400">אין תיעוד</td></tr>`; } window.deleteAmmoLog=async(id,type,qty)=>{if(confirm(`למחוק דיווח? (${qty} יוחזרו)`)){try{await deleteDoc(doc(db,'ammo_logs',id));const c=ammoData[type]||0;await setDoc(doc(db,'logistics','ammo'),{[type]:c+qty},{merge:true});showToast("נמחק ועודכן");}catch(e){}}}; window.deleteAmmoType=async(type)=>{if(confirm(`למחוק סוג ${type}?`)){const nd={...ammoData};delete nd[type];await setDoc(doc(db,'logistics','ammo'),nd);showToast("נמחק");}}; window.openAmmoUpdateModal=()=>{document.getElementById('upd-ammo-type').value='';document.getElementById('upd-ammo-qty').value='';document.getElementById('ammo-update-modal').classList.remove('hidden');document.getElementById('ammo-update-modal').classList.add('flex');}; window.closeAmmoUpdateModal=()=>{document.getElementById('ammo-update-modal').classList.add('hidden');document.getElementById('ammo-update-modal').classList.remove('flex');}; window.submitAmmoUpdate=async()=>{const t=document.getElementById('upd-ammo-type').value.trim(),q=parseInt(document.getElementById('upd-ammo-qty').value);if(!t||isNaN(q))return;try{await setDoc(doc(db,'logistics','ammo'),{[t]:q},{merge:true});closeAmmoUpdateModal();}catch(e){}}; function populateAmmoSelects(){const sl=document.getElementById('shoot-ammo-type');sl.innerHTML='<option value="">בחר...</option>';Object.keys(ammoData).forEach(t=>sl.innerHTML+=`<option value="${t}">${t} (קיים: ${ammoData[t]})</option>`);} window.openShootReportModal=()=>{document.getElementById('shoot-ammo-qty').value='';document.getElementById('shoot-ammo-reason').value='';document.getElementById('shoot-report-modal').classList.remove('hidden');document.getElementById('shoot-report-modal').classList.add('flex');}; window.closeShootReportModal=()=>{document.getElementById('shoot-report-modal').classList.add('hidden');document.getElementById('shoot-report-modal').classList.remove('flex');}; window.submitShootReport=async()=>{const t=document.getElementById('shoot-ammo-type').value,q=parseInt(document.getElementById('shoot-ammo-qty').value),r=document.getElementById('shoot-ammo-reason').value.trim();if(!t||isNaN(q)||q<=0||!r)return;const c=ammoData[t]||0;if(q>c)return showToast("אין מספיק",true);try{await setDoc(doc(db,'logistics','ammo'),{[t]:c-q},{merge:true});await addDoc(collection(db,'ammo_logs'),{type:t,amount:q,reason:r,date:new Date().toISOString()});closeShootReportModal();}catch(e){}}; window.exportAmmo=()=>{let c="סוג תחמושת,כמות במלאי\n";Object.keys(ammoData).forEach(k=>c+=`"${k}","${ammoData[k]}"\n`);const u=URL.createObjectURL(new Blob(["\uFEFF"+c],{type:'text/csv;charset=utf-8;'}));const l=document.createElement("a");l.href=u;l.download="מלאי_תחמושת.csv";document.body.appendChild(l);l.click();document.body.removeChild(l);}; window.importAmmoExcel=async(e)=>{const f=e.target.files[0];if(!f)return;showToast("קורא תחמושת...");const r=new FileReader();r.onload=async(ev)=>{try{const rows=XLSX.utils.sheet_to_json(XLSX.read(new Uint8Array(ev.target.result),{type:'array'}).Sheets[XLSX.read(new Uint8Array(ev.target.result),{type:'array'}).SheetNames[0]],{header:1,defval:""});let u=0;const up={};if(rows.length>0){for(let i=1;i<rows.length;i++){const t=String(rows[i][0]||'').trim(),q=parseInt(String(rows[i][1]||'').replace(/,/g,'').trim());if(t&&!isNaN(q)){up[t]=q;u++;}}}if(u>0){await setDoc(doc(db,'logistics','ammo'),up,{merge:true});showToast(`${u} עודכנו.`);}}catch(err){}e.target.value='';};r.readAsArrayBuffer(f);};
+        function renderLogisticsAmmo() { const g=document.getElementById('ammo-grid');g.innerHTML='';const t=Object.keys(ammoData);if(t.length===0)g.innerHTML=`<div class="col-span-4 p-4 text-center text-gray-500 border border-dashed rounded-lg">אין מלאי</div>`;else t.forEach(k=>{g.innerHTML+=`<div class="bg-white border border-gray-200 p-4 rounded-xl shadow-sm text-center relative group"><button onclick="deleteAmmoType('${escapeHTML(k)}')" class="absolute top-2 left-2 text-red-300 hover:text-red-500 hidden group-hover:block transition" title="מחק סוג"><i class="fa-solid fa-trash text-sm"></i></button><div class="text-gray-500 text-sm font-bold mb-1">${escapeHTML(k)}</div><div class="text-3xl font-black text-gray-800" dir="ltr">${ammoData[k]}</div></div>`;}); const lB=document.getElementById('ammo-logs-body');let lh='';ammoLogs.forEach(lg=>{lh+=`<tr><td class="p-3 text-xs text-gray-500">${new Date(lg.date).toLocaleDateString('he-IL')} ${new Date(lg.date).toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})}</td><td class="p-3 font-bold">${escapeHTML(lg.type)}</td><td class="p-3 font-mono text-red-600" dir="ltr">-${lg.amount}</td><td class="p-3 text-gray-600 text-sm">${escapeHTML(lg.reason)}</td><td class="p-3 text-center w-16"><button onclick="deleteAmmoLog('${lg.id}','${escapeHTML(lg.type)}',${lg.amount})" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button></td></tr>`;});lB.innerHTML=lh||`<tr><td colspan="5" class="p-6 text-center text-gray-400">אין תיעוד</td></tr>`; } window.deleteAmmoLog=async(id,type,qty)=>{if(confirm(`למחוק דיווח? (${qty} יוחזרו)`)){try{await deleteDoc(doc(db,'ammo_logs',id));const c=ammoData[type]||0;await setDoc(doc(db,'logistics','ammo'),{[type]:c+qty},{merge:true});showToast("נמחק ועודכן");}catch(e){}}}; window.deleteAmmoType=async(type)=>{if(confirm(`למחוק סוג ${type}?`)){const nd={...ammoData};delete nd[type];await setDoc(doc(db,'logistics','ammo'),nd);showToast("נמחק");}}; window.openAmmoUpdateModal=()=>{document.getElementById('upd-ammo-type').value='';document.getElementById('upd-ammo-qty').value='';document.getElementById('ammo-update-modal').classList.remove('hidden');document.getElementById('ammo-update-modal').classList.add('flex');}; window.closeAmmoUpdateModal=()=>{document.getElementById('ammo-update-modal').classList.add('hidden');document.getElementById('ammo-update-modal').classList.remove('flex');}; window.submitAmmoUpdate=async()=>{const t=document.getElementById('upd-ammo-type').value.trim(),q=parseInt(document.getElementById('upd-ammo-qty').value);if(!t||isNaN(q))return;try{await setDoc(doc(db,'logistics','ammo'),{[t]:q},{merge:true});closeAmmoUpdateModal();}catch(e){}}; function populateAmmoSelects(){const sl=document.getElementById('shoot-ammo-type');sl.innerHTML='<option value="">בחר...</option>';Object.keys(ammoData).forEach(t=>sl.innerHTML+=`<option value="${t}">${t} (קיים: ${ammoData[t]})</option>`);} window.openShootReportModal=()=>{document.getElementById('shoot-ammo-qty').value='';document.getElementById('shoot-ammo-reason').value='';document.getElementById('shoot-report-modal').classList.remove('hidden');document.getElementById('shoot-report-modal').classList.add('flex');}; window.closeShootReportModal=()=>{document.getElementById('shoot-report-modal').classList.add('hidden');document.getElementById('shoot-report-modal').classList.remove('flex');}; window.submitShootReport=async()=>{const t=document.getElementById('shoot-ammo-type').value,q=parseInt(document.getElementById('shoot-ammo-qty').value),r=document.getElementById('shoot-ammo-reason').value.trim();if(!t||isNaN(q)||q<=0||!r)return;const c=ammoData[t]||0;if(q>c)return showToast("אין מספיק",true);try{await setDoc(doc(db,'logistics','ammo'),{[t]:c-q},{merge:true});await addDoc(collection(db,'ammo_logs'),{type:t,amount:q,reason:r,date:new Date().toISOString()});closeShootReportModal();}catch(e){}}; window.exportAmmo=()=>{let c="סוג תחמושת,כמות במלאי\n";Object.keys(ammoData).forEach(k=>c+=`"${k}","${ammoData[k]}"\n`);const u=URL.createObjectURL(new Blob(["\uFEFF"+c],{type:'text/csv;charset=utf-8;'}));const l=document.createElement("a");l.href=u;l.download="מלאי_תחמושת.csv";document.body.appendChild(l);l.click();document.body.removeChild(l);}; window.importAmmoExcel=async(e)=>{const f=e.target.files[0];if(!f)return;showToast("קורא תחמושת...");const r=new FileReader();r.onload=async(ev)=>{try{const rows=XLSX.utils.sheet_to_json(XLSX.read(new Uint8Array(ev.target.result),{type:'array'}).Sheets[XLSX.read(new Uint8Array(ev.target.result),{type:'array'}).SheetNames[0]],{header:1,defval:""});let u=0;const up={};if(rows.length>0){for(let i=1;i<rows.length;i++){const t=String(rows[i][0]||'').trim(),q=parseInt(String(rows[i][1]||'').replace(/,/g,'').trim());if(t&&!isNaN(q)){up[t]=q;u++;}}}if(u>0){await setDoc(doc(db,'logistics','ammo'),up,{merge:true});showToast(`${u} עודכנו.`);}}catch(err){}e.target.value='';};r.readAsArrayBuffer(f);};
 
         // ================= SOLDIER EQUIPMENT MODAL (טופס 1008 + מנפקים) =================
         function populateIssuers() {
@@ -630,7 +603,7 @@
                 let h=''; as.forEach(i => {
                     const dt = i.assignedAt ? new Date(i.assignedAt).toLocaleDateString('he-IL') : "-";
                     h+=`<tr>
-                        <td class="p-3 w-8"><input type="checkbox" class="eq-item-cb w-4 h-4" value="${i.id}"></td>
+                        <td class="p-3 w-8 logistics-only"><input type="checkbox" class="eq-item-cb w-4 h-4" value="${i.id}"></td>
                         <td class="p-3 font-medium text-gray-800">${escapeHTML(i.name)}</td>
                         <td class="p-3 font-mono text-blue-600 text-sm" dir="ltr">${escapeHTML(i.serial)}</td>
                         <td class="p-3 text-sm text-gray-600">${dt}</td>
@@ -785,17 +758,11 @@
                             await navigator.share({
                                 files: [file],
                                 title: fileName,
-                                text: 'מצורף טופס הציוד שלך.'
+                                text: 'מצורף ' + (currentPrintType === '1008' ? 'טופס 1008' : 'אישור זיכוי') + ' שלך.'
                             });
-                        } catch (err) {
-                            console.error('Share canceled or failed', err);
-                        }
+                        } catch (err) { }
                     } else {
-                        // Fallback download if share API is not available (desktop/old browser)
-                        const a = document.createElement('a');
-                        a.href = URL.createObjectURL(blob);
-                        a.download = fileName;
-                        a.click();
+                        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fileName; a.click();
                         showToast("הורד למכשיר (שיתוף ישיר לא נתמך בדפדפן זה)");
                     }
                 }, 'image/png');
