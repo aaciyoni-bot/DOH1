@@ -93,18 +93,20 @@
 
             <!-- Table -->
             <div class="flex-grow overflow-auto table-container relative">
-                <table class="w-full text-right border-collapse min-w-[600px]">
-                    <thead class="bg-gray-50 text-gray-600 sticky top-0 z-10 shadow-sm">
+                <table class="w-full text-right border-collapse min-w-[800px]">
+                    <thead class="bg-gray-50 text-gray-600 sticky top-0 z-10 shadow-sm text-sm">
                         <tr>
                             <th class="p-4 font-semibold w-12 text-center">#</th>
-                            <th class="p-4 font-semibold w-1/4">שם החייל</th>
-                            <th class="p-4 font-semibold w-1/5">מחלקה/תפקיד</th>
-                            <th class="p-4 font-semibold w-1/4">סטטוס יומי</th>
-                            <th class="p-4 font-semibold w-24 text-center">פעולות</th>
+                            <th class="p-4 font-semibold">שם החייל</th>
+                            <th class="p-4 font-semibold">מספר אישי</th>
+                            <th class="p-4 font-semibold">טלפון</th>
+                            <th class="p-4 font-semibold">תפקיד</th>
+                            <th class="p-4 font-semibold w-48">סטטוס יומי</th>
+                            <th class="p-4 font-semibold w-20 text-center">פעולות</th>
                         </tr>
                     </thead>
-                    <tbody id="soldiers-table-body" class="divide-y divide-gray-100 bg-white">
-                        <tr><td colspan="5" class="p-8 text-center text-gray-500">טוען נתונים מהשרת...</td></tr>
+                    <tbody id="soldiers-table-body" class="divide-y divide-gray-100 bg-white text-sm">
+                        <tr><td colspan="7" class="p-8 text-center text-gray-500">טוען נתונים מהשרת...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -119,26 +121,40 @@
 
     <!-- Add Soldier Modal -->
     <div id="add-soldier-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 transform transition-all">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 transform transition-all max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-5">
                 <h3 class="text-xl font-bold text-gray-800">הוספת חייל למצבת</h3>
                 <button onclick="closeAddSoldierModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             <form id="add-soldier-form" onsubmit="submitNewSoldier(event)">
                 <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">שם מלא</label>
+                    <label class="block text-gray-700 text-sm font-bold mb-2">שם מלא *</label>
                     <input type="text" id="new-soldier-name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
-                <div class="mb-5">
-                    <label class="block text-gray-700 text-sm font-bold mb-2">מחלקה / תפקיד</label>
-                    <input type="text" id="new-soldier-dept" required list="dept-options" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="למשל: מפלג, אספקה, נהגים...">
+                <div class="mb-4 flex gap-4">
+                    <div class="w-1/2">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">מספר אישי</label>
+                        <input type="text" id="new-soldier-id" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="w-1/2">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">טלפון</label>
+                        <input type="text" id="new-soldier-phone" dir="ltr" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">תפקיד</label>
+                    <input type="text" id="new-soldier-role" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="למשל: נהג, חובש, מ''פ...">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">מחלקה (לשונית) *</label>
+                    <input type="text" id="new-soldier-dept" required list="dept-options" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="למשל: מפלג, אספקה...">
                     <datalist id="dept-options">
                         <!-- Options generated dynamically -->
                     </datalist>
                 </div>
                 <div class="flex justify-end gap-3">
                     <button type="button" onclick="closeAddSoldierModal()" class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition">ביטול</button>
-                    <button type="submit" class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition shadow-md">הוסף חייל</button>
+                    <button type="submit" class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition shadow-md">שמור חייל</button>
                 </div>
             </form>
         </div>
@@ -184,7 +200,6 @@
 
         async function init() {
             try {
-                // Initialize Firebase Configuration
                 const firebaseConfig = {
                     apiKey: "AIzaSyCxBF1xT5n5SPR62GWkDdMerrp3QSRKQ-g",
                     authDomain: "doh1-1cdde.firebaseapp.com",
@@ -200,12 +215,10 @@
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                // Authenticate Anonymously (Requires Auth -> Anonymous enabled in Firebase Console)
                 const userCredential = await signInAnonymously(auth);
                 currentUser = userCredential.user;
                 document.getElementById('connection-status').innerHTML = '<i class="fa-solid fa-circle text-green-400 text-xs"></i> מחובר לענן';
 
-                // Set today's date
                 const dateInput = document.getElementById('date-picker');
                 const today = new Date();
                 const yyyy = today.getFullYear();
@@ -214,36 +227,26 @@
                 dateInput.value = `${yyyy}-${mm}-${dd}`;
                 
                 dateInput.addEventListener('change', handleDateChange);
-
-                // Setup midnight auto-refresh
                 setupMidnightRefresh();
-
-                // Start fetching data
                 startDataListeners();
 
             } catch (err) {
                 console.error("Initialization error:", err);
                 document.getElementById('connection-status').innerHTML = `<i class="fa-solid fa-triangle-exclamation text-red-400"></i> שגיאת חיבור`;
-                showToast("שגיאה בהתחברות לשרת. ודא שהגדרת את Firestore נכון.", true);
+                showToast("שגיאה בהתחברות לשרת.", true);
             }
         }
 
-        // Midnight Auto-refresh Function
         function setupMidnightRefresh() {
             const now = new Date();
             const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
             tomorrow.setHours(0, 0, 0, 0);
             const msUntilMidnight = tomorrow - now;
-            
-            setTimeout(() => {
-                window.location.reload(); 
-            }, msUntilMidnight);
+            setTimeout(() => { window.location.reload(); }, msUntilMidnight);
         }
 
         function startDataListeners() {
             if (!currentUser) return;
-
-            // Listen to Soldiers (Roster)
             const soldiersRef = collection(db, 'soldiers_roster');
             
             if (unsubSoldiers) unsubSoldiers();
@@ -259,20 +262,12 @@
                     }
                 });
                 
-                // Sort by name
                 soldiers.sort((a, b) => a.name.localeCompare(b.name, 'he'));
-                
                 updateTabsUI();
                 updateDatalist();
                 renderTable();
-            }, (error) => {
-                console.error("Error fetching soldiers:", error);
-                if(error.code === 'permission-denied') {
-                    showToast("אין הרשאות לקרוא נתונים. ודא שהגדרת Rules נכון ב-Firestore.", true);
-                }
             });
 
-            // Listen to Daily Statuses
             listenToDailyStatus();
         }
 
@@ -300,12 +295,10 @@
             const container = document.getElementById('tabs-container');
             container.innerHTML = '';
             
-            // Convert set to array and keep "הכל" first
             let deptsArray = Array.from(departments);
             deptsArray = deptsArray.filter(d => d !== "הכל").sort();
             deptsArray.unshift("הכל");
 
-            // Make sure active tab still exists, otherwise default to "הכל"
             if (!deptsArray.includes(activeTab)) {
                 activeTab = "הכל";
             }
@@ -314,12 +307,10 @@
                 const btn = document.createElement('button');
                 btn.textContent = dept;
                 
-                // Count soldiers in this tab
                 const count = dept === "הכל" ? soldiers.length : soldiers.filter(s => s.department === dept).length;
                 
                 btn.className = `px-4 py-2 rounded-t-lg transition whitespace-nowrap text-sm sm:text-base flex gap-2 items-center ${activeTab === dept ? 'tab-active bg-white' : 'tab-inactive bg-gray-50/50 hover:bg-gray-100'}`;
                 
-                // Badge for count
                 const badge = document.createElement('span');
                 badge.className = `text-xs px-2 py-0.5 rounded-full ${activeTab === dept ? 'bg-blue-100 text-blue-700' : 'bg-gray-200 text-gray-600'}`;
                 badge.textContent = count;
@@ -357,7 +348,7 @@
             let reportedCount = 0;
 
             if (filteredSoldiers.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-500 bg-gray-50 border-b border-gray-100">אין חיילים במחלקה זו.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500 bg-gray-50 border-b border-gray-100">אין חיילים במחלקה זו.</td></tr>`;
             } else {
                 filteredSoldiers.forEach((soldier, index) => {
                     const currentStatus = dailyStatusMap[soldier.id] || "לא דווח";
@@ -366,7 +357,6 @@
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-blue-50/50 transition border-b border-gray-100";
                     
-                    // Create dropdown HTML
                     let selectHtml = `<select onchange="updateStatus('${soldier.id}', this.value)" class="w-full p-2 border rounded shadow-sm focus:ring-blue-500 text-sm appearance-none cursor-pointer text-center outline-none transition `;
                     
                     const activeOpt = STATUS_OPTIONS.find(o => o.val === currentStatus) || STATUS_OPTIONS[0];
@@ -378,10 +368,17 @@
                     });
                     selectHtml += `</select>`;
 
+                    // Handling values
+                    const pId = soldier.personalId || '-';
+                    const phone = soldier.phone || '-';
+                    const role = soldier.role || '-';
+
                     tr.innerHTML = `
                         <td class="p-3 text-center text-gray-400 font-medium">${index + 1}</td>
                         <td class="p-3 font-medium text-gray-900">${escapeHTML(soldier.name)}</td>
-                        <td class="p-3 text-gray-600"><span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">${escapeHTML(soldier.department)}</span></td>
+                        <td class="p-3 text-gray-600">${escapeHTML(pId)}</td>
+                        <td class="p-3 text-gray-600" dir="ltr" style="text-align: right;">${escapeHTML(phone)}</td>
+                        <td class="p-3 text-gray-600"><span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs whitespace-nowrap">${escapeHTML(role)}</span></td>
                         <td class="p-3">${selectHtml}</td>
                         <td class="p-3 text-center">
                             <button onclick="confirmDelete('${soldier.id}', '${escapeHTML(soldier.name).replace(/'/g, "\\'")}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded transition" title="מחק חייל">
@@ -428,6 +425,9 @@
 
             const name = document.getElementById('new-soldier-name').value.trim();
             const dept = document.getElementById('new-soldier-dept').value.trim();
+            const personalId = document.getElementById('new-soldier-id').value.trim();
+            const phone = document.getElementById('new-soldier-phone').value.trim();
+            const role = document.getElementById('new-soldier-role').value.trim();
 
             if (!name || !dept) return;
 
@@ -435,13 +435,16 @@
                 await addDoc(collection(db, 'soldiers_roster'), {
                     name: name,
                     department: dept,
+                    personalId: personalId,
+                    phone: phone,
+                    role: role,
                     createdAt: new Date().toISOString()
                 });
                 closeAddSoldierModal();
                 showToast(`החייל ${name} נוסף בהצלחה`);
                 
                 if (activeTab !== "הכל" && activeTab !== dept) {
-                     activeTab = dept; // Switch to the new tab if created
+                     activeTab = dept; 
                 }
             } catch (error) {
                 console.error("Error adding soldier:", error);
@@ -529,7 +532,7 @@
             showToast(`הייבוא האחרון בוטל (${deletedCount} חיילים נמחקו).`);
         };
 
-        // Excel Import Logic (Reads ALL Tabs Automatically)
+        // Excel & CSV Import Logic 
         window.processExcel = async (event) => {
             if (!currentUser) {
                 showToast("יש להתחבר תחילה למסד הנתונים.", true);
@@ -541,9 +544,9 @@
             const isCSV = file.name.toLowerCase().endsWith('.csv');
             let csvDeptName = "";
             if (isCSV) {
-                csvDeptName = prompt("מכיוון שזהו קובץ CSV, אנא הקלד את שם הלשונית/המחלקה שאליה ישויכו החיילים מקובץ זה (למשל: מפלג, אספקה):", "מחלקה כללית");
+                csvDeptName = prompt("מכיוון שזהו קובץ CSV, הקלד את שם המחלקה (לשונית) שאליה ישויכו החיילים:", "מחלקה כללית");
                 if (!csvDeptName) {
-                    event.target.value = ''; // Cancelled
+                    event.target.value = ''; 
                     return;
                 }
             }
@@ -559,27 +562,30 @@
                     
                     let added = 0;
                     
-                    // Loop through EVERY tab (sheet) in the Excel file
                     for (const sheetName of workbook.SheetNames) {
                         const worksheet = workbook.Sheets[sheetName];
                         const rows = XLSX.utils.sheet_to_json(worksheet, {header: 1, defval: ""});
                         
                         if (rows.length === 0) continue;
 
-                        let nameIndex = -1;
+                        let nameIndex = -1, roleIndex = -1, idIndex = -1, phoneIndex = -1;
                         
-                        // Find "שם" column in this specific tab
+                        // Find header columns based on user's structure (A=שם, B=תפקיד, C=מספר אישי, D=טלפון)
                         for (let i = 0; i < Math.min(rows.length, 30); i++) {
                             const cols = rows[i].map(c => String(c).trim());
                             if (cols.includes('שם')) {
                                 nameIndex = cols.indexOf('שם');
+                                roleIndex = cols.indexOf('תפקיד');
+                                idIndex = cols.indexOf('מספר אישי');
+                                // sometimes phone header has spaces 'טלפון ' 
+                                phoneIndex = cols.findIndex(c => c.includes('טלפון'));
                                 break;
                             }
                         }
 
-                        if (nameIndex === -1) continue; // Skip tab if no name column found
+                        if (nameIndex === -1) continue;
 
-                        // Add soldiers from this tab
+                        // Add soldiers
                         for (let i = 0; i < rows.length; i++) {
                             const cols = rows[i].map(c => String(c).trim());
                             if (cols.length <= nameIndex) continue;
@@ -587,13 +593,18 @@
                             const name = cols[nameIndex];
                             if (!name || name === 'שם' || name.includes('סה"כ')) continue;
                             
-                            // MAGIC: If CSV, use the user-provided name. Else, use the Tab name!
                             const finalDeptName = isCSV ? csvDeptName : sheetName;
+                            const role = roleIndex > -1 ? cols[roleIndex] : "";
+                            const personalId = idIndex > -1 ? cols[idIndex] : "";
+                            const phone = phoneIndex > -1 ? cols[phoneIndex] : "";
 
                             try {
                                 await addDoc(collection(db, 'soldiers_roster'), {
                                     name: name,
                                     department: finalDeptName,
+                                    role: role,
+                                    personalId: personalId,
+                                    phone: phone,
                                     createdAt: new Date().toISOString(),
                                     importId: importId
                                 });
@@ -675,11 +686,11 @@
                 : soldiers.filter(s => s.department === activeTab);
 
             let csvContent = "data:text/csv;charset=utf-8,%EF%BB%BF"; // BOM for Hebrew
-            csvContent += "שם החייל,מחלקה,סטטוס ב-" + date + "\n";
+            csvContent += "שם החייל,מספר אישי,טלפון,תפקיד,מחלקה,סטטוס ב-" + date + "\n";
 
             filteredSoldiers.forEach(s => {
                 const stat = dailyStatusMap[s.id] || "לא דווח";
-                csvContent += `"${s.name}","${s.department}","${stat}"\n`;
+                csvContent += `"${s.name || ''}","${s.personalId || ''}","${s.phone || ''}","${s.role || ''}","${s.department || ''}","${stat}"\n`;
             });
 
             const encodedUri = encodeURI(csvContent);
