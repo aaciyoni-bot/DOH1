@@ -3,142 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מערכת דוח 1 - מפלג ואספקה</title>
+    <title>מערכת דוח 1 - מילואים</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap');
-        body {
-            font-family: 'Heebo', sans-serif;
-            background-color: #f3f4f6;
-        }
-        /* Custom scrollbar for better aesthetics */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #a1a1aa; 
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #71717a; 
-        }
-        .tab-active {
-            border-bottom-width: 4px;
-            border-color: #15803d; /* Tailwind green-700 */
-            color: #15803d;
-            font-weight: 700;
-        }
-        .tab-inactive {
-            color: #6b7280; /* Tailwind gray-500 */
-            font-weight: 500;
-        }
-        .tab-inactive:hover {
-            color: #374151; /* Tailwind gray-700 */
-            border-bottom-width: 4px;
-            border-color: #d1d5db;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Rubik', sans-serif; background-color: #f3f4f6; }
+        
+        /* Custom scrollbar for table */
+        .table-container::-webkit-scrollbar { height: 8px; width: 8px; }
+        .table-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .table-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .tab-active { border-bottom: 3px solid #2563eb; color: #2563eb; font-weight: 600; }
+        .tab-inactive { border-bottom: 3px solid transparent; color: #6b7280; }
+        .tab-inactive:hover { color: #374151; border-bottom: 3px solid #d1d5db; }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
+<body class="text-gray-800 antialiased min-h-screen flex flex-col">
 
-    <!-- App Header -->
-    <header class="bg-green-800 text-white shadow-md z-10 relative">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <i class="fa-solid fa-clipboard-list text-2xl"></i>
-                <h1 class="text-xl font-bold tracking-wide">ניהול דוח 1 - מילואים</h1>
+    <header class="bg-blue-900 text-white shadow-md sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 py-4 sm:flex sm:items-center sm:justify-between">
+            <div class="flex items-center gap-3 mb-4 sm:mb-0">
+                <i class="fa-solid fa-clipboard-user text-3xl text-blue-300"></i>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight">מערכת דוח 1</h1>
+                    <p class="text-blue-200 text-sm" id="connection-status">מתחבר לשרת...</p>
+                </div>
             </div>
             
-            <div class="flex items-center gap-4 w-full sm:w-auto bg-green-900 px-4 py-2 rounded-lg">
-                <label for="date-picker" class="font-medium text-sm whitespace-nowrap"><i class="fa-regular fa-calendar-days ml-1"></i> תאריך דיווח:</label>
-                <input type="date" id="date-picker" class="bg-transparent border-b border-green-500 text-white focus:outline-none focus:border-white w-full sm:w-auto text-center" />
-            </div>
-
-            <div class="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
-                <button onclick="copySummary()" class="flex-1 sm:flex-none bg-green-600 hover:bg-green-500 transition px-4 py-2 rounded shadow text-sm font-medium whitespace-nowrap">
-                    <i class="fa-brands fa-whatsapp ml-1"></i> העתק דיווח
-                </button>
-                <button onclick="exportToCSV()" class="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-500 transition px-4 py-2 rounded shadow text-sm font-medium whitespace-nowrap">
-                    <i class="fa-solid fa-file-excel ml-1"></i> ייצוא לאקסל
-                </button>
+            <div class="flex items-center bg-blue-800 rounded-lg p-2 shadow-inner">
+                <i class="fa-regular fa-calendar-days ml-3 text-blue-200"></i>
+                <input type="date" id="date-picker" class="bg-transparent text-white border-none focus:ring-0 cursor-pointer font-medium outline-none">
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="flex-grow max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-6 w-full flex flex-col">
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 py-6 flex flex-col">
         
-        <div class="bg-white shadow rounded-t-lg overflow-hidden border-b border-gray-200">
-            <div class="flex overflow-x-auto no-scrollbar" id="tabs-container">
-                <!-- Tabs will be injected here -->
-                <div class="px-6 py-3 tab-active cursor-pointer whitespace-nowrap transition">כללי</div>
-            </div>
-        </div>
+        <!-- Action Buttons Row -->
+        <div class="flex flex-wrap gap-3 justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6">
+            <div class="flex flex-wrap gap-2">
+                <!-- Import CSV Button -->
+                <input type="file" id="csv-file-input" accept=".csv" class="hidden" onchange="processCSV(event)">
+                <button onclick="document.getElementById('csv-file-input').click()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition text-sm font-medium flex items-center gap-2">
+                    <i class="fa-solid fa-file-import"></i>
+                    <span>ייבוא מאקסל (CSV)</span>
+                </button>
 
-        <!-- Content Area -->
-        <div class="bg-white shadow rounded-b-lg flex-grow p-4 sm:p-6 overflow-hidden flex flex-col relative">
-            
-            <!-- Tools Row -->
-            <div class="flex justify-between items-center mb-4 border-b pb-4">
-                <h2 id="current-tab-title" class="text-xl font-bold text-gray-800">מעלים נתונים...</h2>
-                <button onclick="openAddSoldierModal()" class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded shadow transition text-sm font-medium flex items-center gap-2">
+                <!-- Add Soldier Button -->
+                <button onclick="openAddSoldierModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition text-sm font-medium flex items-center gap-2">
                     <i class="fa-solid fa-user-plus"></i>
-                    <span class="hidden sm:inline">הוסף חייל למצבת</span>
+                    <span>הוסף חייל</span>
                 </button>
             </div>
 
-            <!-- Table Container -->
-            <div class="overflow-x-auto flex-grow rounded-lg border border-gray-200">
-                <table class="w-full text-right border-collapse">
-                    <thead class="bg-gray-100 text-gray-700 text-sm border-b-2 border-gray-300">
+            <div class="flex flex-wrap gap-2 mt-2 sm:mt-0">
+                <!-- Export to Excel/CSV -->
+                <button onclick="exportToCSV()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition text-sm font-medium flex items-center gap-2 border border-gray-300">
+                    <i class="fa-solid fa-file-csv"></i>
+                    <span class="hidden sm:inline">ייצוא נתונים</span>
+                </button>
+                
+                <!-- WhatsApp Summary -->
+                <button onclick="copySummary()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow transition text-sm font-medium flex items-center gap-2">
+                    <i class="fa-brands fa-whatsapp text-lg"></i>
+                    <span>העתק דיווח לוואטסאפ</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex-grow flex flex-col overflow-hidden">
+            <!-- Tabs Navigation -->
+            <div class="border-b border-gray-200 bg-gray-50/50 overflow-x-auto">
+                <nav class="flex gap-2 px-4 py-2" id="tabs-container" aria-label="Tabs">
+                    <!-- Tabs will be injected here -->
+                    <button class="tab-active px-4 py-2 rounded-t-lg transition whitespace-nowrap">מעלים...</button>
+                </nav>
+            </div>
+
+            <!-- Table -->
+            <div class="flex-grow overflow-auto table-container relative">
+                <table class="w-full text-right border-collapse min-w-[600px]">
+                    <thead class="bg-gray-50 text-gray-600 sticky top-0 z-10 shadow-sm">
                         <tr>
-                            <th class="p-3 font-semibold w-12 text-center">#</th>
-                            <th class="p-3 font-semibold">שם החייל</th>
-                            <th class="p-3 font-semibold hidden sm:table-cell">מחלקה</th>
-                            <th class="p-3 font-semibold w-48">סטטוס דוח 1</th>
-                            <th class="p-3 font-semibold w-16 text-center">פעולות</th>
+                            <th class="p-4 font-semibold w-12 text-center">#</th>
+                            <th class="p-4 font-semibold w-1/4">שם החייל</th>
+                            <th class="p-4 font-semibold w-1/5">מחלקה/תפקיד</th>
+                            <th class="p-4 font-semibold w-1/4">סטטוס יומי</th>
+                            <th class="p-4 font-semibold w-24 text-center">פעולות</th>
                         </tr>
                     </thead>
-                    <tbody id="soldiers-table-body" class="divide-y divide-gray-200 text-gray-800">
-                        <!-- Rows injected here -->
+                    <tbody id="soldiers-table-body" class="divide-y divide-gray-100 bg-white">
                         <tr><td colspan="5" class="p-8 text-center text-gray-500">טוען נתונים מהשרת...</td></tr>
                     </tbody>
                 </table>
             </div>
-
+            
+            <!-- Summary Footer -->
+            <div class="bg-gray-50 p-4 border-t border-gray-200 flex justify-between items-center text-sm">
+                <span class="text-gray-600">סה"כ במצבת: <strong id="total-count" class="text-gray-900">0</strong></span>
+                <span class="text-gray-600">דווחו היום: <strong id="reported-count" class="text-blue-600">0</strong></span>
+            </div>
         </div>
     </main>
 
     <!-- Add Soldier Modal -->
-    <div id="add-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex justify-center items-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
-            <div class="bg-gray-100 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                <h3 class="text-lg font-bold text-gray-800"><i class="fa-solid fa-user-plus ml-2 text-green-700"></i>הוספת חייל למצבת הקבועה</h3>
-                <button onclick="closeModal('add-modal')" class="text-gray-500 hover:text-red-500 transition"><i class="fa-solid fa-times text-xl"></i></button>
+    <div id="add-soldier-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 transform transition-all">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-xl font-bold text-gray-800">הוספת חייל למצבת</h3>
+                <button onclick="closeAddSoldierModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
-            <div class="p-6 space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">שם מלא</label>
-                    <input type="text" id="new-soldier-name" class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="לדוגמה: ישראל ישראלי">
+            <form id="add-soldier-form" onsubmit="submitNewSoldier(event)">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">שם מלא</label>
+                    <input type="text" id="new-soldier-name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">מחלקה / צוות</label>
-                    <input type="text" id="new-soldier-dept" list="dept-list" class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-green-500 focus:outline-none" placeholder="בחר מרשימה או הקלד חדש (למשל: מפלג)">
-                    <datalist id="dept-list">
-                        <option value="מפלג"></option>
-                        <option value="אספקה"></option>
+                <div class="mb-5">
+                    <label class="block text-gray-700 text-sm font-bold mb-2">מחלקה / תפקיד</label>
+                    <input type="text" id="new-soldier-dept" required list="dept-options" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="למשל: מפלג, אספקה, נהגים...">
+                    <datalist id="dept-options">
+                        <!-- Options generated dynamically -->
                     </datalist>
                 </div>
-            </div>
-            <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
-                <button onclick="closeModal('add-modal')" class="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-100 transition">ביטול</button>
-                <button onclick="saveNewSoldier()" class="px-4 py-2 bg-green-700 text-white rounded hover:bg-green-800 transition shadow">שמור במצבת</button>
-            </div>
+                <div class="flex justify-end gap-3">
+                    <button type="button" onclick="closeAddSoldierModal()" class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition">ביטול</button>
+                    <button type="submit" class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition shadow-md">הוסף חייל</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -150,59 +144,62 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, collection, onSnapshot, setDoc, deleteDoc, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Global State
         let db;
         let auth;
         let currentUser = null;
-        let appId = typeof __app_id !== 'undefined' ? __app_id : 'default-doach1-app';
-        
-        let soldiers = []; // The static roster
-        let dailyStatusMap = {}; // { soldierId: "status" } for the selected date
+        let soldiers = [];
+        let dailyStatusMap = {};
         let departments = new Set(["הכל", "מפלג", "אספקה"]);
         let activeTab = "הכל";
         
-        // Unsubscribe functions for real-time listeners
         let unsubSoldiers = null;
         let unsubDaily = null;
 
+        // Expanded Statuses
         const STATUS_OPTIONS = [
-            { val: "לא דווח", color: "text-gray-500 bg-gray-100" },
-            { val: "בבסיס", color: "text-green-800 bg-green-100" },
-            { val: "בחופשה", color: "text-blue-800 bg-blue-100" },
-            { val: "השתחרר מהמילואים", color: "text-purple-800 bg-purple-100" },
-            { val: "גימלים", color: "text-red-800 bg-red-100" }
+            { val: "לא דווח", color: "text-gray-500 bg-gray-100 border-gray-200", emoji: "⚪" },
+            { val: "נוכח", color: "text-green-800 bg-green-100 border-green-200", emoji: "🟢" },
+            { val: "אחרי משמרת", color: "text-yellow-800 bg-yellow-100 border-yellow-200", emoji: "🟡" },
+            { val: "חופשה", color: "text-blue-800 bg-blue-100 border-blue-200", emoji: "🔵" },
+            { val: "הגנש", color: "text-orange-800 bg-orange-100 border-orange-200", emoji: "🟠" },
+            { val: "רם 2", color: "text-red-800 bg-red-100 border-red-200", emoji: "🏥" },
+            { val: "גימלים", color: "text-red-900 bg-red-200 border-red-300", emoji: "🤒" },
+            { val: "אבטש", color: "text-purple-800 bg-purple-100 border-purple-200", emoji: "🛡️" },
+            { val: "השתחרר", color: "text-teal-800 bg-teal-100 border-teal-200", emoji: "✌️" },
+            { val: "בבית", color: "text-gray-700 bg-gray-200 border-gray-300", emoji: "🏠" },
+            { val: "עריץ/נפקד", color: "text-pink-800 bg-pink-100 border-pink-200", emoji: "❌" }
         ];
 
         async function init() {
             try {
-                // Initialize Firebase
-                const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-                    // Fallback dummy config for local testing if needed
-                    projectId: "dummy-project"
+                // Initialize Firebase Configuration
+                const firebaseConfig = {
+                    apiKey: "AIzaSyCxBF1xT5n5SPR62GWkDdMerrp3QSRKQ-g",
+                    authDomain: "doh1-1cdde.firebaseapp.com",
+                    databaseURL: "https://doh1-1cdde-default-rtdb.europe-west1.firebasedatabase.app",
+                    projectId: "doh1-1cdde",
+                    storageBucket: "doh1-1cdde.firebasestorage.app",
+                    messagingSenderId: "653604638082",
+                    appId: "1:653604638082:web:73c5f6588780122cf8539b",
+                    measurementId: "G-9LL5BM6BYN"
                 };
                 
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
 
-                // Authenticate (Strictly following Rule 3)
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    const userCredential = await signInWithCustomToken(auth, __initial_auth_token);
-                    currentUser = userCredential.user;
-                } else {
-                    const userCredential = await signInAnonymously(auth);
-                    currentUser = userCredential.user;
-                }
-
-                if (!currentUser) throw new Error("Authentication failed");
+                // Authenticate Anonymously (Requires Auth -> Anonymous enabled in Firebase Console)
+                const userCredential = await signInAnonymously(auth);
+                currentUser = userCredential.user;
+                document.getElementById('connection-status').innerHTML = '<i class="fa-solid fa-circle text-green-400 text-xs"></i> מחובר לענן';
 
                 // Set today's date
                 const dateInput = document.getElementById('date-picker');
                 const today = new Date();
-                // Format correctly to local timezone YYYY-MM-DD
                 const yyyy = today.getFullYear();
                 const mm = String(today.getMonth() + 1).padStart(2, '0');
                 const dd = String(today.getDate()).padStart(2, '0');
@@ -210,384 +207,17 @@
                 
                 dateInput.addEventListener('change', handleDateChange);
 
+                // Setup midnight auto-refresh
+                setupMidnightRefresh();
+
                 // Start fetching data
                 startDataListeners();
 
             } catch (err) {
                 console.error("Initialization error:", err);
-                showToast("שגיאה בהתחברות למסד הנתונים.", true);
+                document.getElementById('connection-status').innerHTML = `<i class="fa-solid fa-triangle-exclamation text-red-400"></i> שגיאת חיבור`;
+                showToast("שגיאה בהתחברות לשרת. ודא שהגדרת את Firestore נכון.", true);
             }
-        }
-
-        function startDataListeners() {
-            if (!currentUser) return;
-
-            // Paths based on Rule 1 (Public collaborative data)
-            const soldiersRef = collection(db, 'artifacts', appId, 'public', 'data', 'soldiers');
-            
-            // Listen to Soldiers roster
-            unsubSoldiers = onSnapshot(soldiersRef, (snapshot) => {
-                soldiers = [];
-                departments = new Set(["הכל"]); // Reset departments
-                
-                snapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-                    soldiers.push({ id: docSnap.id, ...data });
-                    if (data.department) departments.add(data.department);
-                });
-
-                // Sort soldiers by name
-                soldiers.sort((a, b) => a.name.localeCompare(b.name, 'he'));
-                
-                updateTabsUI();
-                renderTable();
-            }, (error) => {
-                console.error("Error fetching soldiers:", error);
-                showToast("שגיאה בטעינת מצבת החיילים.", true);
-            });
-
-            // Initial fetch of daily statuses
-            handleDateChange(); 
-        }
-
-        function handleDateChange() {
-            const selectedDate = document.getElementById('date-picker').value;
-            if (!selectedDate || !currentUser) return;
-
-            // Unsubscribe from previous date if exists
-            if (unsubDaily) unsubDaily();
-
-            const dailyDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'daily_reports', selectedDate);
-            
-            unsubDaily = onSnapshot(dailyDocRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    dailyStatusMap = docSnap.data() || {};
-                } else {
-                    dailyStatusMap = {};
-                }
-                renderTable(); // Re-render to show statuses for the new date
-            }, (error) => {
-                console.error("Error fetching daily report:", error);
-            });
-        }
-
-        // Expose to window so HTML can call it
-        window.updateStatus = async function(soldierId, newStatus) {
-            if (!currentUser) return;
-            const selectedDate = document.getElementById('date-picker').value;
-            if (!selectedDate) {
-                showToast("אנא בחר תאריך תחילה.", true);
-                return;
-            }
-
-            const dailyDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'daily_reports', selectedDate);
-            
-            // Optimistic UI Update
-            dailyStatusMap[soldierId] = newStatus;
-            
-            // Update Select styling immediately
-            const selectEl = document.getElementById(`status-${soldierId}`);
-            if(selectEl) {
-                applyStatusStyle(selectEl, newStatus);
-            }
-
-            try {
-                // We use setDoc with merge: true to just update/add this soldier's status
-                await setDoc(dailyDocRef, {
-                    [soldierId]: newStatus,
-                    updatedAt: new Date().toISOString(),
-                    updatedBy: currentUser.uid
-                }, { merge: true });
-            } catch (error) {
-                console.error("Error updating status:", error);
-                showToast("שגיאה בעדכון הסטטוס.", true);
-            }
-        };
-
-        function updateTabsUI() {
-            const container = document.getElementById('tabs-container');
-            container.innerHTML = ''; // Clear
-
-            departments.forEach(dept => {
-                const tab = document.createElement('div');
-                tab.className = `px-6 py-3 cursor-pointer whitespace-nowrap transition select-none ${activeTab === dept ? 'tab-active' : 'tab-inactive'}`;
-                tab.textContent = dept;
-                tab.onclick = () => {
-                    activeTab = dept;
-                    updateTabsUI();
-                    renderTable();
-                };
-                container.appendChild(tab);
-            });
-            
-            // Update datalist for Add Modal
-            const datalist = document.getElementById('dept-list');
-            datalist.innerHTML = '';
-            departments.forEach(dept => {
-                if(dept !== "הכל") {
-                    const opt = document.createElement('option');
-                    opt.value = dept;
-                    datalist.appendChild(opt);
-                }
-            });
-        }
-
-        function renderTable() {
-            document.getElementById('current-tab-title').textContent = activeTab === "הכל" ? "כל הכוח" : `מחלקה: ${activeTab}`;
-            const tbody = document.getElementById('soldiers-table-body');
-            tbody.innerHTML = '';
-
-            let filteredSoldiers = soldiers;
-            if (activeTab !== "הכל") {
-                filteredSoldiers = soldiers.filter(s => s.department === activeTab);
-            }
-
-            if (filteredSoldiers.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-500">אין חיילים במחלקה זו. הוסף חיילים למצבת.</td></tr>`;
-                return;
-            }
-
-            filteredSoldiers.forEach((soldier, index) => {
-                const currentStatus = dailyStatusMap[soldier.id] || "לא דווח";
-                
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-50 transition";
-                
-                // Construct Status Options HTML
-                let optionsHTML = '';
-                STATUS_OPTIONS.forEach(opt => {
-                    const isSelected = currentStatus === opt.val ? 'selected' : '';
-                    optionsHTML += `<option value="${opt.val}" ${isSelected}>${opt.val}</option>`;
-                });
-
-                tr.innerHTML = `
-                    <td class="p-3 text-center text-gray-500">${index + 1}</td>
-                    <td class="p-3 font-medium text-gray-900">${escapeHTML(soldier.name)}</td>
-                    <td class="p-3 text-gray-600 hidden sm:table-cell">${escapeHTML(soldier.department || '-')}</td>
-                    <td class="p-3">
-                        <select 
-                            id="status-${soldier.id}"
-                            onchange="updateStatus('${soldier.id}', this.value)"
-                            class="w-full border-0 outline-none rounded-md px-3 py-1.5 font-medium shadow-sm focus:ring-2 focus:ring-green-500 appearance-none text-center cursor-pointer transition-colors"
-                        >
-                            ${optionsHTML}
-                        </select>
-                    </td>
-                    <td class="p-3 text-center">
-                        <button onclick="confirmDelete('${soldier.id}', '${escapeHTML(soldier.name)}')" class="text-gray-400 hover:text-red-600 transition p-1" title="מחק חייל">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-
-                // Apply initial style
-                applyStatusStyle(document.getElementById(`status-${soldier.id}`), currentStatus);
-            });
-        }
-
-        function applyStatusStyle(selectElement, statusValue) {
-            // Remove existing custom classes
-            STATUS_OPTIONS.forEach(opt => {
-                const classes = opt.color.split(' ');
-                selectElement.classList.remove(...classes);
-            });
-            // Add new class
-            const matchedOpt = STATUS_OPTIONS.find(o => o.val === statusValue) || STATUS_OPTIONS[0];
-            const newClasses = matchedOpt.color.split(' ');
-            selectElement.classList.add(...newClasses);
-        }
-
-        window.openAddSoldierModal = () => {
-            document.getElementById('new-soldier-name').value = '';
-            // Auto-fill dept if a specific tab is selected
-            document.getElementById('new-soldier-dept').value = activeTab === "הכל" ? '' : activeTab;
-            document.getElementById('add-modal').classList.remove('hidden');
-        };
-
-        window.closeModal = (modalId) => {
-            document.getElementById(modalId).classList.add('hidden');
-        };
-
-        window.saveNewSoldier = async () => {
-            if (!currentUser) return;
-            const name = document.getElementById('new-soldier-name').value.trim();
-            const dept = document.getElementById('new-soldier-dept').value.trim();
-
-            if (!name) {
-                showToast("יש להזין שם חייל", true);
-                return;
-            }
-
-            const soldiersRef = collection(db, 'artifacts', appId, 'public', 'data', 'soldiers');
-            try {
-                await addDoc(soldiersRef, {
-                    name: name,
-                    department: dept || 'כללי',
-                    createdAt: new Date().toISOString()
-                });
-                closeModal('add-modal');
-                showToast("החייל נוסף בהצלחה");
-            } catch (error) {
-                console.error("Error adding soldier:", error);
-                showToast("שגיאה בהוספת החייל", true);
-            }
-        };
-
-        window.confirmDelete = (soldierId, soldierName) => {
-            // Using a custom modal approach or confirm (Wait, prompt says NO alert/confirm under any circumstances. I will use a custom implementation or soft delete).
-            // Creating a dynamic confirmation modal:
-            const existingModal = document.getElementById('confirm-modal');
-            if(existingModal) existingModal.remove();
-
-            const modalHtml = `
-            <div id="confirm-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-                <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden">
-                    <div class="p-6 text-center">
-                        <div class="text-red-500 mb-4"><i class="fa-solid fa-triangle-exclamation text-4xl"></i></div>
-                        <h3 class="text-lg font-bold text-gray-800 mb-2">מחיקת חייל</h3>
-                        <p class="text-gray-600 mb-6">האם אתה בטוח שברצונך למחוק את החייל <strong>${soldierName}</strong> מהמצבת?</p>
-                        <div class="flex justify-center gap-3">
-                            <button onclick="document.getElementById('confirm-modal').remove()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-100 transition">ביטול</button>
-                            <button onclick="executeDelete('${soldierId}')" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition shadow">כן, מחק</button>
-                        </div>
-                    </div>
-                </div>
-            </div>`;
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-        };
-
-        window.executeDelete = async (soldierId) => {
-            if (!currentUser) return;
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'soldiers', soldierId);
-            try {
-                await deleteDoc(docRef);
-                document.getElementById('confirm-modal').remove();
-                showToast("החייל נמחק מהמצבת");
-            } catch (error) {
-                console.error("Error deleting:", error);
-                showToast("שגיאה במחיקת החייל", true);
-            }
-        };
-
-        window.copySummary = () => {
-            const date = document.getElementById('date-picker').value;
-            // Reverse date format for Hebrew view DD/MM/YYYY
-            const parts = date.split('-');
-            const prettyDate = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : date;
-            
-            let text = `*דוח 1 - ${prettyDate}*\n\n`;
-            
-            let counts = {};
-            STATUS_OPTIONS.forEach(opt => counts[opt.val] = 0);
-            
-            let missingNames = [];
-
-            soldiers.forEach(s => {
-                const stat = dailyStatusMap[s.id] || "לא דווח";
-                counts[stat]++;
-                if (stat === "לא דווח") {
-                    missingNames.push(s.name);
-                }
-            });
-
-            text += `👥 סה"כ במצבת: ${soldiers.length}\n`;
-            text += `🟢 בבסיס: ${counts["בבסיס"]}\n`;
-            text += `🔵 בחופשה: ${counts["בחופשה"]}\n`;
-            text += `🟣 שוחררו: ${counts["השתחרר מהמילואים"]}\n`;
-            if(counts["גימלים"] > 0) text += `🔴 גימלים: ${counts["גימלים"]}\n`;
-            
-            text += `\n⚪ לא דווח: ${counts["לא דווח"]}\n`;
-            if (missingNames.length > 0 && missingNames.length <= 10) {
-                text += `(חסרים דיווח: ${missingNames.join(', ')})\n`;
-            }
-
-            copyToClipboard(text);
-        };
-
-        window.exportToCSV = () => {
-            const date = document.getElementById('date-picker').value;
-            // Add BOM for Hebrew support in Excel
-            let csvContent = "\uFEFF";
-            csvContent += "שם חייל,מחלקה/צוות,סטטוס דוח 1\n";
-            
-            soldiers.forEach(s => {
-                const status = dailyStatusMap[s.id] || "לא דווח";
-                // Escape quotes just in case
-                const safeName = s.name.replace(/"/g, '""');
-                const safeDept = (s.department || "").replace(/"/g, '""');
-                csvContent += `"${safeName}","${safeDept}","${status}"\n`;
-            });
-
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.setAttribute('href', url);
-            a.setAttribute('download', `דוח_1_${date}.csv`);
-            a.style.display = 'none';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        };
-
-        function copyToClipboard(text) {
-            // Using modern clipboard API with fallback
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(text).then(() => {
-                    showToast("הסיכום הועתק ללוח!");
-                }).catch(err => {
-                    fallbackCopyTextToClipboard(text);
-                });
-            } else {
-                fallbackCopyTextToClipboard(text);
-            }
-        }
-
-        function fallbackCopyTextToClipboard(text) {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            // Avoid scrolling to bottom
-            textArea.style.top = "0";
-            textArea.style.left = "0";
-            textArea.style.position = "fixed";
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            try {
-                document.execCommand('copy');
-                showToast("הסיכום הועתק ללוח!");
-            } catch (err) {
-                showToast("שגיאה בהעתקה", true);
-            }
-            document.body.removeChild(textArea);
-        }
-
-        function showToast(message, isError = false) {
-            const toast = document.getElementById('toast');
-            const msgEl = document.getElementById('toast-msg');
-            msgEl.textContent = message;
-            
-            if(isError) {
-                toast.classList.replace('bg-gray-800', 'bg-red-600');
-            } else {
-                toast.classList.replace('bg-red-600', 'bg-gray-800');
-            }
-
-            toast.classList.remove('opacity-0');
-            setTimeout(() => {
-                toast.classList.add('opacity-0');
-            }, 3000);
-        }
-
-        function escapeHTML(str) {
-            if (!str) return '';
-            return str.replace(/[&<>'"]/g, tag => ({
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                "'": '&#39;',
-                '"': '&quot;'
-            }[tag]));
         }
 
         // Midnight Auto-refresh Function
@@ -598,11 +228,252 @@
             const msUntilMidnight = tomorrow - now;
             
             setTimeout(() => {
-                window.location.reload(); // Reload the page to load the new day automatically
+                window.location.reload(); 
             }, msUntilMidnight);
         }
 
-        // CSV Import Logic
+        function startDataListeners() {
+            if (!currentUser) return;
+
+            // Listen to Soldiers (Roster)
+            const soldiersRef = collection(db, 'soldiers_roster');
+            
+            if (unsubSoldiers) unsubSoldiers();
+            unsubSoldiers = onSnapshot(soldiersRef, (snapshot) => {
+                soldiers = [];
+                departments = new Set(["הכל"]);
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    soldiers.push({ id: doc.id, ...data });
+                    if (data.department) {
+                        departments.add(data.department);
+                    }
+                });
+                
+                // Sort by name
+                soldiers.sort((a, b) => a.name.localeCompare(b.name, 'he'));
+                
+                updateTabsUI();
+                updateDatalist();
+                renderTable();
+            }, (error) => {
+                console.error("Error fetching soldiers:", error);
+                if(error.code === 'permission-denied') {
+                    showToast("אין הרשאות לקרוא נתונים. ודא שהגדרת Rules נכון ב-Firestore.", true);
+                }
+            });
+
+            // Listen to Daily Statuses
+            listenToDailyStatus();
+        }
+
+        function listenToDailyStatus() {
+            const dateStr = document.getElementById('date-picker').value;
+            if (!dateStr || !currentUser) return;
+
+            const dailyRef = collection(db, `daily_status/${dateStr}/statuses`);
+            
+            if (unsubDaily) unsubDaily();
+            unsubDaily = onSnapshot(dailyRef, (snapshot) => {
+                dailyStatusMap = {};
+                snapshot.forEach(doc => {
+                    dailyStatusMap[doc.id] = doc.data().status;
+                });
+                renderTable();
+            });
+        }
+
+        function handleDateChange() {
+            listenToDailyStatus();
+        }
+
+        function updateTabsUI() {
+            const container = document.getElementById('tabs-container');
+            container.innerHTML = '';
+            
+            // Convert set to array and keep "הכל" first
+            let deptsArray = Array.from(departments);
+            deptsArray = deptsArray.filter(d => d !== "הכל").sort();
+            deptsArray.unshift("הכל");
+
+            // Make sure active tab still exists, otherwise default to "הכל"
+            if (!deptsArray.includes(activeTab)) {
+                activeTab = "הכל";
+            }
+
+            deptsArray.forEach(dept => {
+                const btn = document.createElement('button');
+                btn.textContent = dept;
+                
+                // Count soldiers in this tab
+                const count = dept === "הכל" ? soldiers.length : soldiers.filter(s => s.department === dept).length;
+                
+                btn.className = `px-4 py-2 rounded-t-lg transition whitespace-nowrap text-sm sm:text-base flex gap-2 items-center ${activeTab === dept ? 'tab-active bg-white' : 'tab-inactive bg-gray-50/50 hover:bg-gray-100'}`;
+                
+                // Badge for count
+                const badge = document.createElement('span');
+                badge.className = `text-xs px-2 py-0.5 rounded-full ${activeTab === dept ? 'bg-blue-100 text-blue-700' : 'bg-gray-200 text-gray-600'}`;
+                badge.textContent = count;
+                btn.appendChild(badge);
+
+                btn.onclick = () => {
+                    activeTab = dept;
+                    updateTabsUI();
+                    renderTable();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function updateDatalist() {
+            const datalist = document.getElementById('dept-options');
+            datalist.innerHTML = '';
+            departments.forEach(dept => {
+                if (dept !== "הכל") {
+                    const opt = document.createElement('option');
+                    opt.value = dept;
+                    datalist.appendChild(opt);
+                }
+            });
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('soldiers-table-body');
+            tbody.innerHTML = '';
+
+            const filteredSoldiers = activeTab === "הכל" 
+                ? soldiers 
+                : soldiers.filter(s => s.department === activeTab);
+
+            let reportedCount = 0;
+
+            if (filteredSoldiers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-500 bg-gray-50 border-b border-gray-100">אין חיילים במחלקה זו.</td></tr>`;
+            } else {
+                filteredSoldiers.forEach((soldier, index) => {
+                    const currentStatus = dailyStatusMap[soldier.id] || "לא דווח";
+                    if (currentStatus !== "לא דווח") reportedCount++;
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-blue-50/50 transition border-b border-gray-100";
+                    
+                    // Create dropdown HTML
+                    let selectHtml = `<select onchange="updateStatus('${soldier.id}', this.value)" class="w-full p-2 border rounded shadow-sm focus:ring-blue-500 text-sm appearance-none cursor-pointer text-center outline-none transition `;
+                    
+                    const activeOpt = STATUS_OPTIONS.find(o => o.val === currentStatus) || STATUS_OPTIONS[0];
+                    selectHtml += `${activeOpt.color}">`;
+                    
+                    STATUS_OPTIONS.forEach(opt => {
+                        const isSelected = opt.val === currentStatus ? 'selected' : '';
+                        selectHtml += `<option value="${opt.val}" ${isSelected}>${opt.emoji} ${opt.val}</option>`;
+                    });
+                    selectHtml += `</select>`;
+
+                    tr.innerHTML = `
+                        <td class="p-3 text-center text-gray-400 font-medium">${index + 1}</td>
+                        <td class="p-3 font-medium text-gray-900">${escapeHTML(soldier.name)}</td>
+                        <td class="p-3 text-gray-600"><span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">${escapeHTML(soldier.department)}</span></td>
+                        <td class="p-3">${selectHtml}</td>
+                        <td class="p-3 text-center">
+                            <button onclick="confirmDelete('${soldier.id}', '${escapeHTML(soldier.name).replace(/'/g, "\\'")}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded transition" title="מחק חייל">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            document.getElementById('total-count').textContent = filteredSoldiers.length;
+            document.getElementById('reported-count').textContent = `${reportedCount} / ${filteredSoldiers.length}`;
+        }
+
+        window.updateStatus = async (soldierId, newStatus) => {
+            if (!currentUser) return;
+            const dateStr = document.getElementById('date-picker').value;
+            const docRef = doc(db, `daily_status/${dateStr}/statuses`, soldierId);
+            
+            try {
+                await setDoc(docRef, { status: newStatus, updatedAt: new Date().toISOString() });
+            } catch (error) {
+                console.error("Error updating status:", error);
+                showToast("שגיאה בעדכון סטטוס", true);
+            }
+        };
+
+        window.openAddSoldierModal = () => {
+            document.getElementById('add-soldier-modal').classList.remove('hidden');
+            document.getElementById('add-soldier-modal').classList.add('flex');
+            document.getElementById('new-soldier-name').focus();
+        };
+
+        window.closeAddSoldierModal = () => {
+            document.getElementById('add-soldier-modal').classList.add('hidden');
+            document.getElementById('add-soldier-modal').classList.remove('flex');
+            document.getElementById('add-soldier-form').reset();
+        };
+
+        window.submitNewSoldier = async (e) => {
+            e.preventDefault();
+            if (!currentUser) return;
+
+            const name = document.getElementById('new-soldier-name').value.trim();
+            const dept = document.getElementById('new-soldier-dept').value.trim();
+
+            if (!name || !dept) return;
+
+            try {
+                await addDoc(collection(db, 'soldiers_roster'), {
+                    name: name,
+                    department: dept,
+                    createdAt: new Date().toISOString()
+                });
+                closeAddSoldierModal();
+                showToast(`החייל ${name} נוסף בהצלחה`);
+                
+                if (activeTab !== "הכל" && activeTab !== dept) {
+                     activeTab = dept; // Switch to the new tab if created
+                }
+            } catch (error) {
+                console.error("Error adding soldier:", error);
+                showToast("שגיאה בהוספת חייל", true);
+            }
+        };
+
+        window.confirmDelete = (id, name) => {
+            const confirmDiv = document.createElement('div');
+            confirmDiv.id = 'confirm-modal';
+            confirmDiv.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4';
+            confirmDiv.innerHTML = `
+                <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full text-center">
+                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 text-2xl">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">מחיקת חייל</h3>
+                    <p class="text-gray-600 mb-6">האם אתה בטוח שברצונך למחוק את <strong>${name}</strong> מהמצבת? לא ניתן לבטל פעולה זו.</p>
+                    <div class="flex gap-3 justify-center">
+                        <button onclick="document.getElementById('confirm-modal').remove()" class="px-5 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition">ביטול</button>
+                        <button onclick="executeDelete('${id}')" class="px-5 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg font-medium transition shadow-md">כן, מחק</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(confirmDiv);
+        };
+
+        window.executeDelete = async (soldierId) => {
+            if (!currentUser) return;
+            const docRef = doc(db, 'soldiers_roster', soldierId);
+            try {
+                await deleteDoc(docRef);
+                document.getElementById('confirm-modal').remove();
+                showToast("החייל נמחק מהמצבת");
+            } catch (error) {
+                console.error("Error deleting:", error);
+                showToast("שגיאה במחיקת החייל", true);
+            }
+        };
+
         window.processCSV = async (event) => {
             if (!currentUser) {
                 showToast("יש להתחבר תחילה למסד הנתונים.", true);
@@ -618,7 +489,7 @@
                 let nameIndex = -1;
                 let deptIndex = -1;
                 
-                // Scan the first few rows to find the headers "שם" and "תפקיד" (or "מחלקה")
+                // Scan header
                 for (let i = 0; i < Math.min(lines.length, 30); i++) {
                     const cols = lines[i].split(',').map(c => c.trim().replace(/"/g, ''));
                     if (cols.includes('שם')) {
@@ -633,15 +504,14 @@
                     return;
                 }
 
-                showToast("מייבא נתונים מהקובץ... אנא המתן.");
-                const soldiersRef = collection(db, 'artifacts', appId, 'public', 'data', 'soldiers');
+                showToast("מייבא נתונים... אנא המתן.");
+                const soldiersRef = collection(db, 'soldiers_roster');
                 
                 let added = 0;
                 for (let i = 0; i < lines.length; i++) {
                     const cols = lines[i].split(',').map(c => c.trim().replace(/"/g, ''));
                     const name = cols[nameIndex];
                     
-                    // Skip empty rows, headers, or summary rows
                     if (!name || name === 'שם' || name.includes('סה"כ')) continue;
                     
                     const dept = (deptIndex !== -1 && cols[deptIndex]) ? cols[deptIndex] : 'כללי';
@@ -654,18 +524,134 @@
                         });
                         added++;
                     } catch (error) {
-                        console.error("Error adding soldier row:", error);
+                        console.error("Error adding row:", error);
                     }
                 }
                 
-                showToast(`הייבוא הסתיים! ${added} חיילים נוספו למצבת.`);
-                // Reset input so the same file can be selected again if needed
+                showToast(`הייבוא הסתיים! ${added} חיילים נוספו.`);
                 event.target.value = '';
             };
             
-            // Read as UTF-8 (If Excel CSV is in Hebrew, it is best saved as CSV UTF-8)
             reader.readAsText(file);
         };
+
+        window.copySummary = () => {
+            const date = document.getElementById('date-picker').value;
+            const parts = date.split('-');
+            const prettyDate = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : date;
+            
+            let text = `*דוח 1 - ${prettyDate}*\n`;
+            if (activeTab !== "הכל") text += `*מחלקה: ${activeTab}*\n`;
+            text += `\n`;
+            
+            let counts = {};
+            STATUS_OPTIONS.forEach(opt => counts[opt.val] = 0);
+            let missingNames = [];
+
+            const filteredSoldiers = activeTab === "הכל" 
+                ? soldiers 
+                : soldiers.filter(s => s.department === activeTab);
+
+            filteredSoldiers.forEach(s => {
+                const stat = dailyStatusMap[s.id] || "לא דווח";
+                if (counts[stat] !== undefined) {
+                    counts[stat]++;
+                } else {
+                    counts["לא דווח"]++;
+                }
+                
+                if (stat === "לא דווח") {
+                    missingNames.push(s.name);
+                }
+            });
+
+            text += `👥 סה"כ במצבת: ${filteredSoldiers.length}\n`;
+            
+            STATUS_OPTIONS.forEach(opt => {
+                if (opt.val !== "לא דווח" && counts[opt.val] > 0) {
+                    text += `${opt.emoji} ${opt.val}: ${counts[opt.val]}\n`;
+                }
+            });
+            
+            text += `\n${STATUS_OPTIONS[0].emoji} לא דווח: ${counts["לא דווח"]}\n`;
+            if (missingNames.length > 0 && missingNames.length <= 15) {
+                text += `(חסרים: ${missingNames.join(', ')})\n`;
+            }
+
+            copyToClipboard(text);
+        };
+
+        window.exportToCSV = () => {
+            const date = document.getElementById('date-picker').value;
+            
+            const filteredSoldiers = activeTab === "הכל" 
+                ? soldiers 
+                : soldiers.filter(s => s.department === activeTab);
+
+            let csvContent = "data:text/csv;charset=utf-8,%EF%BB%BF"; // BOM for Hebrew
+            csvContent += "שם החייל,מחלקה,סטטוס ב-" + date + "\n";
+
+            filteredSoldiers.forEach(s => {
+                const stat = dailyStatusMap[s.id] || "לא דווח";
+                csvContent += `"${s.name}","${s.department}","${stat}"\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `דוח_1_${activeTab}_${date}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast("הדיווח הועתק ללוח. אפשר להדביק בוואטסאפ!");
+            } catch (err) {
+                console.error('Failed to copy', err);
+                showToast("שגיאה בהעתקה", true);
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const msgSpan = document.getElementById('toast-msg');
+            const icon = toast.querySelector('i');
+            
+            msgSpan.textContent = message;
+            
+            if (isError) {
+                toast.classList.replace('bg-gray-800', 'bg-red-600');
+                icon.className = 'fa-solid fa-circle-exclamation';
+            } else {
+                toast.classList.replace('bg-red-600', 'bg-gray-800');
+                icon.className = 'fa-solid fa-circle-check text-green-400';
+            }
+
+            toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+            
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+            }, 3000);
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.replace(/[&<>'"]/g, tag => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[tag]));
+        }
 
         // Boot
         window.addEventListener('DOMContentLoaded', init);
