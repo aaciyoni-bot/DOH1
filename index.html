@@ -51,7 +51,7 @@
                 <input type="file" id="csv-file-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="processExcel(event)">
                 <button onclick="document.getElementById('csv-file-input').click()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition text-sm font-medium flex items-center gap-2">
                     <i class="fa-solid fa-file-import"></i>
-                    <span>ייבוא מאקסל (.xlsx)</span>
+                    <span>ייבוא מקובץ (CSV/אקסל)</span>
                 </button>
 
                 <!-- Add Soldier Button -->
@@ -538,7 +538,17 @@
             const file = event.target.files[0];
             if (!file) return;
 
-            showToast("קורא את קובץ האקסל... אנא המתן.");
+            const isCSV = file.name.toLowerCase().endsWith('.csv');
+            let csvDeptName = "";
+            if (isCSV) {
+                csvDeptName = prompt("מכיוון שזהו קובץ CSV, אנא הקלד את שם הלשונית/המחלקה שאליה ישויכו החיילים מקובץ זה (למשל: מפלג, אספקה):", "מחלקה כללית");
+                if (!csvDeptName) {
+                    event.target.value = ''; // Cancelled
+                    return;
+                }
+            }
+
+            showToast("קורא את הקובץ... אנא המתן.");
             const importId = Date.now();
 
             const reader = new FileReader();
@@ -577,11 +587,13 @@
                             const name = cols[nameIndex];
                             if (!name || name === 'שם' || name.includes('סה"כ')) continue;
                             
-                            // MAGIC: The name of the Tab (sheetName) becomes the Department!
+                            // MAGIC: If CSV, use the user-provided name. Else, use the Tab name!
+                            const finalDeptName = isCSV ? csvDeptName : sheetName;
+
                             try {
                                 await addDoc(collection(db, 'soldiers_roster'), {
                                     name: name,
-                                    department: sheetName,
+                                    department: finalDeptName,
                                     createdAt: new Date().toISOString(),
                                     importId: importId
                                 });
@@ -593,14 +605,14 @@
                     }
                     
                     if (added > 0) {
-                        showToast(`הייבוא הסתיים! ${added} חיילים נוספו מכל הלשוניות.`);
+                        showToast(`הייבוא הסתיים! ${added} חיילים נוספו.`);
                     } else {
                         showToast("לא נמצאו נתונים לייבוא. ודא שיש עמודת 'שם'.", true);
                     }
                     
                 } catch (err) {
                     console.error(err);
-                    showToast("שגיאה בקריאת הקובץ. ודא שזה קובץ אקסל תקין.", true);
+                    showToast("שגיאה בקריאת הקובץ. ודא שזה קובץ תקין.", true);
                 }
                 
                 event.target.value = ''; // Reset input
