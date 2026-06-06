@@ -34,7 +34,7 @@
                 </button>
                 <i class="fa-solid fa-shield-halved text-3xl text-blue-300"></i>
                 <div>
-                    <h1 class="text-2xl font-bold tracking-tight">מערכת גדודית מתקדמת</h1>
+                    <h1 class="text-2xl font-bold tracking-tight">מערכת פלוגתית מתקדמת</h1>
                     <p class="text-blue-200 text-sm" id="connection-status">מתחבר לשרת...</p>
                 </div>
             </div>
@@ -56,8 +56,8 @@
 
     <div class="flex-grow flex flex-col w-full relative">
 
+        <!-- ================= ATTENDANCE MODULE ================= -->
         <div id="module-attendance" class="flex-grow flex flex-col w-full">
-            
             <div id="home-view" class="max-w-5xl mx-auto w-full px-4 py-12 flex-grow flex flex-col items-center justify-center animate-fade-in">
                 <div class="text-center mb-10">
                     <h2 class="text-3xl font-bold text-gray-800 mb-3">ברוכים הבאים למערכת הדיווח</h2>
@@ -128,6 +128,7 @@
             </main>
         </div>
 
+        <!-- ================= LOGISTICS & ARMORY MODULE ================= -->
         <div id="module-logistics" class="hidden flex-grow max-w-7xl mx-auto w-full px-4 py-6 flex-col">
             
             <div class="flex gap-2 mb-6 overflow-x-auto hide-scrollbar bg-white p-2 rounded-xl shadow-sm border border-gray-100">
@@ -135,16 +136,21 @@
                 <button onclick="switchLogisticsTab('ammo')" id="tab-log-ammo" class="px-5 py-2.5 rounded-lg text-gray-600 hover:bg-gray-100 transition whitespace-nowrap"><i class="fa-solid fa-box-archive ml-2"></i>תחמושת ושצ"ל</button>
             </div>
 
+            <!-- Armory Tab -->
             <div id="logistics-tab-armory" class="bg-white rounded-xl shadow-sm border border-gray-100 flex-grow flex flex-col p-5">
-                <div class="flex justify-between items-center mb-6">
+                <div class="flex justify-between items-center mb-6 border-b pb-4">
                     <h2 class="text-xl font-bold text-gray-800">מחסן צל"מ וציוד ממוספר</h2>
-                    <button onclick="openAddInventoryModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
-                        <i class="fa-solid fa-plus"></i> קלוט פריט למחסן
-                    </button>
+                    <div class="flex gap-2">
+                        <input type="file" id="armory-import-input" accept=".xlsx, .csv" class="hidden" onchange="importArmoryExcel(event)">
+                        <button onclick="document.getElementById('armory-import-input').click()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm border border-gray-300" title="ייבוא מאקסל"><i class="fa-solid fa-file-import"></i></button>
+                        <button onclick="exportArmory()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm border border-gray-300" title="ייצוא לאקסל"><i class="fa-solid fa-file-csv"></i></button>
+                        <button onclick="openAddInventoryModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i> קלוט פריט
+                        </button>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-3 gap-4 mb-6" id="armory-stats">
-                    </div>
+                <div class="grid grid-cols-3 gap-4 mb-6" id="armory-stats"></div>
 
                 <div class="flex gap-3 mb-4">
                     <div class="relative flex-grow">
@@ -170,27 +176,29 @@
                                 <th class="p-3 border-b text-center">פעולות</th>
                             </tr>
                         </thead>
-                        <tbody id="armory-table-body" class="divide-y divide-gray-100">
-                            </tbody>
+                        <tbody id="armory-table-body" class="divide-y divide-gray-100"></tbody>
                     </table>
                 </div>
             </div>
 
+            <!-- Ammo Tab -->
             <div id="logistics-tab-ammo" class="hidden bg-white rounded-xl shadow-sm border border-gray-100 flex-grow flex flex-col p-5">
-                <div class="flex justify-between items-center mb-6">
+                <div class="flex justify-between items-center mb-6 border-b pb-4">
                     <h2 class="text-xl font-bold text-gray-800">ניהול תחמושת ומלאי מתכלה</h2>
                     <div class="flex gap-2">
+                        <input type="file" id="ammo-import-input" accept=".xlsx, .csv" class="hidden" onchange="importAmmoExcel(event)">
+                        <button onclick="document.getElementById('ammo-import-input').click()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm border border-gray-300" title="ייבוא מאקסל"><i class="fa-solid fa-file-import"></i></button>
+                        <button onclick="exportAmmo()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm border border-gray-300" title="ייצוא לאקסל"><i class="fa-solid fa-file-csv"></i></button>
                         <button onclick="openAmmoUpdateModal()" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-lg text-sm font-medium border border-gray-300">
-                            <i class="fa-solid fa-boxes-stacked"></i> קליטת/ספירת תחמושת
+                            <i class="fa-solid fa-boxes-stacked"></i> קליטת תחמושת
                         </button>
                         <button onclick="openShootReportModal()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow flex items-center gap-2">
-                            <i class="fa-solid fa-fire"></i> דיווח ירי / בלאי
+                            <i class="fa-solid fa-fire"></i> דיווח ירי
                         </button>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8" id="ammo-grid">
-                    </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8" id="ammo-grid"></div>
 
                 <h3 class="text-lg font-bold text-gray-700 mb-3 border-b pb-2">יומן תנועות אחרונות (ירי/בלאי)</h3>
                 <div class="overflow-auto border border-gray-200 rounded-lg max-h-[300px]">
@@ -203,14 +211,16 @@
                                 <th class="p-3 border-b">סיבת דיווח / מטווח</th>
                             </tr>
                         </thead>
-                        <tbody id="ammo-logs-body" class="divide-y divide-gray-100">
-                            </tbody>
+                        <tbody id="ammo-logs-body" class="divide-y divide-gray-100"></tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- ================= MODALS ================= -->
+
+    <!-- SOLDIER EQUIPMENT MODAL -->
     <div id="equipment-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full flex flex-col max-h-[90vh] overflow-hidden">
             <div class="bg-blue-900 text-white p-5 flex justify-between items-center">
@@ -222,14 +232,11 @@
             </div>
             
             <div class="p-6 flex-grow overflow-y-auto bg-gray-50">
-                
                 <div class="bg-white p-4 rounded-xl border border-blue-100 shadow-sm mb-6">
-                    <h4 class="font-bold text-blue-900 mb-3 text-sm">החתמה חדשה:</h4>
+                    <h4 class="font-bold text-blue-900 mb-3 text-sm">החתמה חדשה מתוך מלאי זמין:</h4>
                     <div class="flex flex-col sm:flex-row gap-3 items-end">
                         <div class="w-full">
-                            <label class="block text-xs text-gray-500 mb-1">בחר פריט ממחסן הפלוגה (לפי מס' צ')</label>
-                            <select id="eq-item-select" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50">
-                                </select>
+                            <select id="eq-item-select" class="w-full border border-gray-300 rounded-lg p-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"></select>
                         </div>
                         <button onclick="assignEquipmentToSoldier()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold w-full sm:w-auto whitespace-nowrap shadow-md">
                             החתם
@@ -240,7 +247,7 @@
                 <div class="flex justify-between items-end mb-3">
                     <h4 class="font-bold text-gray-800 text-lg">ציוד שמונפק כרגע לחייל:</h4>
                     <button onclick="sendWhatsAppEq()" class="text-green-600 hover:text-green-700 text-sm font-bold bg-green-50 px-3 py-1.5 rounded-lg flex items-center gap-1 border border-green-200">
-                        <i class="fa-brands fa-whatsapp text-lg"></i> שלח אסמכתא
+                        <i class="fa-brands fa-whatsapp text-lg"></i> שלח לחייל
                     </button>
                 </div>
                 
@@ -253,14 +260,14 @@
                                 <th class="p-3 text-gray-600 text-center w-24">פעולה</th>
                             </tr>
                         </thead>
-                        <tbody id="eq-assigned-body" class="divide-y divide-gray-100">
-                            </tbody>
+                        <tbody id="eq-assigned-body" class="divide-y divide-gray-100"></tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- ADD INVENTORY ITEM MODAL -->
     <div id="add-inventory-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6">
             <h3 class="text-xl font-bold text-gray-800 mb-4">קליטת פריט ממוספר למחסן</h3>
@@ -290,6 +297,7 @@
         </div>
     </div>
 
+    <!-- UPDATE AMMO MODAL -->
     <div id="ammo-update-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6">
             <h3 class="text-xl font-bold text-gray-800 mb-4">עדכון/קליטת תחמושת</h3>
@@ -301,7 +309,6 @@
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1">כמות כוללת עכשווית (ספירה)</label>
                     <input type="number" id="upd-ammo-qty" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500" dir="ltr">
-                    <p class="text-xs text-gray-500 mt-1">הזן את המספר הכולל שנמצא עכשיו במחסן.</p>
                 </div>
             </div>
             <div class="flex justify-end gap-3">
@@ -311,15 +318,14 @@
         </div>
     </div>
 
+    <!-- REPORT SHOOTING MODAL -->
     <div id="shoot-report-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 border-t-8 border-orange-500">
             <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-fire text-orange-500"></i> דיווח ירי / בלאי</h3>
-            <p class="text-sm text-gray-600 mb-4">דיווח ירי יקזז אוטומטית את הכמות ממלאי התחמושת הקיים ויתועד ביומן התנועות.</p>
             <div class="space-y-4 mb-6">
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1">בחר תחמושת למשיכה</label>
-                    <select id="shoot-ammo-type" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500">
-                        </select>
+                    <select id="shoot-ammo-type" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500"></select>
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1">כמות שנורתה/נצרכה</label>
@@ -327,16 +333,17 @@
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-1">תיאור/סיבה</label>
-                    <input type="text" id="shoot-ammo-reason" placeholder="למשל: מטווח כיתתי, איפוסים" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500">
+                    <input type="text" id="shoot-ammo-reason" placeholder="למשל: מטווח כיתתי" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500">
                 </div>
             </div>
             <div class="flex justify-end gap-3">
                 <button onclick="closeShootReportModal()" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg">ביטול</button>
-                <button onclick="submitShootReport()" class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-bold">דווח וקזז</button>
+                <button onclick="submitShootReport()" class="px-4 py-2 bg-orange-500 text-white rounded-lg font-bold">דווח וקזז</button>
             </div>
         </div>
     </div>
 
+    <!-- EXPORT MODAL -->
     <div id="export-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6">
             <div class="flex justify-between items-center mb-5">
@@ -358,6 +365,7 @@
         </div>
     </div>
 
+    <!-- ADD SOLDIER MODAL -->
     <div id="add-soldier-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
             <h3 id="modal-title" class="text-xl font-bold mb-4">הוספת חייל</h3>
@@ -380,6 +388,7 @@
         </div>
     </div>
 
+    <!-- TOAST -->
     <div id="toast" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none z-50 flex items-center gap-2">
         <i class="fa-solid fa-circle-info"></i>
         <span id="toast-msg">הודעה</span>
@@ -390,7 +399,6 @@
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, collection, onSnapshot, setDoc, getDoc, deleteDoc, addDoc, updateDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyCxBF1xT5n5SPR62GWkDdMerrp3QSRKQ-g",
             authDomain: "doh1-1cdde.firebaseapp.com",
@@ -401,19 +409,17 @@
             appId: "1:653604638082:web:73c5f6588780122cf8539b"
         };
 
-        // State variables
         let db, auth, currentUser = null;
         let soldiers = [];
         let dailyStatusMap = {};
-        let inventory = []; // מספרי צ
-        let ammoData = {}; // תחמושת
-        let ammoLogs = []; // ירי
-        
+        let inventory = [];
+        let ammoData = {};
+        let ammoLogs = [];
         let departments = new Set(["הכל"]);
         let activeTab = "הכל";
         let searchQuery = "";
         let currentEditSoldierId = null;
-        let equipmentModalSoldierId = null; // לניהול החלון של 1004
+        let equipmentModalSoldierId = null; 
 
         const STATUS_OPTIONS = [
             { val: "לא דווח", color: "text-gray-500 bg-gray-100 border-gray-200", emoji: "⚪" },
@@ -433,647 +439,312 @@
         async function init() {
             try {
                 const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-                const userCredential = await signInAnonymously(auth);
-                currentUser = userCredential.user;
+                auth = getAuth(app); db = getFirestore(app);
+                currentUser = (await signInAnonymously(auth)).user;
                 document.getElementById('connection-status').innerHTML = '<i class="fa-solid fa-circle text-green-400 text-xs"></i> מחובר';
-
                 const today = new Date();
                 document.getElementById('date-picker').value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
                 document.getElementById('date-picker').addEventListener('change', listenToDailyStatus);
-                
                 startDataListeners();
             } catch (err) {
-                console.error(err);
                 document.getElementById('connection-status').innerHTML = `<i class="fa-solid fa-triangle-exclamation text-red-400"></i> שגיאה`;
             }
         }
 
-        // --- NAVIGATION ---
         window.switchAppModule = (module) => {
-            const elAtt = document.getElementById('module-attendance');
-            const elLog = document.getElementById('module-logistics');
-            const navAtt = document.getElementById('nav-attendance');
-            const navLog = document.getElementById('nav-logistics');
-
+            const elAtt = document.getElementById('module-attendance'), elLog = document.getElementById('module-logistics');
+            const navAtt = document.getElementById('nav-attendance'), navLog = document.getElementById('nav-logistics');
             if(module === 'attendance') {
-                elLog.classList.add('hidden');
-                elAtt.classList.remove('hidden');
-                elAtt.classList.add('flex');
-                
-                navAtt.classList.add('border-blue-400', 'text-white');
-                navAtt.classList.remove('border-transparent', 'text-blue-200');
-                navLog.classList.remove('border-blue-400', 'text-white');
-                navLog.classList.add('border-transparent', 'text-blue-200');
+                elLog.classList.add('hidden'); elAtt.classList.remove('hidden'); elAtt.classList.add('flex');
+                navAtt.classList.add('border-blue-400', 'text-white'); navAtt.classList.remove('border-transparent', 'text-blue-200');
+                navLog.classList.remove('border-blue-400', 'text-white'); navLog.classList.add('border-transparent', 'text-blue-200');
             } else {
-                elAtt.classList.add('hidden');
-                elAtt.classList.remove('flex');
-                elLog.classList.remove('hidden');
-                elLog.classList.add('flex');
-                
-                navLog.classList.add('border-blue-400', 'text-white');
-                navLog.classList.remove('border-transparent', 'text-blue-200');
-                navAtt.classList.remove('border-blue-400', 'text-white');
-                navAtt.classList.add('border-transparent', 'text-blue-200');
-                renderArmoryTable();
-                renderLogisticsAmmo();
+                elAtt.classList.add('hidden'); elAtt.classList.remove('flex'); elLog.classList.remove('hidden'); elLog.classList.add('flex');
+                navLog.classList.add('border-blue-400', 'text-white'); navLog.classList.remove('border-transparent', 'text-blue-200');
+                navAtt.classList.remove('border-blue-400', 'text-white'); navAtt.classList.add('border-transparent', 'text-blue-200');
+                renderArmoryTable(); renderLogisticsAmmo();
             }
         };
 
         window.switchLogisticsTab = (tab) => {
-            const tabArmory = document.getElementById('logistics-tab-armory');
-            const tabAmmo = document.getElementById('logistics-tab-ammo');
-            const btnArmory = document.getElementById('tab-log-armory');
-            const btnAmmo = document.getElementById('tab-log-ammo');
-
+            const tArm = document.getElementById('logistics-tab-armory'), tAmo = document.getElementById('logistics-tab-ammo');
+            const bArm = document.getElementById('tab-log-armory'), bAmo = document.getElementById('tab-log-ammo');
             if(tab === 'armory') {
-                tabAmmo.classList.add('hidden');
-                tabArmory.classList.remove('hidden');
-                tabArmory.classList.add('flex');
-                
-                btnArmory.className = "px-5 py-2.5 rounded-lg bg-blue-100 text-blue-800 font-bold transition whitespace-nowrap";
-                btnAmmo.className = "px-5 py-2.5 rounded-lg text-gray-600 hover:bg-gray-100 transition whitespace-nowrap";
+                tAmo.classList.add('hidden'); tArm.classList.remove('hidden'); tArm.classList.add('flex');
+                bArm.className = "px-5 py-2.5 rounded-lg bg-blue-100 text-blue-800 font-bold transition whitespace-nowrap";
+                bAmo.className = "px-5 py-2.5 rounded-lg text-gray-600 hover:bg-gray-100 transition whitespace-nowrap";
             } else {
-                tabArmory.classList.add('hidden');
-                tabArmory.classList.remove('flex');
-                tabAmmo.classList.remove('hidden');
-                tabAmmo.classList.add('flex');
-
-                btnAmmo.className = "px-5 py-2.5 rounded-lg bg-blue-100 text-blue-800 font-bold transition whitespace-nowrap";
-                btnArmory.className = "px-5 py-2.5 rounded-lg text-gray-600 hover:bg-gray-100 transition whitespace-nowrap";
+                tArm.classList.add('hidden'); tArm.classList.remove('flex'); tAmo.classList.remove('hidden'); tAmo.classList.add('flex');
+                bAmo.className = "px-5 py-2.5 rounded-lg bg-blue-100 text-blue-800 font-bold transition whitespace-nowrap";
+                bArm.className = "px-5 py-2.5 rounded-lg text-gray-600 hover:bg-gray-100 transition whitespace-nowrap";
             }
         }
 
-        // --- FIREBASE LISTENERS ---
         function startDataListeners() {
             if (!currentUser) return;
-            
-            // Soldiers
             onSnapshot(collection(db, 'soldiers_roster'), (snap) => {
-                soldiers = [];
-                departments = new Set(["הכל"]);
-                snap.forEach(doc => {
-                    const data = doc.data();
-                    soldiers.push({ id: doc.id, ...data });
-                    if (data.department) departments.add(data.department);
-                });
+                soldiers = []; departments = new Set(["הכל"]);
+                snap.forEach(doc => { const d = doc.data(); soldiers.push({ id: doc.id, ...d }); if (d.department) departments.add(d.department); });
                 soldiers.sort((a, b) => a.name.localeCompare(b.name, 'he'));
                 updateTabsUI(); updateDatalist(); updateStreaks();
             });
-
-            // Inventory (Serial numbers)
             onSnapshot(collection(db, 'inventory'), (snap) => {
-                inventory = [];
-                snap.forEach(doc => inventory.push({id: doc.id, ...doc.data()}));
-                renderArmoryTable();
-                if(equipmentModalSoldierId) renderEquipmentModal(equipmentModalSoldierId);
+                inventory = []; snap.forEach(doc => inventory.push({id: doc.id, ...doc.data()}));
+                renderArmoryTable(); if(equipmentModalSoldierId) renderEquipmentModal(equipmentModalSoldierId);
             });
-
-            // Ammo main counters
-            onSnapshot(doc(db, 'logistics', 'ammo'), (docSnap) => {
-                ammoData = docSnap.exists() ? docSnap.data() : {};
-                renderLogisticsAmmo();
-                populateAmmoSelects();
-            });
-
-            // Ammo Logs (Shooting)
-            onSnapshot(query(collection(db, 'ammo_logs'), orderBy('date', 'desc')), (snap) => {
-                ammoLogs = [];
-                snap.forEach(doc => ammoLogs.push({id: doc.id, ...doc.data()}));
-                renderLogisticsAmmo();
-            });
-
+            onSnapshot(doc(db, 'logistics', 'ammo'), (snap) => { ammoData = snap.exists() ? snap.data() : {}; renderLogisticsAmmo(); populateAmmoSelects(); });
+            onSnapshot(query(collection(db, 'ammo_logs'), orderBy('date', 'desc')), (snap) => { ammoLogs = []; snap.forEach(doc => ammoLogs.push({id: doc.id, ...doc.data()})); renderLogisticsAmmo(); });
             listenToDailyStatus();
         }
 
         function listenToDailyStatus() {
-            const dateStr = document.getElementById('date-picker').value;
-            if (!dateStr || !currentUser) return;
-            onSnapshot(collection(db, `daily_status/${dateStr}/statuses`), (snap) => {
-                dailyStatusMap = {};
-                snap.forEach(doc => dailyStatusMap[doc.id] = doc.data().status);
-                updateStreaks();
+            const dt = document.getElementById('date-picker').value; if (!dt || !currentUser) return;
+            onSnapshot(collection(db, `daily_status/${dt}/statuses`), (snap) => {
+                dailyStatusMap = {}; snap.forEach(doc => dailyStatusMap[doc.id] = doc.data().status); updateStreaks();
             });
         }
 
         window.updateStreaks = async () => {
-            const baseDateStr = document.getElementById('date-picker').value;
-            const promises = []; const dateList = [];
-            let d = new Date(baseDateStr);
-            
-            for(let i=0; i<21; i++) {
-                const ds = d.toISOString().split('T')[0];
-                dateList.push(ds);
-                promises.push(getDocs(collection(db, `daily_status/${ds}/statuses`)));
-                d.setDate(d.getDate() - 1);
-            }
+            const dt = document.getElementById('date-picker').value; const pr = []; const dsList = []; let d = new Date(dt);
+            for(let i=0; i<21; i++) { dsList.push(d.toISOString().split('T')[0]); pr.push(getDocs(collection(db, `daily_status/${d.toISOString().split('T')[0]}/statuses`))); d.setDate(d.getDate() - 1); }
             try {
-                const snaps = await Promise.all(promises);
-                const history = {};
-                snaps.forEach((snap, i) => {
-                    history[dateList[i]] = {};
-                    snap.forEach(doc => history[dateList[i]][doc.id] = doc.data().status);
-                });
-                soldiers.forEach(s => {
-                    let streak = 0;
-                    for(let i=0; i<dateList.length; i++) {
-                        const stat = history[dateList[i]][s.id] || "לא דווח";
-                        if(STREAK_STATUSES.includes(stat)) streak++; else break;
-                    }
-                    s.streak = streak;
-                });
+                const snaps = await Promise.all(pr); const history = {};
+                snaps.forEach((s, i) => { history[dsList[i]] = {}; s.forEach(doc => history[dsList[i]][doc.id] = doc.data().status); });
+                soldiers.forEach(s => { let str = 0; for(let i=0; i<dsList.length; i++) { if(STREAK_STATUSES.includes(history[dsList[i]][s.id]||"לא דווח")) str++; else break; } s.streak = str; });
             } catch (err) {}
             renderHomeView(); renderTable();
         };
 
-        // --- ATTENDANCE UI (Same as before, + Backpack icon) ---
         window.handleSearch = (e) => { searchQuery = e.target.value.trim().toLowerCase(); renderTable(); };
         
         function renderHomeView() {
-            const grid = document.getElementById('departments-grid');
-            if(!grid) return; grid.innerHTML = '';
-            
-            let deptsArray = Array.from(departments).filter(d => d !== "הכל").sort();
-            deptsArray.forEach(dept => {
-                const deptSoldiers = soldiers.filter(s => s.department === dept);
-                let reported = 0, present = 0;
-                deptSoldiers.forEach(s => {
-                    const stat = dailyStatusMap[s.id] || "לא דווח";
-                    if (stat !== "לא דווח") reported++;
-                    if (stat === "נוכח") present++;
-                });
-
-                const btn = document.createElement('button');
-                btn.className = "bg-white hover:bg-blue-50 border border-gray-200 p-5 rounded-2xl shadow-sm transition-all flex flex-col items-center gap-3 group w-full";
+            const grid = document.getElementById('departments-grid'); if(!grid) return; grid.innerHTML = '';
+            Array.from(departments).filter(d => d !== "הכל").sort().forEach(dept => {
+                const ds = soldiers.filter(s => s.department === dept); let rep = 0, pre = 0;
+                ds.forEach(s => { const st = dailyStatusMap[s.id] || "לא דווח"; if (st !== "לא דווח") rep++; if (st === "נוכח") pre++; });
+                const btn = document.createElement('div');
+                btn.className = "cursor-pointer bg-white hover:bg-blue-50 border border-gray-200 p-5 rounded-2xl shadow-sm transition-all flex flex-col items-center gap-3 group w-full";
                 btn.onclick = () => goToDepartment(dept);
                 btn.innerHTML = `
                     <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl"><i class="fa-solid fa-users"></i></div>
                     <div class="text-center w-full mt-1">
                         <h3 class="font-bold text-xl mb-3">${escapeHTML(dept)}</h3>
                         <div class="grid grid-cols-3 gap-1 bg-gray-50 p-2 rounded-xl text-sm border border-gray-100 w-full">
-                            <div class="flex flex-col"><span class="text-gray-500 text-xs">במצבת</span><span class="font-bold">${deptSoldiers.length}</span></div>
-                            <div class="flex flex-col border-r border-gray-200"><span class="text-gray-500 text-xs">דווחו</span><span class="font-bold text-blue-600">${reported}/${deptSoldiers.length}</span></div>
-                            <div class="flex flex-col border-r border-gray-200"><span class="text-gray-500 text-xs">נוכחים</span><span class="font-bold text-green-600">${present}</span></div>
+                            <div class="flex flex-col"><span class="text-gray-500 text-xs">במצבת</span><span class="font-bold">${ds.length}</span></div>
+                            <div class="flex flex-col border-r border-gray-200"><span class="text-gray-500 text-xs">דווחו</span><span class="font-bold text-blue-600">${rep}/${ds.length}</span></div>
+                            <div class="flex flex-col border-r border-gray-200"><span class="text-gray-500 text-xs">נוכחים</span><span class="font-bold text-green-600">${pre}</span></div>
                         </div>
                     </div>`;
                 grid.appendChild(btn);
             });
-            // All Button
-            let tr=0, tp=0;
-            soldiers.forEach(s => { const stat = dailyStatusMap[s.id] || "לא דווח"; if (stat !== "לא דווח") tr++; if (stat === "נוכח") tp++; });
-            grid.innerHTML += `<button onclick="goToDepartment('הכל')" class="bg-gradient-to-br from-blue-800 to-blue-900 p-5 rounded-2xl shadow-md transition-all flex flex-col items-center gap-3 text-white sm:col-span-2 md:col-span-1 w-full">
+            let tr=0, tp=0; soldiers.forEach(s => { const st = dailyStatusMap[s.id] || "לא דווח"; if (st !== "לא דווח") tr++; if (st === "נוכח") tp++; });
+            const all = document.createElement('div');
+            all.className = "cursor-pointer bg-gradient-to-br from-blue-800 to-blue-900 p-5 rounded-2xl shadow-md transition-all flex flex-col items-center gap-3 text-white sm:col-span-2 md:col-span-1 w-full";
+            all.onclick = () => goToDepartment("הכל");
+            all.innerHTML = `
                 <div class="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center text-2xl"><i class="fa-solid fa-building-shield"></i></div>
                 <div class="text-center w-full mt-1"><h3 class="font-bold text-xl mb-3">כלל הפלוגה</h3>
                 <div class="grid grid-cols-3 gap-1 bg-white/10 p-2 rounded-xl text-sm border border-white/20 w-full">
                     <div class="flex flex-col"><span class="text-blue-200 text-xs">במצבת</span><span class="font-bold">${soldiers.length}</span></div>
                     <div class="flex flex-col border-r border-white/20"><span class="text-blue-200 text-xs">דווחו</span><span class="font-bold">${tr}/${soldiers.length}</span></div>
                     <div class="flex flex-col border-r border-white/20"><span class="text-blue-200 text-xs">נוכחים</span><span class="font-bold text-green-400">${tp}</span></div>
-                </div></div></button>`;
+                </div></div>`;
+            grid.appendChild(all);
         }
 
         window.goToDepartment = (dept) => {
-            activeTab = dept;
-            document.getElementById('home-view').classList.add('hidden');
-            document.getElementById('main-app-view').classList.remove('hidden');
-            document.getElementById('main-app-view').classList.add('flex');
-            document.getElementById('back-to-home-btn').classList.remove('hidden');
-            searchQuery = ""; document.getElementById('search-input').value = "";
-            updateTabsUI(); renderTable(); window.scrollTo(0,0);
+            activeTab = dept; document.getElementById('home-view').classList.add('hidden'); document.getElementById('main-app-view').classList.remove('hidden'); document.getElementById('main-app-view').classList.add('flex'); document.getElementById('back-to-home-btn').classList.remove('hidden');
+            searchQuery = ""; document.getElementById('search-input').value = ""; updateTabsUI(); renderTable(); window.scrollTo(0,0);
         };
-        window.goHome = () => {
-            document.getElementById('main-app-view').classList.add('hidden');
-            document.getElementById('main-app-view').classList.remove('flex');
-            document.getElementById('home-view').classList.remove('hidden');
-            document.getElementById('back-to-home-btn').classList.add('hidden');
-        };
+        window.goHome = () => { document.getElementById('main-app-view').classList.add('hidden'); document.getElementById('main-app-view').classList.remove('flex'); document.getElementById('home-view').classList.remove('hidden'); document.getElementById('back-to-home-btn').classList.add('hidden'); };
 
         function updateTabsUI() {
-            const container = document.getElementById('tabs-container'); container.innerHTML = '';
-            let deptsArray = Array.from(departments).filter(d => d !== "הכל").sort(); deptsArray.unshift("הכל");
-            if (!deptsArray.includes(activeTab)) activeTab = "הכל";
-            deptsArray.forEach(dept => {
+            const c = document.getElementById('tabs-container'); c.innerHTML = '';
+            let dArr = Array.from(departments).filter(d => d !== "הכל").sort(); dArr.unshift("הכל");
+            if (!dArr.includes(activeTab)) activeTab = "הכל";
+            dArr.forEach(dept => {
                 const count = dept === "הכל" ? soldiers.length : soldiers.filter(s => s.department === dept).length;
                 const btn = document.createElement('button');
                 btn.className = `px-4 py-2 rounded-t-lg transition whitespace-nowrap text-sm flex gap-2 items-center ${activeTab === dept ? 'tab-active bg-white' : 'tab-inactive bg-gray-50/50 hover:bg-gray-100'}`;
                 btn.innerHTML = `${dept} <span class="text-xs px-2 rounded-full ${activeTab === dept ? 'bg-blue-100 text-blue-700' : 'bg-gray-200 text-gray-600'}">${count}</span>`;
                 btn.onclick = () => { activeTab = dept; updateTabsUI(); renderTable(); };
-                container.appendChild(btn);
+                c.appendChild(btn);
             });
         }
-        function updateDatalist() {
-            const dl = document.getElementById('dept-options'); dl.innerHTML = '';
-            departments.forEach(dept => { if(dept !== "הכל") dl.innerHTML += `<option value="${dept}">` });
-        }
+        function updateDatalist() { const dl = document.getElementById('dept-options'); dl.innerHTML = ''; departments.forEach(d => { if(d !== "הכל") dl.innerHTML += `<option value="${d}">` }); }
 
         function renderTable() {
             const tbody = document.getElementById('soldiers-table-body'); tbody.innerHTML = '';
-            let filtered = activeTab === "הכל" ? soldiers : soldiers.filter(s => s.department === activeTab);
-            if (searchQuery) filtered = filtered.filter(s => (s.name||"").includes(searchQuery) || (s.personalId||"").includes(searchQuery));
-            let repCount = 0;
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500">אין נתונים</td></tr>`;
-            } else {
-                filtered.forEach((soldier, idx) => {
-                    const status = dailyStatusMap[soldier.id] || "לא דווח";
-                    if (status !== "לא דווח") repCount++;
-                    const opt = STATUS_OPTIONS.find(o => o.val === status) || STATUS_OPTIONS[0];
-                    const streakHtml = soldier.streak > 0 ? `<span class="ml-2 inline-flex items-center gap-1 text-[10px] bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full border border-orange-200" title="${soldier.streak} ימים ברצף"><i class="fa-solid fa-fire text-orange-500"></i> ${soldier.streak}</span>` : '';
+            let f = activeTab === "הכל" ? soldiers : soldiers.filter(s => s.department === activeTab);
+            if (searchQuery) f = f.filter(s => (s.name||"").includes(searchQuery) || (s.personalId||"").includes(searchQuery));
+            let rC = 0;
+            if (f.length === 0) tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500">אין נתונים</td></tr>`;
+            else {
+                f.forEach((s, idx) => {
+                    const st = dailyStatusMap[s.id] || "לא דווח"; if (st !== "לא דווח") rC++;
+                    const opt = STATUS_OPTIONS.find(o => o.val === st) || STATUS_OPTIONS[0];
+                    const stHtml = s.streak > 0 ? `<span class="ml-2 inline-flex items-center gap-1 text-[10px] bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full border border-orange-200" title="${s.streak} ימים ברצף"><i class="fa-solid fa-fire text-orange-500"></i> ${s.streak}</span>` : '';
                     
-                    let selHtml = `<div class="flex items-center gap-2 justify-center">
-                        <button onclick="updateStatus('${soldier.id}', 'נוכח')" class="w-9 h-9 rounded-full flex items-center justify-center transition border focus:outline-none ${status==='נוכח'?'bg-green-500 text-white border-green-600':'bg-white text-gray-300 border-gray-200 hover:text-green-500'}"><i class="fa-solid fa-check"></i></button>
-                        <select onchange="updateStatus('${soldier.id}', this.value)" class="w-full min-w-[120px] p-2 border rounded-lg shadow-sm text-sm outline-none ${opt.color}">`;
-                    STATUS_OPTIONS.forEach(o => selHtml += `<option value="${o.val}" ${o.val===status?'selected':''}>${o.emoji} ${o.val}</option>`);
-                    selHtml += `</select></div>`;
+                    let sH = `<div class="flex items-center gap-2 justify-center">
+                        <button onclick="updateStatus('${s.id}', 'נוכח')" class="w-9 h-9 rounded-full flex items-center justify-center transition border focus:outline-none ${st==='נוכח'?'bg-green-500 text-white border-green-600':'bg-white text-gray-300 border-gray-200 hover:text-green-500'}"><i class="fa-solid fa-check"></i></button>
+                        <select onchange="updateStatus('${s.id}', this.value)" class="w-full min-w-[120px] p-2 border rounded-lg shadow-sm text-sm outline-none ${opt.color}">`;
+                    STATUS_OPTIONS.forEach(o => sH += `<option value="${o.val}" ${o.val===st?'selected':''}>${o.emoji} ${o.val}</option>`); sH += `</select></div>`;
 
                     tbody.innerHTML += `
                         <tr class="hover:bg-blue-50/50 border-b border-gray-100">
                             <td class="p-3 text-center text-gray-400 text-xs">${idx + 1}</td>
-                            <td class="p-3 font-medium text-gray-900 whitespace-nowrap">${escapeHTML(soldier.name)}${streakHtml}</td>
-                            <td class="p-3">${selHtml}</td>
-                            <td class="p-3 text-gray-600 text-xs"><span class="bg-gray-100 px-2 py-1 rounded">${escapeHTML(soldier.role||'-')}</span></td>
-                            <td class="p-3 text-gray-600 text-xs" dir="ltr">${escapeHTML(soldier.phone||'-')}</td>
-                            <td class="p-3 text-gray-600 text-xs">${escapeHTML(soldier.personalId||'-')}</td>
+                            <td class="p-3 font-medium text-gray-900 whitespace-nowrap cursor-pointer hover:text-blue-600 transition" onclick="openEquipmentModal('${s.id}')" title="לחץ לציוד חתום">${escapeHTML(s.name)}${stHtml}</td>
+                            <td class="p-3">${sH}</td>
+                            <td class="p-3 text-gray-600 text-xs"><span class="bg-gray-100 px-2 py-1 rounded">${escapeHTML(s.role||'-')}</span></td>
+                            <td class="p-3 text-gray-600 text-xs" dir="ltr">${escapeHTML(s.phone||'-')}</td>
+                            <td class="p-3 text-gray-600 text-xs">${escapeHTML(s.personalId||'-')}</td>
                             <td class="p-3 text-center">
                                 <div class="flex justify-center gap-1">
-                                    <button onclick="openEquipmentModal('${soldier.id}')" class="text-emerald-500 hover:bg-emerald-50 p-2 rounded transition" title="1004 / אפסנאות"><i class="fa-solid fa-backpack"></i></button>
-                                    <button onclick="openEditSoldierModal('${soldier.id}')" class="text-blue-400 hover:bg-blue-50 p-2 rounded transition"><i class="fa-solid fa-pen"></i></button>
-                                    <button onclick="confirmDelete('${soldier.id}', '${escapeHTML(soldier.name).replace(/'/g, "\\'")}')" class="text-red-400 hover:bg-red-50 p-2 rounded transition"><i class="fa-solid fa-trash"></i></button>
+                                    <button onclick="openEquipmentModal('${s.id}')" class="text-emerald-500 hover:bg-emerald-50 p-2 rounded transition" title="1004"><i class="fa-solid fa-backpack"></i></button>
+                                    <button onclick="openEditSoldierModal('${s.id}')" class="text-blue-400 hover:bg-blue-50 p-2 rounded transition"><i class="fa-solid fa-pen"></i></button>
+                                    <button onclick="confirmDelete('${s.id}', '${escapeHTML(s.name).replace(/'/g, "\\'")}')" class="text-red-400 hover:bg-red-50 p-2 rounded transition"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                             </td>
                         </tr>`;
                 });
             }
-            document.getElementById('total-count').textContent = filtered.length;
-            document.getElementById('reported-count').textContent = `${repCount} / ${filtered.length}`;
+            document.getElementById('total-count').textContent = f.length; document.getElementById('reported-count').textContent = `${rC} / ${f.length}`;
         }
-        window.updateStatus = async (id, st) => {
-            if(currentUser) await setDoc(doc(db, `daily_status/${document.getElementById('date-picker').value}/statuses`, id), { status: st });
-        };
+        window.updateStatus = async (id, st) => { if(currentUser) await setDoc(doc(db, `daily_status/${document.getElementById('date-picker').value}/statuses`, id), { status: st }); };
 
-
-        // ================= LOGISTICS: INVENTORY (ARMORY) =================
+        // ================= LOGISTICS: ARMORY =================
         function renderArmoryTable() {
-            const tbody = document.getElementById('armory-table-body');
-            const term = document.getElementById('inv-search').value.toLowerCase();
-            const fStatus = document.getElementById('inv-filter-status').value;
-            
-            let availCount = 0, assignedCount = 0;
-            
-            inventory.forEach(i => {
-                if(i.status === 'available') availCount++;
-                if(i.status === 'assigned') assignedCount++;
-            });
-
+            const tb = document.getElementById('armory-table-body'), term = document.getElementById('inv-search').value.toLowerCase(), fSt = document.getElementById('inv-filter-status').value;
+            let a=0, as=0; inventory.forEach(i => { if(i.status === 'available') a++; if(i.status === 'assigned') as++; });
             document.getElementById('armory-stats').innerHTML = `
-                <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 text-center">
-                    <div class="text-xs text-blue-600 font-bold mb-1">סה"כ פריטים ממוספרים</div><div class="text-2xl font-black text-blue-900">${inventory.length}</div>
-                </div>
-                <div class="bg-green-50 p-3 rounded-lg border border-green-100 text-center">
-                    <div class="text-xs text-green-600 font-bold mb-1">זמינים במחסן</div><div class="text-2xl font-black text-green-900">${availCount}</div>
-                </div>
-                <div class="bg-orange-50 p-3 rounded-lg border border-orange-100 text-center">
-                    <div class="text-xs text-orange-600 font-bold mb-1">מונפקים לחיילים</div><div class="text-2xl font-black text-orange-900">${assignedCount}</div>
-                </div>
-            `;
-
-            let html = '';
+                <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 text-center"><div class="text-xs text-blue-600 font-bold mb-1">סה"כ פריטים</div><div class="text-2xl font-black text-blue-900">${inventory.length}</div></div>
+                <div class="bg-green-50 p-3 rounded-lg border border-green-100 text-center"><div class="text-xs text-green-600 font-bold mb-1">זמינים במחסן</div><div class="text-2xl font-black text-green-900">${a}</div></div>
+                <div class="bg-orange-50 p-3 rounded-lg border border-orange-100 text-center"><div class="text-xs text-orange-600 font-bold mb-1">מונפקים</div><div class="text-2xl font-black text-orange-900">${as}</div></div>`;
+            let h = '';
             inventory.filter(i => {
-                if(fStatus !== 'all' && i.status !== fStatus) return false;
-                if(term) {
-                    const sName = i.assignedTo ? (soldiers.find(s=>s.id===i.assignedTo)?.name || "") : "";
-                    return (i.serial||"").includes(term) || (i.name||"").includes(term) || sName.includes(term);
-                }
+                if(fSt !== 'all' && i.status !== fSt) return false;
+                if(term) return (i.serial||"").includes(term) || (i.name||"").includes(term) || (i.assignedTo ? (soldiers.find(s=>s.id===i.assignedTo)?.name || "") : "").includes(term);
                 return true;
-            }).forEach(item => {
-                const sName = item.assignedTo ? (soldiers.find(s=>s.id===item.assignedTo)?.name || "חייל נמחק") : "-";
-                const statBadge = item.status === 'available' 
-                    ? `<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs"><i class="fa-solid fa-check mr-1"></i>במחסן</span>`
-                    : `<span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs"><i class="fa-solid fa-user mr-1"></i>מונפק</span>`;
-                
-                html += `<tr class="hover:bg-gray-50">
-                    <td class="p-3 text-xs text-gray-500">${escapeHTML(item.category)}</td>
-                    <td class="p-3 font-bold">${escapeHTML(item.name)}</td>
-                    <td class="p-3 font-mono text-blue-600" dir="ltr">${escapeHTML(item.serial)}</td>
-                    <td class="p-3">${statBadge}</td>
-                    <td class="p-3 text-sm">${escapeHTML(sName)}</td>
-                    <td class="p-3 text-center">
-                        ${item.status === 'available' ? `<button onclick="deleteInventoryItem('${item.id}')" class="text-red-400 hover:text-red-600 p-1"><i class="fa-solid fa-trash"></i></button>` : `<span class="text-gray-400 text-xs">לא ניתן למחוק בשימוש</span>`}
-                    </td>
-                </tr>`;
+            }).forEach(i => {
+                const sN = i.assignedTo ? (soldiers.find(s=>s.id===i.assignedTo)?.name || "-") : "-";
+                const bdg = i.status === 'available' ? `<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">במחסן</span>` : `<span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs">מונפק</span>`;
+                h += `<tr class="hover:bg-gray-50"><td class="p-3 text-xs text-gray-500">${escapeHTML(i.category)}</td><td class="p-3 font-bold">${escapeHTML(i.name)}</td><td class="p-3 font-mono text-blue-600" dir="ltr">${escapeHTML(i.serial)}</td><td class="p-3">${bdg}</td><td class="p-3 text-sm">${escapeHTML(sN)}</td><td class="p-3 text-center">${i.status === 'available' ? `<button onclick="deleteInventoryItem('${i.id}')" class="text-red-400 hover:text-red-600 p-1"><i class="fa-solid fa-trash"></i></button>` : `<span class="text-gray-400 text-xs">בשימוש</span>`}</td></tr>`;
             });
-            tbody.innerHTML = html || `<tr><td colspan="6" class="p-6 text-center text-gray-400">לא נמצאו פריטים</td></tr>`;
+            tb.innerHTML = h || `<tr><td colspan="6" class="p-6 text-center text-gray-400">לא נמצאו פריטים</td></tr>`;
         }
-
-        window.openAddInventoryModal = () => {
-            document.getElementById('new-inv-name').value = '';
-            document.getElementById('new-inv-serial').value = '';
-            document.getElementById('add-inventory-modal').classList.remove('hidden');
-            document.getElementById('add-inventory-modal').classList.add('flex');
+        window.openAddInventoryModal=()=>{document.getElementById('new-inv-name').value='';document.getElementById('new-inv-serial').value='';document.getElementById('add-inventory-modal').classList.remove('hidden');document.getElementById('add-inventory-modal').classList.add('flex');};
+        window.closeAddInventoryModal=()=>{document.getElementById('add-inventory-modal').classList.add('hidden');document.getElementById('add-inventory-modal').classList.remove('flex');};
+        window.submitNewInventoryItem=async()=>{
+            const c=document.getElementById('new-inv-cat').value, n=document.getElementById('new-inv-name').value.trim(), s=document.getElementById('new-inv-serial').value.trim();
+            if(!n||!s)return showToast("נא למלא הכל",true); if(inventory.find(i=>i.serial===s))return showToast("מס צ קיים!",true);
+            try{ await addDoc(collection(db,'inventory'),{category:c,name:n,serial:s,status:'available',assignedTo:null,addedAt:new Date().toISOString()}); showToast("נקלט"); closeAddInventoryModal(); }catch(e){}
         };
-        window.closeAddInventoryModal = () => {
-            document.getElementById('add-inventory-modal').classList.add('hidden');
-            document.getElementById('add-inventory-modal').classList.remove('flex');
-        };
-        window.submitNewInventoryItem = async () => {
-            const cat = document.getElementById('new-inv-cat').value;
-            const name = document.getElementById('new-inv-name').value.trim();
-            const serial = document.getElementById('new-inv-serial').value.trim();
-            if(!name || !serial) return showToast("נא למלא שם ומספר צ'", true);
-            
-            // בדיקת כפילות צ'
-            if(inventory.find(i => i.serial === serial)) return showToast("מספר צ' זה כבר קיים במערכת!", true);
+        window.deleteInventoryItem=async(id)=>{ if(confirm("למחוק פריט מהמחסן?")) await deleteDoc(doc(db,'inventory',id)); };
 
-            try {
-                await addDoc(collection(db, 'inventory'), {
-                    category: cat, name: name, serial: serial, status: 'available', assignedTo: null, addedAt: new Date().toISOString()
-                });
-                showToast("הפריט נקלט במחסן בהצלחה");
-                closeAddInventoryModal();
-            } catch(e) { showToast("שגיאה בשמירה", true); }
+        // Export/Import Armory
+        window.exportArmory = () => {
+            let c = "קטגוריה,שם פריט,מספר צ,סטטוס,חייל חתום\n";
+            inventory.forEach(i => { const sn=i.assignedTo?(soldiers.find(s=>s.id===i.assignedTo)?.name||""):""; const st=i.status==='available'?'במחסן':'מונפק'; c+=`"${i.category||''}","${i.name||''}","${i.serial||''}","${st}","${sn}"\n`; });
+            const u = URL.createObjectURL(new Blob(["\uFEFF" + c], { type: 'text/csv;charset=utf-8;' }));
+            const l = document.createElement("a"); l.href = u; l.download = "מלאי_מחסן.csv"; document.body.appendChild(l); l.click(); document.body.removeChild(l);
         };
-
-        window.deleteInventoryItem = async (id) => {
-            if(confirm("האם אתה בטוח שברצונך למחוק פריט זה מהמחסן לצמיתות?")) {
-                await deleteDoc(doc(db, 'inventory', id));
-                showToast("הפריט נמחק מהמחסן");
-            }
+        window.importArmoryExcel = async (e) => {
+            const f = e.target.files[0]; if(!f) return; showToast("קורא קובץ מחסן..."); const r = new FileReader();
+            r.onload = async (ev) => {
+                try {
+                    const rows = XLSX.utils.sheet_to_json(XLSX.read(new Uint8Array(ev.target.result), {type: 'array'}).Sheets[XLSX.read(new Uint8Array(ev.target.result), {type: 'array'}).SheetNames[0]], {header:1, defval:""}); let a=0;
+                    if(rows.length>0) {
+                        let ci=0, ni=1, si=2; const h=rows[0].map(x=>String(x).trim()); const hc=h.findIndex(x=>x.includes('קטגוריה')), hn=h.findIndex(x=>x.includes('שם')||x.includes('פריט')), hs=h.findIndex(x=>x.includes('צ')||x.includes('סידורי'));
+                        if(hn>-1&&hs>-1){ci=Math.max(0,hc);ni=hn;si=hs;}
+                        for(let i=1;i<rows.length;i++){
+                            const n=String(rows[i][ni]||'').replace(/["']/g,'').trim(), s=String(rows[i][si]||'').replace(/["']/g,'').trim(), c=String(rows[i][ci]||'כללי').trim();
+                            if(!n||!s||n==='שם הפריט'||inventory.find(iv=>iv.serial===s)) continue;
+                            await addDoc(collection(db,'inventory'),{category:c,name:n,serial:s,status:'available',assignedTo:null,addedAt:new Date().toISOString()}); a++;
+                        }
+                    } showToast(`${a} פריטים נוספו למחסן.`);
+                } catch(err) {} e.target.value='';
+            }; r.readAsArrayBuffer(f);
         };
 
         // ================= LOGISTICS: AMMO =================
         function renderLogisticsAmmo() {
-            const grid = document.getElementById('ammo-grid');
-            grid.innerHTML = '';
-            const types = Object.keys(ammoData);
-            if(types.length === 0) {
-                grid.innerHTML = `<div class="col-span-4 p-4 text-center text-gray-500 border border-dashed border-gray-300 rounded-lg">אין מלאי תחמושת. לחץ על 'קליטת תחמושת'.</div>`;
-            } else {
-                types.forEach(t => {
-                    grid.innerHTML += `<div class="bg-white border border-gray-200 p-4 rounded-xl shadow-sm text-center">
-                        <div class="text-gray-500 text-sm font-bold mb-1">${escapeHTML(t)}</div>
-                        <div class="text-3xl font-black text-gray-800" dir="ltr">${ammoData[t]}</div>
-                    </div>`;
-                });
-            }
-
-            const logsBody = document.getElementById('ammo-logs-body');
-            let lhtml = '';
-            ammoLogs.forEach(lg => {
-                const dt = new Date(lg.date).toLocaleDateString('he-IL') + " " + new Date(lg.date).toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'});
-                lhtml += `<tr>
-                    <td class="p-3 text-xs text-gray-500">${dt}</td>
-                    <td class="p-3 font-bold">${escapeHTML(lg.type)}</td>
-                    <td class="p-3 font-mono text-red-600" dir="ltr">-${lg.amount}</td>
-                    <td class="p-3 text-gray-600 text-sm">${escapeHTML(lg.reason)}</td>
-                </tr>`;
+            const g = document.getElementById('ammo-grid'); g.innerHTML = ''; const t = Object.keys(ammoData);
+            if(t.length===0) g.innerHTML = `<div class="col-span-4 p-4 text-center text-gray-500 border border-dashed rounded-lg">אין מלאי</div>`;
+            else t.forEach(k => {
+                g.innerHTML += `<div class="bg-white border border-gray-200 p-4 rounded-xl shadow-sm text-center relative group">
+                    <button onclick="deleteAmmoType('${escapeHTML(k)}')" class="absolute top-2 left-2 text-red-300 hover:text-red-500 hidden group-hover:block transition" title="מחק סוג"><i class="fa-solid fa-trash text-sm"></i></button>
+                    <div class="text-gray-500 text-sm font-bold mb-1">${escapeHTML(k)}</div><div class="text-3xl font-black text-gray-800" dir="ltr">${ammoData[k]}</div>
+                </div>`;
             });
-            logsBody.innerHTML = lhtml || `<tr><td colspan="4" class="p-6 text-center text-gray-400">אין תיעוד ירי/בלאי</td></tr>`;
+            const lB = document.getElementById('ammo-logs-body'); let lh = '';
+            ammoLogs.forEach(lg => { lh += `<tr><td class="p-3 text-xs text-gray-500">${new Date(lg.date).toLocaleDateString('he-IL')} ${new Date(lg.date).toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})}</td><td class="p-3 font-bold">${escapeHTML(lg.type)}</td><td class="p-3 font-mono text-red-600" dir="ltr">-${lg.amount}</td><td class="p-3 text-gray-600 text-sm">${escapeHTML(lg.reason)}</td></tr>`; });
+            lB.innerHTML = lh || `<tr><td colspan="4" class="p-6 text-center text-gray-400">אין תיעוד</td></tr>`;
         }
+        window.deleteAmmoType = async (type) => {
+            if(confirm(`למחוק לחלוטין את התחמושת מסוג ${type}?`)) { const nd={...ammoData}; delete nd[type]; await setDoc(doc(db,'logistics','ammo'), nd); showToast("נמחק"); }
+        };
+        window.openAmmoUpdateModal=()=>{document.getElementById('upd-ammo-type').value='';document.getElementById('upd-ammo-qty').value='';document.getElementById('ammo-update-modal').classList.remove('hidden');document.getElementById('ammo-update-modal').classList.add('flex');};
+        window.closeAmmoUpdateModal=()=>{document.getElementById('ammo-update-modal').classList.add('hidden');document.getElementById('ammo-update-modal').classList.remove('flex');};
+        window.submitAmmoUpdate=async()=>{ const t=document.getElementById('upd-ammo-type').value.trim(), q=parseInt(document.getElementById('upd-ammo-qty').value); if(!t||isNaN(q))return; try{ await setDoc(doc(db,'logistics','ammo'),{[t]:q},{merge:true}); closeAmmoUpdateModal(); }catch(e){} };
+        function populateAmmoSelects(){ const sl=document.getElementById('shoot-ammo-type'); sl.innerHTML='<option value="">בחר...</option>'; Object.keys(ammoData).forEach(t=>sl.innerHTML+=`<option value="${t}">${t} (קיים: ${ammoData[t]})</option>`); }
+        window.openShootReportModal=()=>{document.getElementById('shoot-ammo-qty').value='';document.getElementById('shoot-ammo-reason').value='';document.getElementById('shoot-report-modal').classList.remove('hidden');document.getElementById('shoot-report-modal').classList.add('flex');};
+        window.closeShootReportModal=()=>{document.getElementById('shoot-report-modal').classList.add('hidden');document.getElementById('shoot-report-modal').classList.remove('flex');};
+        window.submitShootReport=async()=>{ const t=document.getElementById('shoot-ammo-type').value, q=parseInt(document.getElementById('shoot-ammo-qty').value), r=document.getElementById('shoot-ammo-reason').value.trim(); if(!t||isNaN(q)||q<=0||!r)return; const c=ammoData[t]||0; if(q>c)return showToast("אין מספיק",true); try{ await setDoc(doc(db,'logistics','ammo'),{[t]:c-q},{merge:true}); await addDoc(collection(db,'ammo_logs'),{type:t,amount:q,reason:r,date:new Date().toISOString()}); closeShootReportModal(); }catch(e){} };
 
-        window.openAmmoUpdateModal = () => {
-            document.getElementById('upd-ammo-type').value = ''; document.getElementById('upd-ammo-qty').value = '';
-            document.getElementById('ammo-update-modal').classList.remove('hidden'); document.getElementById('ammo-update-modal').classList.add('flex');
+        // Export/Import Ammo
+        window.exportAmmo = () => {
+            let c = "סוג תחמושת,כמות במלאי\n"; Object.keys(ammoData).forEach(k => c += `"${k}","${ammoData[k]}"\n`);
+            const u = URL.createObjectURL(new Blob(["\uFEFF" + c], { type: 'text/csv;charset=utf-8;' })); const l = document.createElement("a"); l.href = u; l.download = "מלאי_תחמושת.csv"; document.body.appendChild(l); l.click(); document.body.removeChild(l);
         };
-        window.closeAmmoUpdateModal = () => {
-            document.getElementById('ammo-update-modal').classList.add('hidden'); document.getElementById('ammo-update-modal').classList.remove('flex');
-        };
-        window.submitAmmoUpdate = async () => {
-            const type = document.getElementById('upd-ammo-type').value.trim();
-            const qty = parseInt(document.getElementById('upd-ammo-qty').value);
-            if(!type || isNaN(qty)) return showToast("נא למלא נתונים", true);
-            try {
-                await setDoc(doc(db, 'logistics', 'ammo'), { [type]: qty }, {merge: true});
-                showToast("מלאי תחמושת עודכן"); closeAmmoUpdateModal();
-            } catch(e) { showToast("שגיאה בעדכון", true); }
-        };
-
-        function populateAmmoSelects() {
-            const sel = document.getElementById('shoot-ammo-type');
-            sel.innerHTML = '<option value="">בחר תחמושת...</option>';
-            Object.keys(ammoData).forEach(t => sel.innerHTML += `<option value="${t}">${t} (קיים: ${ammoData[t]})</option>`);
-        }
-
-        window.openShootReportModal = () => {
-            document.getElementById('shoot-ammo-qty').value = ''; document.getElementById('shoot-ammo-reason').value = '';
-            document.getElementById('shoot-report-modal').classList.remove('hidden'); document.getElementById('shoot-report-modal').classList.add('flex');
-        };
-        window.closeShootReportModal = () => {
-            document.getElementById('shoot-report-modal').classList.add('hidden'); document.getElementById('shoot-report-modal').classList.remove('flex');
-        };
-        window.submitShootReport = async () => {
-            const type = document.getElementById('shoot-ammo-type').value;
-            const qty = parseInt(document.getElementById('shoot-ammo-qty').value);
-            const reason = document.getElementById('shoot-ammo-reason').value.trim();
-            
-            if(!type || isNaN(qty) || qty<=0 || !reason) return showToast("מלא את כל שדות הדיווח", true);
-            const current = ammoData[type] || 0;
-            if(qty > current) return showToast("הכמות גדולה ממה שקיים במחסן!", true);
-
-            try {
-                // Deduct ammo
-                await setDoc(doc(db, 'logistics', 'ammo'), { [type]: current - qty }, {merge: true});
-                // Log the action
-                await addDoc(collection(db, 'ammo_logs'), { type, amount: qty, reason, date: new Date().toISOString() });
-                showToast("דיווח ירי נקלט בהצלחה והמלאי עודכן");
-                closeShootReportModal();
-            } catch(e) { showToast("שגיאה", true); }
+        window.importAmmoExcel = async (e) => {
+            const f = e.target.files[0]; if(!f) return; showToast("קורא תחמושת..."); const r = new FileReader();
+            r.onload = async (ev) => {
+                try {
+                    const rows = XLSX.utils.sheet_to_json(XLSX.read(new Uint8Array(ev.target.result), {type: 'array'}).Sheets[XLSX.read(new Uint8Array(ev.target.result), {type: 'array'}).SheetNames[0]], {header:1, defval:""});
+                    let u=0; const up={};
+                    if(rows.length>0) { for(let i=1;i<rows.length;i++){ const t=String(rows[i][0]||'').trim(), q=parseInt(String(rows[i][1]||'').replace(/,/g,'').trim()); if(t&&!isNaN(q)){up[t]=q; u++;} } }
+                    if(u>0){ await setDoc(doc(db,'logistics','ammo'),up,{merge:true}); showToast(`${u} עודכנו.`); } else showToast("אין נתונים",true);
+                } catch(err) {} e.target.value='';
+            }; r.readAsArrayBuffer(f);
         };
 
 
         // ================= SOLDIER EQUIPMENT MODAL (טופס 1004) =================
-        window.openEquipmentModal = (soldierId) => {
-            equipmentModalSoldierId = soldierId;
-            const soldier = soldiers.find(s => s.id === soldierId);
-            document.getElementById('eq-soldier-name').textContent = soldier.name + " (" + (soldier.personalId||"") + ")";
-            renderEquipmentModal(soldierId);
-            document.getElementById('equipment-modal').classList.remove('hidden');
-            document.getElementById('equipment-modal').classList.add('flex');
+        window.openEquipmentModal = (id) => {
+            equipmentModalSoldierId = id; const s = soldiers.find(x => x.id === id); document.getElementById('eq-soldier-name').textContent = s.name + " (" + (s.personalId||"") + ")";
+            renderEquipmentModal(id); document.getElementById('equipment-modal').classList.remove('hidden'); document.getElementById('equipment-modal').classList.add('flex');
         };
-
-        window.closeEquipmentModal = () => {
-            equipmentModalSoldierId = null;
-            document.getElementById('equipment-modal').classList.add('hidden');
-            document.getElementById('equipment-modal').classList.remove('flex');
-        };
-
-        function renderEquipmentModal(soldierId) {
-            // 1. Populate Dropdown with AVAILABLE items
-            const sel = document.getElementById('eq-item-select');
-            sel.innerHTML = '<option value="">בחר מתוך המחסן...</option>';
-            const avail = inventory.filter(i => i.status === 'available');
-            if(avail.length === 0) sel.innerHTML = '<option value="">המחסן ריק / הכל מונפק</option>';
-            
-            avail.forEach(item => {
-                sel.innerHTML += `<option value="${item.id}">${item.category}: ${item.name} (צ': ${item.serial})</option>`;
-            });
-
-            // 2. Populate Assigned Table
-            const tbody = document.getElementById('eq-assigned-body');
-            const assigned = inventory.filter(i => i.status === 'assigned' && i.assignedTo === soldierId);
-            
-            if(assigned.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-gray-500 text-sm">החייל לא חתום על ציוד מהמחסן.</td></tr>`;
-            } else {
-                let html = '';
-                assigned.forEach(item => {
-                    html += `<tr>
-                        <td class="p-3 font-medium text-gray-800">${escapeHTML(item.name)}</td>
-                        <td class="p-3 font-mono text-blue-600 text-sm" dir="ltr">${escapeHTML(item.serial)}</td>
-                        <td class="p-3 text-center">
-                            <button onclick="returnEquipmentFromSoldier('${item.id}')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded text-xs font-bold transition">הזדכות <i class="fa-solid fa-arrow-rotate-left"></i></button>
-                        </td>
-                    </tr>`;
-                });
-                tbody.innerHTML = html;
-            }
+        window.closeEquipmentModal = () => { equipmentModalSoldierId = null; document.getElementById('equipment-modal').classList.add('hidden'); document.getElementById('equipment-modal').classList.remove('flex'); };
+        function renderEquipmentModal(id) {
+            const sl = document.getElementById('eq-item-select'); sl.innerHTML = '<option value="">בחר פריט פנוי...</option>'; const av = inventory.filter(i => i.status === 'available');
+            if(av.length === 0) sl.innerHTML = '<option value="">המחסן ריק</option>'; av.forEach(i => sl.innerHTML += `<option value="${i.id}">${i.category}: ${i.name} (צ': ${i.serial})</option>`);
+            const tb = document.getElementById('eq-assigned-body'); const as = inventory.filter(i => i.status === 'assigned' && i.assignedTo === id);
+            if(as.length === 0) tb.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-gray-500 text-sm">אין ציוד חתום.</td></tr>`;
+            else { let h=''; as.forEach(i => h+=`<tr><td class="p-3 font-medium text-gray-800">${escapeHTML(i.name)}</td><td class="p-3 font-mono text-blue-600 text-sm" dir="ltr">${escapeHTML(i.serial)}</td><td class="p-3 text-center"><button onclick="returnEquipmentFromSoldier('${i.id}')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded text-xs font-bold">הזדכות <i class="fa-solid fa-arrow-rotate-left"></i></button></td></tr>`); tb.innerHTML = h; }
         }
-
-        window.assignEquipmentToSoldier = async () => {
-            if(!equipmentModalSoldierId) return;
-            const invId = document.getElementById('eq-item-select').value;
-            if(!invId) return showToast("בחר פריט", true);
-
-            try {
-                await updateDoc(doc(db, 'inventory', invId), {
-                    status: 'assigned',
-                    assignedTo: equipmentModalSoldierId,
-                    assignedAt: new Date().toISOString()
-                });
-                showToast("הפריט הונפק לחייל");
-                // The onSnapshot will auto-refresh the modal!
-            } catch(e) { showToast("שגיאה בהנפקה", true); }
-        };
-
-        window.returnEquipmentFromSoldier = async (invId) => {
-            if(confirm("להזדכות על הפריט ולהחזיר אותו למחסן הפלוגה?")) {
-                try {
-                    await updateDoc(doc(db, 'inventory', invId), {
-                        status: 'available',
-                        assignedTo: null,
-                        assignedAt: null
-                    });
-                    showToast("הפריט חזר למחסן");
-                } catch(e) { showToast("שגיאה בהזדכות", true); }
-            }
-        };
-
+        window.assignEquipmentToSoldier = async () => { if(!equipmentModalSoldierId) return; const id = document.getElementById('eq-item-select').value; if(!id) return; try{ await updateDoc(doc(db,'inventory',id),{status:'assigned',assignedTo:equipmentModalSoldierId,assignedAt:new Date().toISOString()}); showToast("הונפק"); }catch(e){} };
+        window.returnEquipmentFromSoldier = async (id) => { if(confirm("להזדכות למחסן?")) await updateDoc(doc(db,'inventory',id),{status:'available',assignedTo:null,assignedAt:null}); };
         window.sendWhatsAppEq = () => {
-            if(!equipmentModalSoldierId) return;
-            const soldier = soldiers.find(s => s.id === equipmentModalSoldierId);
-            const assigned = inventory.filter(i => i.status === 'assigned' && i.assignedTo === equipmentModalSoldierId);
-            
-            const todayStr = new Date().toLocaleDateString('he-IL');
-            let text = `היי ${soldier.name},\nלהלן פירוט ציוד ה-*צל"מ והאפסנאות* שאתה חתום עליו (1004) נכון ל-${todayStr}:\n\n`;
-            
-            if(assigned.length === 0) {
-                text += `✅ *אין לך ציוד חתום.* הכל זוכה בהצלחה.\n`;
-            } else {
-                assigned.forEach((item, idx) => {
-                    text += `${idx+1}. ${item.name} - מס' צ': *${item.serial}*\n`;
-                });
-                text += `\n⚠️ *שים לב:* הציוד באחריותך האישית. נא לוודא שהוא ברשותך ושלם, ולהזדכות כראוי בסיום הפעילות.`;
-            }
-            
-            copyToClipboard(text, "רשימת הציוד הועתקה. פתח את וואטסאפ והדבק לחייל.");
+            if(!equipmentModalSoldierId) return; const s = soldiers.find(x => x.id === equipmentModalSoldierId); const as = inventory.filter(i => i.status === 'assigned' && i.assignedTo === equipmentModalSoldierId);
+            let t = `היי ${s.name},\nפירוט צל"מ שאתה חתום עליו (1004) נכון להיום:\n\n`;
+            if(as.length===0) t+=`✅ אין ציוד. הכל זוכה.\n`; else { as.forEach((i,idx)=>t+=`${idx+1}. ${i.name} - מס' צ': *${i.serial}*\n`); t+=`\n⚠️ שים לב: באחריותך להזדכות עליו בסוף הפעילות.`; }
+            copyToClipboard(t, "רשימת הציוד הועתקה.");
         };
 
-
-        // ================= GENERAL HELPERS & EXPORTS (Preserved intact) =================
-        function copyToClipboard(text, successMsg = "הועתק ללוח!") {
-            const textarea = document.createElement('textarea'); textarea.value = text;
-            document.body.appendChild(textarea); textarea.select();
-            try { document.execCommand('copy'); showToast(successMsg); } 
-            catch(err) { showToast("שגיאה בהעתקה", true); }
-            document.body.removeChild(textarea);
-        }
-
-        window.copySummary = () => {
-            const date = document.getElementById('date-picker').value;
-            const parts = date.split('-');
-            const pd = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : date;
-            let text = `*דוח 1 - ${pd}*\n`; if (activeTab !== "הכל") text += `*מחלקה: ${activeTab}*\n`; text += `\n`;
-            let counts = {}; STATUS_OPTIONS.forEach(opt => counts[opt.val] = 0); let msN = [];
-            const fs = activeTab === "הכל" ? soldiers : soldiers.filter(s => s.department === activeTab);
-            fs.forEach(s => { const stat = dailyStatusMap[s.id] || "לא דווח"; if(counts[stat]!==undefined) counts[stat]++; else counts["לא דווח"]++; if(stat==="לא דווח") msN.push(s.name); });
-            text += `👥 סה"כ במצבת: ${fs.length}\n`;
-            STATUS_OPTIONS.forEach(opt => { if(opt.val!=="לא דווח" && counts[opt.val]>0) text += `${opt.emoji} ${opt.val}: ${counts[opt.val]}\n`; });
-            text += `\n${STATUS_OPTIONS[0].emoji} לא דווח: ${counts["לא דווח"]}\n`;
-            if (msN.length > 0 && msN.length <= 15) text += `(חסרים: ${msN.join(', ')})\n`;
-            copyToClipboard(text);
-        };
-
-        window.openExportModal = () => {
-            const t = new Date(); const y=t.getFullYear(), m=String(t.getMonth()+1).padStart(2,'0'), d=String(t.getDate()).padStart(2,'0');
-            document.getElementById('export-start').value = `${y}-${m}-01`; document.getElementById('export-end').value = `${y}-${m}-${d}`;
-            document.getElementById('export-modal').classList.remove('hidden'); document.getElementById('export-modal').classList.add('flex');
-        };
-        window.closeExportModal = () => { document.getElementById('export-modal').classList.add('hidden'); document.getElementById('export-modal').classList.remove('flex'); };
-
-        window.executeRangeExport = async () => {
-            const stStr = document.getElementById('export-start').value, enStr = document.getElementById('export-end').value;
-            if (!stStr || !enStr) return showToast("נא לבחור תאריכים", true);
-            showToast("מכין דוח..."); closeExportModal();
-            const dates = []; let c = new Date(stStr); const e = new Date(enStr);
-            while (c <= e) { dates.push(c.toISOString().split('T')[0]); c.setDate(c.getDate() + 1); }
-            const rd = {};
-            for (const d of dates) {
-                rd[d] = {}; const snap = await getDocs(collection(db, `daily_status/${d}/statuses`)); snap.forEach(doc => rd[d][doc.id] = doc.data().status);
-            }
-            const fs = activeTab === "הכל" ? soldiers : soldiers.filter(s => s.department === activeTab);
-            let csv = "שם החייל,מספר אישי,טלפון,תפקיד,מחלקה,רצף עכשווי";
-            dates.forEach(d => csv += `,${d.split('-')[2]}/${d.split('-')[1]}`); csv += "\n";
-            fs.forEach(s => {
-                let row = `"${s.name||''}","${s.personalId||''}","${s.phone||''}","${s.role||''}","${s.department||''}","${s.streak||0}"`;
-                dates.forEach(d => row += `,"${rd[d][s.id] || "לא דווח"}"`); csv += row + "\n";
-            });
-            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob); const link = document.createElement("a");
-            link.setAttribute("href", url); link.setAttribute("download", `דוח_נוכחות_${stStr}_${enStr}.csv`);
-            document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
-        };
-
-        // EXCEL IMPORT 
-        window.processExcel = async (event) => {
-            const f = event.target.files[0]; if(!f) return;
-            const dn = prompt("שם המחלקה לקובץ זה:", f.name.replace(/\.[^/.]+$/, "")); if(!dn) { event.target.value=''; return; }
-            showToast("קורא קובץ..."); const importId = Date.now(); const r = new FileReader();
-            r.onload = async (e) => {
-                try {
-                    const rows = XLSX.utils.sheet_to_json(XLSX.read(new Uint8Array(e.target.result), {type: 'array'}).Sheets[XLSX.read(new Uint8Array(e.target.result), {type: 'array'}).SheetNames[0]], {header:1, defval:""});
-                    let added = 0;
-                    if(rows.length > 0) {
-                        let ni=-1, ri=-1, idi=-1, pi=-1;
-                        for(let i=0; i<Math.min(rows.length,30); i++) {
-                            const c = rows[i].map(x=>String(x).trim());
-                            ni = c.findIndex(x=>x.includes('שם')); if(ni!==-1) { ri = c.findIndex(x=>x.includes('תפקיד')||x.includes('מחלקה')); idi = c.findIndex(x=>x.includes('אישי')||x.includes('צ"')); pi = c.findIndex(x=>x.includes('טלפון')||x.includes('נייד')); break; }
-                        }
-                        if(ni===-1 && rows.length>0) { ni=0; ri=1; idi=2; pi=3; }
-                        for(let i=0; i<rows.length; i++) {
-                            const c = rows[i]; if(c.length<=ni || !c[ni]) continue;
-                            const n = String(c[ni]).replace(/["']/g,'').trim();
-                            if(n==='שם'||n.includes('סה"כ')||!isNaN(n)||n.length<2) continue;
-                            await addDoc(collection(db, 'soldiers_roster'), { name:n, department:dn, role:(ri>-1?String(c[ri]).trim():""), personalId:(idi>-1?String(c[idi]).trim():""), phone:(pi>-1?String(c[pi]).trim():""), createdAt:new Date().toISOString(), importId }); added++;
-                        }
-                    }
-                    showToast(`הסתיים! ${added} שורות יובאו`);
-                } catch(err) { showToast("שגיאה בקריאת הקובץ", true); }
-                event.target.value='';
-            }; r.readAsArrayBuffer(f);
-        };
-        window.confirmUndoImport = () => {
-            const b = soldiers.map(s=>s.importId).filter(id=>id); if(b.length===0) return showToast("אין ייבוא לבטל",true);
-            const lid = Math.max(...b); const d = soldiers.filter(s=>s.importId===lid);
-            if(confirm(`למחוק ${d.length} חיילים מהייבוא האחרון?`)) { d.forEach(s=>deleteDoc(doc(db,'soldiers_roster',s.id))); showToast("הייבוא בוטל"); }
-        };
-
+        // EXPORTS / IMPORTS / MODALS (General)
+        function copyToClipboard(t, sm="הועתק ללוח!"){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');showToast(sm);}catch(err){}document.body.removeChild(ta);}
+        window.openExportModal=()=>{const t=new Date(),y=t.getFullYear(),m=String(t.getMonth()+1).padStart(2,'0'),d=String(t.getDate()).padStart(2,'0');document.getElementById('export-start').value=`${y}-${m}-01`;document.getElementById('export-end').value=`${y}-${m}-${d}`;document.getElementById('export-modal').classList.remove('hidden');document.getElementById('export-modal').classList.add('flex');};
+        window.closeExportModal=()=>{document.getElementById('export-modal').classList.add('hidden');document.getElementById('export-modal').classList.remove('flex');};
+        window.executeRangeExport=async()=>{const st=document.getElementById('export-start').value,en=document.getElementById('export-end').value;if(!st||!en)return;showToast("מכין דוח...");closeExportModal();const ds=[];let c=new Date(st);const e=new Date(en);while(c<=e){ds.push(c.toISOString().split('T')[0]);c.setDate(c.getDate()+1);}const rd={};for(const d of ds){rd[d]={};const snap=await getDocs(collection(db,`daily_status/${d}/statuses`));snap.forEach(doc=>rd[d][doc.id]=doc.data().status);}const fs=activeTab==="הכל"?soldiers:soldiers.filter(s=>s.department===activeTab);let csv="שם החייל,מספר אישי,טלפון,תפקיד,מחלקה,רצף עכשווי";ds.forEach(d=>csv+=`,${d.split('-')[2]}/${d.split('-')[1]}`);csv+="\n";fs.forEach(s=>{let row=`"${s.name||''}","${s.personalId||''}","${s.phone||''}","${s.role||''}","${s.department||''}","${s.streak||0}"`;ds.forEach(d=>row+=`,"${rd[d][s.id]||"לא דווח"}"`);csv+=row+"\n";});const u=URL.createObjectURL(new Blob(["\uFEFF"+csv],{type:'text/csv;charset=utf-8;'}));const l=document.createElement("a");l.href=u;l.download=`דוח_${st}_${en}.csv`;document.body.appendChild(l);l.click();document.body.removeChild(l);URL.revokeObjectURL(u);};
+        window.processExcel=async(e)=>{const f=e.target.files[0];if(!f)return;const dn=prompt("שם המחלקה:",f.name.replace(/\.[^/.]+$/,""));if(!dn){e.target.value='';return;}showToast("קורא קובץ...");const id=Date.now(),r=new FileReader();r.onload=async(ev)=>{try{const rows=XLSX.utils.sheet_to_json(XLSX.read(new Uint8Array(ev.target.result),{type:'array'}).Sheets[XLSX.read(new Uint8Array(ev.target.result),{type:'array'}).SheetNames[0]],{header:1,defval:""});let a=0;if(rows.length>0){let ni=-1,ri=-1,idi=-1,pi=-1;for(let i=0;i<Math.min(rows.length,30);i++){const c=rows[i].map(x=>String(x).trim());ni=c.findIndex(x=>x.includes('שם'));if(ni!==-1){ri=c.findIndex(x=>x.includes('תפקיד')||x.includes('מחלקה'));idi=c.findIndex(x=>x.includes('אישי')||x.includes('צ"'));pi=c.findIndex(x=>x.includes('טלפון')||x.includes('נייד'));break;}}if(ni===-1&&rows.length>0){ni=0;ri=1;idi=2;pi=3;}for(let i=0;i<rows.length;i++){const c=rows[i];if(c.length<=ni||!c[ni])continue;const n=String(c[ni]).replace(/["']/g,'').trim();if(n==='שם'||n.includes('סה"כ')||!isNaN(n)||n.length<2)continue;await addDoc(collection(db,'soldiers_roster'),{name:n,department:dn,role:(ri>-1?String(c[ri]).trim():""),personalId:(idi>-1?String(c[idi]).trim():""),phone:(pi>-1?String(c[pi]).trim():""),createdAt:new Date().toISOString(),importId:id});a++;}}showToast(`הסתיים! ${a} שורות יובאו`);}catch(err){}e.target.value='';};r.readAsArrayBuffer(f);};
+        window.confirmUndoImport=()=>{const b=soldiers.map(s=>s.importId).filter(i=>i);if(b.length===0)return showToast("אין ייבוא לבטל",true);const lid=Math.max(...b),d=soldiers.filter(s=>s.importId===lid);if(confirm(`למחוק ${d.length} חיילים?`)){d.forEach(s=>deleteDoc(doc(db,'soldiers_roster',s.id)));showToast("הייבוא בוטל");}};
         window.openAddSoldierModal=()=>{currentEditSoldierId=null;document.getElementById('modal-title').textContent='הוספת חייל';document.getElementById('add-soldier-form').reset();document.getElementById('add-soldier-modal').classList.remove('hidden');document.getElementById('add-soldier-modal').classList.add('flex');};
         window.openEditSoldierModal=(id)=>{const s=soldiers.find(x=>x.id===id);if(!s)return;currentEditSoldierId=id;document.getElementById('modal-title').textContent='עריכת חייל';document.getElementById('new-soldier-name').value=s.name||'';document.getElementById('new-soldier-id').value=s.personalId||'';document.getElementById('new-soldier-phone').value=s.phone||'';document.getElementById('new-soldier-role').value=s.role||'';document.getElementById('new-soldier-dept').value=s.department||'';document.getElementById('add-soldier-modal').classList.remove('hidden');document.getElementById('add-soldier-modal').classList.add('flex');};
         window.closeAddSoldierModal=()=>{document.getElementById('add-soldier-modal').classList.add('hidden');document.getElementById('add-soldier-modal').classList.remove('flex');};
-        window.submitSoldierForm=async(e)=>{e.preventDefault();const n=document.getElementById('new-soldier-name').value.trim(),d=document.getElementById('new-soldier-dept').value.trim(),i=document.getElementById('new-soldier-id').value.trim(),p=document.getElementById('new-soldier-phone').value.trim(),r=document.getElementById('new-soldier-role').value.trim();if(!n||!d)return;try{if(currentEditSoldierId)await updateDoc(doc(db,'soldiers_roster',currentEditSoldierId),{name:n,department:d,personalId:i,phone:p,role:r});else await addDoc(collection(db,'soldiers_roster'),{name:n,department:d,personalId:i,phone:p,role:r,createdAt:new Date().toISOString()});closeAddSoldierModal();showToast("נשמר!");if(activeTab!=="הכל"&&activeTab!==d)activeTab=d;}catch(e){showToast("שגיאה",true);}};
+        window.submitSoldierForm=async(e)=>{e.preventDefault();const n=document.getElementById('new-soldier-name').value.trim(),d=document.getElementById('new-soldier-dept').value.trim(),i=document.getElementById('new-soldier-id').value.trim(),p=document.getElementById('new-soldier-phone').value.trim(),r=document.getElementById('new-soldier-role').value.trim();if(!n||!d)return;try{if(currentEditSoldierId)await updateDoc(doc(db,'soldiers_roster',currentEditSoldierId),{name:n,department:d,personalId:i,phone:p,role:r});else await addDoc(collection(db,'soldiers_roster'),{name:n,department:d,personalId:i,phone:p,role:r,createdAt:new Date().toISOString()});closeAddSoldierModal();showToast("נשמר!");if(activeTab!=="הכל"&&activeTab!==d)activeTab=d;}catch(e){}};
         window.confirmDelete=(id,name)=>{if(confirm(`למחוק את ${name}?`))deleteDoc(doc(db,'soldiers_roster',id)).then(()=>showToast("נמחק"));};
-        function showToast(msg,err=false){const t=document.getElementById('toast');document.getElementById('toast-msg').textContent=msg;t.classList.replace(err?'bg-gray-800':'bg-red-600',err?'bg-red-600':'bg-gray-800');t.querySelector('i').className=err?'fa-solid fa-circle-exclamation':'fa-solid fa-circle-check text-green-400';t.classList.remove('opacity-0','pointer-events-none','translate-y-4');setTimeout(()=>t.classList.add('opacity-0','pointer-events-none','translate-y-4'),3000);}
-        function escapeHTML(str){if(!str)return'';return str.replace(/[&<>'"]/g,tag=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[tag]));}
-
+        function showToast(m,err=false){const t=document.getElementById('toast');document.getElementById('toast-msg').textContent=m;t.classList.replace(err?'bg-gray-800':'bg-red-600',err?'bg-red-600':'bg-gray-800');t.querySelector('i').className=err?'fa-solid fa-circle-exclamation':'fa-solid fa-circle-check text-green-400';t.classList.remove('opacity-0','pointer-events-none','translate-y-4');setTimeout(()=>t.classList.add('opacity-0','pointer-events-none','translate-y-4'),3000);}
+        function escapeHTML(str){if(!str)return'';return str.replace(/[&<>'"]/g,t=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t]));}
         window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
