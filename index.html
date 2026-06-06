@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -298,6 +299,7 @@
                     dailyStatusMap[doc.id] = doc.data().status;
                 });
                 renderTable();
+                renderHomeView(); // Update the dashboard cards in real time
             });
         }
 
@@ -321,35 +323,80 @@
 
             // Render specific departments first
             deptsArray.forEach(dept => {
-                const count = soldiers.filter(s => s.department === dept).length;
+                const deptSoldiers = soldiers.filter(s => s.department === dept);
+                const count = deptSoldiers.length;
+                
+                let reported = 0;
+                let present = 0;
+                
+                deptSoldiers.forEach(s => {
+                    const stat = dailyStatusMap[s.id] || "לא דווח";
+                    if (stat !== "לא דווח") reported++;
+                    if (stat === "נוכח") present++;
+                });
+
                 const btn = document.createElement('button');
-                btn.className = "bg-white hover:bg-blue-50 border border-gray-200 hover:border-blue-300 p-6 rounded-2xl shadow-sm hover:shadow-md transition-all flex flex-col items-center justify-center gap-3 text-gray-800 group";
+                btn.className = "bg-white hover:bg-blue-50 border border-gray-200 hover:border-blue-300 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all flex flex-col items-center justify-center gap-3 text-gray-800 group w-full";
                 btn.onclick = () => goToDepartment(dept);
                 
                 btn.innerHTML = `
                     <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
                         <i class="fa-solid fa-users"></i>
                     </div>
-                    <div class="text-center">
-                        <h3 class="font-bold text-xl">${escapeHTML(dept)}</h3>
-                        <p class="text-sm text-gray-500 mt-1">${count} חיילים במצבת</p>
+                    <div class="text-center w-full mt-1">
+                        <h3 class="font-bold text-xl mb-3">${escapeHTML(dept)}</h3>
+                        <div class="grid grid-cols-3 gap-1 bg-gray-50 p-2 rounded-xl text-sm border border-gray-100 group-hover:bg-white group-hover:border-blue-200 transition-colors w-full">
+                            <div class="flex flex-col">
+                                <span class="text-gray-500 text-[10px] sm:text-xs font-medium">במצבת</span>
+                                <span class="font-bold text-gray-800">${count}</span>
+                            </div>
+                            <div class="flex flex-col border-r border-gray-200">
+                                <span class="text-gray-500 text-[10px] sm:text-xs font-medium">דווחו</span>
+                                <span class="font-bold ${reported === count && count > 0 ? 'text-green-600' : 'text-blue-600'}">${reported}/${count}</span>
+                            </div>
+                            <div class="flex flex-col border-r border-gray-200">
+                                <span class="text-gray-500 text-[10px] sm:text-xs font-medium">נוכחים</span>
+                                <span class="font-bold text-green-600">${present}</span>
+                            </div>
+                        </div>
                     </div>
                 `;
                 grid.appendChild(btn);
             });
 
-            // Always add "הכל" (All / Admin) button at the end
+            // Always add "הכל" (All / Admin) button at the end with full stats
+            let totalReported = 0;
+            let totalPresent = 0;
+            soldiers.forEach(s => {
+                const stat = dailyStatusMap[s.id] || "לא דווח";
+                if (stat !== "לא דווח") totalReported++;
+                if (stat === "נוכח") totalPresent++;
+            });
+
             const allBtn = document.createElement('button');
-            allBtn.className = "bg-gradient-to-br from-blue-800 to-blue-900 hover:from-blue-700 hover:to-blue-800 p-6 rounded-2xl shadow-md hover:shadow-lg transition-all flex flex-col items-center justify-center gap-3 text-white group sm:col-span-2 md:col-span-1";
+            allBtn.className = "bg-gradient-to-br from-blue-800 to-blue-900 hover:from-blue-700 hover:to-blue-800 p-5 rounded-2xl shadow-md hover:shadow-lg transition-all flex flex-col items-center justify-center gap-3 text-white group sm:col-span-2 md:col-span-1 w-full";
             allBtn.onclick = () => goToDepartment("הכל");
             
             allBtn.innerHTML = `
                 <div class="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
                     <i class="fa-solid fa-building-shield"></i>
                 </div>
-                <div class="text-center">
-                    <h3 class="font-bold text-xl">כלל הפלוגה / ניהול</h3>
-                    <p class="text-sm text-blue-200 mt-1">${soldiers.length} סה"כ במצבת</p>
+                <div class="text-center w-full mt-1">
+                    <h3 class="font-bold text-xl mb-3">כלל הפלוגה / ניהול</h3>
+                    <div class="grid grid-cols-3 gap-1 bg-white/10 p-2 rounded-xl text-sm border border-white/20 w-full">
+                        <div class="flex flex-col">
+                            <span class="text-blue-200 text-[10px] sm:text-xs font-medium">במצבת</span>
+                            <span class="font-bold">${soldiers.length}</span>
+                        </div>
+                        <div class="flex flex-col border-r border-white/20">
+                            <span class="text-blue-200 text-[10px] sm:text-xs font-medium">דווחו</span>
+                            <span class="font-bold ${totalReported === soldiers.length && soldiers.length > 0 ? 'text-green-300' : 'text-white'}">${totalReported}/${soldiers.length}</span>
+                        </div>
+                        <div class="flex flex-col border-r border-white/20">
+                            <span class="text-blue-200 text-[10px] sm:text-xs font-medium">נוכחים</span>
+                            <span class="font-bold text-green-400">${totalPresent}</span>
+                        </div>
+                    </div>
                 </div>
             `;
             grid.appendChild(allBtn);
