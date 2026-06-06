@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -30,6 +31,9 @@
     <header class="bg-blue-900 text-white shadow-md sticky top-0 z-10">
         <div class="max-w-7xl mx-auto px-4 py-4 sm:flex sm:items-center sm:justify-between">
             <div class="flex items-center gap-3 mb-4 sm:mb-0">
+                <button id="back-to-home-btn" onclick="goHome()" class="hidden text-blue-200 hover:text-white transition bg-blue-800/50 hover:bg-blue-800 p-2 rounded-lg ml-2" title="חזור לתפריט הראשי">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
                 <i class="fa-solid fa-clipboard-user text-3xl text-blue-300"></i>
                 <div>
                     <h1 class="text-2xl font-bold tracking-tight">מערכת דוח 1</h1>
@@ -44,30 +48,27 @@
         </div>
     </header>
 
-    <main class="flex-grow max-w-7xl mx-auto w-full px-4 py-6 flex flex-col">
-        
-        <!-- Action Buttons Row -->
-        <div class="flex flex-wrap gap-3 justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6">
-            <div class="flex flex-wrap gap-2">
-                <!-- Import Excel Button -->
-                <input type="file" id="csv-file-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="processExcel(event)">
-                <button onclick="document.getElementById('csv-file-input').click()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition text-sm font-medium flex items-center gap-2">
-                    <i class="fa-solid fa-file-import"></i>
-                    <span>ייבוא מקובץ (CSV/אקסל)</span>
-                </button>
-
-                <!-- Add Soldier Button -->
-                <button onclick="openAddSoldierModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition text-sm font-medium flex items-center gap-2">
-                    <i class="fa-solid fa-user-plus"></i>
-                    <span>הוסף חייל</span>
-                </button>
-                
-                <!-- Undo Import Button -->
-                <button onclick="confirmUndoImport()" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg transition text-sm font-medium flex items-center gap-2 border border-red-200" title="מחק ייבוא אחרון">
-                    <i class="fa-solid fa-clock-rotate-left"></i>
-                    <span class="hidden sm:inline">בטל ייבוא</span>
-                </button>
+    <div class="flex-grow flex flex-col w-full">
+        <!-- Home View (Landing Page) -->
+        <div id="home-view" class="max-w-5xl mx-auto w-full px-4 py-12 flex-grow flex flex-col items-center justify-center animate-fade-in">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-3">ברוכים הבאים למערכת הדיווח</h2>
+                <p class="text-gray-500 text-lg">אנא בחר את המחלקה שלך כדי להתחיל בדיווח נוכחות</p>
             </div>
+            
+            <div id="departments-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-4xl">
+                <!-- Department buttons will be injected here -->
+                <div class="p-8 text-center text-gray-500 bg-white rounded-xl shadow-sm border border-gray-100 col-span-full">
+                    טוען נתונים...
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App View (Table & Actions) -->
+        <main id="main-app-view" class="hidden flex-grow max-w-7xl mx-auto w-full px-4 py-6 flex-col">
+            
+            <!-- Action Buttons Row -->
+            <div class="flex flex-wrap gap-3 justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6">
 
             <div class="flex flex-wrap gap-2 mt-2 sm:mt-0">
                 <!-- Export to Excel/CSV -->
@@ -105,13 +106,13 @@
                 <table class="w-full text-right border-collapse min-w-[800px]">
                     <thead class="bg-gray-50 text-gray-600 sticky top-0 z-10 shadow-sm text-sm">
                         <tr>
-                            <th class="p-4 font-semibold w-12 text-center">#</th>
-                            <th class="p-4 font-semibold">שם החייל</th>
-                            <th class="p-4 font-semibold">מספר אישי</th>
-                            <th class="p-4 font-semibold">טלפון</th>
-                            <th class="p-4 font-semibold">תפקיד</th>
-                            <th class="p-4 font-semibold w-48">סטטוס יומי</th>
-                            <th class="p-4 font-semibold w-20 text-center">פעולות</th>
+                            <th class="p-3 font-semibold w-12 text-center">#</th>
+                            <th class="p-3 font-semibold">שם החייל</th>
+                            <th class="p-3 font-semibold w-56 text-center">סטטוס יומי</th>
+                            <th class="p-3 font-semibold">תפקיד</th>
+                            <th class="p-3 font-semibold">טלפון</th>
+                            <th class="p-3 font-semibold">מספר אישי</th>
+                            <th class="p-3 font-semibold w-20 text-center">פעולות</th>
                         </tr>
                     </thead>
                     <tbody id="soldiers-table-body" class="divide-y divide-gray-100 bg-white text-sm">
@@ -189,8 +190,8 @@
         let departments = new Set(["הכל", "מפלג", "אספקה"]);
         let activeTab = "הכל";
         let searchQuery = "";
-        let currentWorkbook = null; // Used for excel sheets
-        let currentEditSoldierId = null; // למעקב אחרי עריכת חייל
+        let currentWorkbook = null; 
+        let currentEditSoldierId = null; 
         
         let unsubSoldiers = null;
         let unsubDaily = null;
@@ -275,6 +276,8 @@
                 });
                 
                 soldiers.sort((a, b) => a.name.localeCompare(b.name, 'he'));
+                
+                renderHomeView(); // Update landing page buttons
                 updateTabsUI();
                 updateDatalist();
                 renderTable();
@@ -306,6 +309,75 @@
         window.handleSearch = (event) => {
             searchQuery = event.target.value.trim().toLowerCase();
             renderTable();
+        };
+
+        // --- Navigation Functions (Home vs Main) ---
+        
+        function renderHomeView() {
+            const grid = document.getElementById('departments-grid');
+            grid.innerHTML = '';
+            
+            let deptsArray = Array.from(departments);
+            deptsArray = deptsArray.filter(d => d !== "הכל").sort();
+
+            // Render specific departments first
+            deptsArray.forEach(dept => {
+                const count = soldiers.filter(s => s.department === dept).length;
+                const btn = document.createElement('button');
+                btn.className = "bg-white hover:bg-blue-50 border border-gray-200 hover:border-blue-300 p-6 rounded-2xl shadow-sm hover:shadow-md transition-all flex flex-col items-center justify-center gap-3 text-gray-800 group";
+                btn.onclick = () => goToDepartment(dept);
+                
+                btn.innerHTML = `
+                    <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="font-bold text-xl">${escapeHTML(dept)}</h3>
+                        <p class="text-sm text-gray-500 mt-1">${count} חיילים במצבת</p>
+                    </div>
+                `;
+                grid.appendChild(btn);
+            });
+
+            // Always add "הכל" (All / Admin) button at the end
+            const allBtn = document.createElement('button');
+            allBtn.className = "bg-gradient-to-br from-blue-800 to-blue-900 hover:from-blue-700 hover:to-blue-800 p-6 rounded-2xl shadow-md hover:shadow-lg transition-all flex flex-col items-center justify-center gap-3 text-white group sm:col-span-2 md:col-span-1";
+            allBtn.onclick = () => goToDepartment("הכל");
+            
+            allBtn.innerHTML = `
+                <div class="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-building-shield"></i>
+                </div>
+                <div class="text-center">
+                    <h3 class="font-bold text-xl">כלל הפלוגה / ניהול</h3>
+                    <p class="text-sm text-blue-200 mt-1">${soldiers.length} סה"כ במצבת</p>
+                </div>
+            `;
+            grid.appendChild(allBtn);
+        }
+
+        window.goToDepartment = (dept) => {
+            activeTab = dept;
+            
+            // UI Toggle
+            document.getElementById('home-view').classList.add('hidden');
+            document.getElementById('main-app-view').classList.remove('hidden');
+            document.getElementById('main-app-view').classList.add('flex');
+            document.getElementById('back-to-home-btn').classList.remove('hidden');
+            
+            // Reset search and refresh
+            searchQuery = "";
+            document.getElementById('search-input').value = "";
+            updateTabsUI();
+            renderTable();
+            window.scrollTo(0, 0);
+        };
+
+        window.goHome = () => {
+            document.getElementById('main-app-view').classList.add('hidden');
+            document.getElementById('main-app-view').classList.remove('flex');
+            document.getElementById('home-view').classList.remove('hidden');
+            document.getElementById('back-to-home-btn').classList.add('hidden');
         };
 
         function updateTabsUI() {
@@ -392,35 +464,49 @@
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-blue-50/50 transition border-b border-gray-100";
                     
-                    let selectHtml = `<select onchange="updateStatus('${soldier.id}', this.value)" class="w-full p-2 border rounded shadow-sm focus:ring-blue-500 text-sm appearance-none cursor-pointer text-center outline-none transition `;
-                    
                     const activeOpt = STATUS_OPTIONS.find(o => o.val === currentStatus) || STATUS_OPTIONS[0];
-                    selectHtml += `${activeOpt.color}">`;
+                    
+                    // כפתור ה-V המהיר והרשימה הנפתחת צמודים יחד
+                    let statusCellHtml = `
+                        <div class="flex items-center gap-2 justify-center">
+                            <!-- כפתור V מהיר -->
+                            <button onclick="updateStatus('${soldier.id}', 'נוכח')" 
+                                    class="shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 border shadow-sm focus:outline-none 
+                                    ${currentStatus === 'נוכח' ? 'bg-green-500 text-white border-green-600 ring-2 ring-green-200/50' : 'bg-white text-gray-300 border-gray-200 hover:bg-green-50 hover:text-green-500 hover:border-green-300'}" 
+                                    title="סמן כנוכח">
+                                <i class="fa-solid fa-check text-lg"></i>
+                            </button>
+                            
+                            <!-- בחירת סיבת היעדרות / סטטוס אחר -->
+                            <select onchange="updateStatus('${soldier.id}', this.value)" 
+                                    class="w-full min-w-[120px] p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 text-sm appearance-none cursor-pointer text-center outline-none transition ${activeOpt.color}">
+                    `;
                     
                     STATUS_OPTIONS.forEach(opt => {
                         const isSelected = opt.val === currentStatus ? 'selected' : '';
-                        selectHtml += `<option value="${opt.val}" ${isSelected}>${opt.emoji} ${opt.val}</option>`;
+                        statusCellHtml += `<option value="${opt.val}" ${isSelected}>${opt.emoji} ${opt.val}</option>`;
                     });
-                    selectHtml += `</select>`;
+                    statusCellHtml += `</select></div>`;
 
                     // Handling values
                     const pId = soldier.personalId || '-';
                     const phone = soldier.phone || '-';
                     const role = soldier.role || '-';
 
+                    // הזרקת השורה עם הסדר החדש של העמודות
                     tr.innerHTML = `
                         <td class="p-3 text-center text-gray-400 font-medium">${index + 1}</td>
-                        <td class="p-3 font-medium text-gray-900">${escapeHTML(soldier.name)}</td>
-                        <td class="p-3 text-gray-600">${escapeHTML(pId)}</td>
-                        <td class="p-3 text-gray-600" dir="ltr" style="text-align: right;">${escapeHTML(phone)}</td>
+                        <td class="p-3 font-medium text-gray-900 whitespace-nowrap">${escapeHTML(soldier.name)}</td>
+                        <td class="p-3">${statusCellHtml}</td>
                         <td class="p-3 text-gray-600"><span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs whitespace-nowrap">${escapeHTML(role)}</span></td>
-                        <td class="p-3">${selectHtml}</td>
+                        <td class="p-3 text-gray-600" dir="ltr" style="text-align: right;">${escapeHTML(phone)}</td>
+                        <td class="p-3 text-gray-600 whitespace-nowrap">${escapeHTML(pId)}</td>
                         <td class="p-3 text-center">
                             <div class="flex justify-center gap-1">
                                 <button onclick="openEditSoldierModal('${soldier.id}')" class="text-blue-400 hover:text-blue-600 hover:bg-blue-50 p-2 rounded transition" title="ערוך חייל">
                                     <i class="fa-solid fa-pen"></i>
                                 </button>
-                                <button onclick="confirmDelete('${soldier.id}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded transition" title="מחק חייל">
+                                <button onclick="confirmDelete('${soldier.id}', '${escapeHTML(soldier.name).replace(/'/g, "\\'")}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded transition" title="מחק חייל">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
                             </div>
