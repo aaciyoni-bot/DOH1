@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -128,14 +129,14 @@
         </div>
     </main>
 
-    <!-- Add Soldier Modal -->
+    <!-- Add/Edit Soldier Modal -->
     <div id="add-soldier-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 transform transition-all max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-5">
-                <h3 class="text-xl font-bold text-gray-800">הוספת חייל למצבת</h3>
+                <h3 id="modal-title" class="text-xl font-bold text-gray-800">הוספת חייל למצבת</h3>
                 <button onclick="closeAddSoldierModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
-            <form id="add-soldier-form" onsubmit="submitNewSoldier(event)">
+            <form id="add-soldier-form" onsubmit="submitSoldierForm(event)">
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2">שם מלא *</label>
                     <input type="text" id="new-soldier-name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -163,7 +164,7 @@
                 </div>
                 <div class="flex justify-end gap-3">
                     <button type="button" onclick="closeAddSoldierModal()" class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition">ביטול</button>
-                    <button type="submit" class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition shadow-md">שמור חייל</button>
+                    <button type="submit" id="modal-submit-btn" class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition shadow-md">שמור חייל</button>
                 </div>
             </form>
         </div>
@@ -198,7 +199,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, collection, onSnapshot, setDoc, deleteDoc, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, collection, onSnapshot, setDoc, deleteDoc, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Global State
         let db;
@@ -210,6 +211,7 @@
         let activeTab = "הכל";
         let searchQuery = "";
         let currentWorkbook = null; // Used for excel sheets
+        let currentEditSoldierId = null; // למעקב אחרי עריכת חייל
         
         let unsubSoldiers = null;
         let unsubDaily = null;
@@ -435,9 +437,14 @@
                         <td class="p-3 text-gray-600"><span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs whitespace-nowrap">${escapeHTML(role)}</span></td>
                         <td class="p-3">${selectHtml}</td>
                         <td class="p-3 text-center">
-                            <button onclick="confirmDelete('${soldier.id}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded transition" title="מחק חייל">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
+                            <div class="flex justify-center gap-1">
+                                <button onclick="openEditSoldierModal('${soldier.id}')" class="text-blue-400 hover:text-blue-600 hover:bg-blue-50 p-2 rounded transition" title="ערוך חייל">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <button onclick="confirmDelete('${soldier.id}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded transition" title="מחק חייל">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -462,6 +469,30 @@
         };
 
         window.openAddSoldierModal = () => {
+            currentEditSoldierId = null;
+            document.getElementById('modal-title').textContent = 'הוספת חייל למצבת';
+            document.getElementById('modal-submit-btn').textContent = 'שמור חייל';
+            document.getElementById('add-soldier-form').reset();
+            
+            document.getElementById('add-soldier-modal').classList.remove('hidden');
+            document.getElementById('add-soldier-modal').classList.add('flex');
+            document.getElementById('new-soldier-name').focus();
+        };
+
+        window.openEditSoldierModal = (id) => {
+            const soldier = soldiers.find(s => s.id === id);
+            if (!soldier) return;
+            
+            currentEditSoldierId = id;
+            document.getElementById('modal-title').textContent = 'עריכת פרטי חייל';
+            document.getElementById('modal-submit-btn').textContent = 'עדכן פרטים';
+            
+            document.getElementById('new-soldier-name').value = soldier.name || '';
+            document.getElementById('new-soldier-id').value = soldier.personalId || '';
+            document.getElementById('new-soldier-phone').value = soldier.phone || '';
+            document.getElementById('new-soldier-role').value = soldier.role || '';
+            document.getElementById('new-soldier-dept').value = soldier.department || '';
+            
             document.getElementById('add-soldier-modal').classList.remove('hidden');
             document.getElementById('add-soldier-modal').classList.add('flex');
             document.getElementById('new-soldier-name').focus();
@@ -471,9 +502,10 @@
             document.getElementById('add-soldier-modal').classList.add('hidden');
             document.getElementById('add-soldier-modal').classList.remove('flex');
             document.getElementById('add-soldier-form').reset();
+            currentEditSoldierId = null;
         };
 
-        window.submitNewSoldier = async (e) => {
+        window.submitSoldierForm = async (e) => {
             e.preventDefault();
             if (!currentUser) return;
 
@@ -486,23 +518,37 @@
             if (!name || !dept) return;
 
             try {
-                await addDoc(collection(db, 'soldiers_roster'), {
-                    name: name,
-                    department: dept,
-                    personalId: personalId,
-                    phone: phone,
-                    role: role,
-                    createdAt: new Date().toISOString()
-                });
+                if (currentEditSoldierId) {
+                    // Update existing soldier
+                    await updateDoc(doc(db, 'soldiers_roster', currentEditSoldierId), {
+                        name: name,
+                        department: dept,
+                        personalId: personalId,
+                        phone: phone,
+                        role: role
+                    });
+                    showToast(`פרטי החייל עודכנו בהצלחה`);
+                } else {
+                    // Add new soldier
+                    await addDoc(collection(db, 'soldiers_roster'), {
+                        name: name,
+                        department: dept,
+                        personalId: personalId,
+                        phone: phone,
+                        role: role,
+                        createdAt: new Date().toISOString()
+                    });
+                    showToast(`החייל ${name} נוסף בהצלחה`);
+                }
+                
                 closeAddSoldierModal();
-                showToast(`החייל ${name} נוסף בהצלחה`);
                 
                 if (activeTab !== "הכל" && activeTab !== dept) {
                      activeTab = dept; 
                 }
             } catch (error) {
-                console.error("Error adding soldier:", error);
-                showToast("שגיאה בהוספת חייל", true);
+                console.error("Error saving soldier:", error);
+                showToast("שגיאה בשמירת נתונים", true);
             }
         };
 
@@ -589,7 +635,7 @@
             showToast(`הייבוא האחרון בוטל (${deletedCount} שורות נמחקו).`);
         };
 
-        // --- EXCEL & CSV IMPORT WITH SHEET SELECTOR ---
+        // --- EXCEL & CSV IMPORT WITH FOOLPROOF PARSING ---
         
         window.processExcel = async (event) => {
             if (!currentUser) {
@@ -701,32 +747,67 @@
 
                 let nameIndex = -1, roleIndex = -1, idIndex = -1, phoneIndex = -1;
                 
-                // Find header columns based on user's structure (A=שם, B=תפקיד, C=מספר אישי, D=טלפון)
+                // --- SMARTER HEADER DETECTION ---
+                // Search up to 30 rows to find headers
                 for (let i = 0; i < Math.min(rows.length, 30); i++) {
-                    const cols = rows[i].map(c => String(c).trim());
-                    if (cols.includes('שם')) {
-                        nameIndex = cols.indexOf('שם');
-                        roleIndex = cols.indexOf('תפקיד');
-                        idIndex = cols.indexOf('מספר אישי');
-                        phoneIndex = cols.findIndex(c => c.includes('טלפון'));
+                    const cols = rows[i].map(c => String(c).replace(/["']/g, '').trim());
+                    
+                    // Priority 1: Exact match or obvious match
+                    let foundName = cols.findIndex(c => c === 'שם' || c === 'שם מלא' || c === 'שם החייל' || c === 'שם פרטי');
+                    
+                    // Priority 2: Fuzzy match
+                    if (foundName === -1) {
+                        foundName = cols.findIndex(c => c.includes('שם'));
+                    }
+                    
+                    if (foundName !== -1) {
+                        nameIndex = foundName;
+                        roleIndex = cols.findIndex(c => c.includes('תפקיד') || c.includes('מחלקה'));
+                        idIndex = cols.findIndex(c => c.includes('מספר אישי') || c.includes('מס"א') || c.includes('אישי'));
+                        phoneIndex = cols.findIndex(c => c.includes('טלפון') || c.includes('נייד'));
                         break;
                     }
                 }
 
-                if (nameIndex === -1) continue;
+                // --- FOOLPROOF FALLBACK ---
+                // If it STILL couldn't find the word "שם" because of formatting or spaces, 
+                // we force the system to assume exactly what you said: A=Name, B=Role, C=ID, D=Phone.
+                if (nameIndex === -1 && rows.length > 0) {
+                    nameIndex = 0; // טור A
+                    roleIndex = 1; // טור B
+                    idIndex = 2;   // טור C
+                    phoneIndex = 3; // טור D
+                }
 
                 // Add soldiers
                 for (let i = 0; i < rows.length; i++) {
-                    const cols = rows[i].map(c => String(c).trim());
+                    const cols = rows[i];
                     if (cols.length <= nameIndex) continue;
                     
-                    const name = cols[nameIndex];
-                    if (!name || name === 'שם' || name.includes('סה"כ')) continue;
+                    const nameRaw = cols[nameIndex];
+                    if (!nameRaw) continue; // Skip empty
+                    
+                    const name = String(nameRaw).replace(/["']/g, '').trim();
+                    
+                    // Filter out garbage rows (titles, summaries, numbers)
+                    if (
+                        name === 'שם' || 
+                        name === 'שם מלא' ||
+                        name.includes('סה"כ') || 
+                        name.includes('סהכ') || 
+                        name === 'מפקדים' || 
+                        name === 'נהגים' || 
+                        name.includes('100%') || 
+                        name.length < 2 || 
+                        !isNaN(name) // Skip if the name is just a number
+                    ) {
+                        continue;
+                    }
                     
                     const finalDeptName = isCSV ? csvDeptName : sheetName;
-                    const role = roleIndex > -1 ? cols[roleIndex] : "";
-                    const personalId = idIndex > -1 ? cols[idIndex] : "";
-                    const phone = phoneIndex > -1 ? cols[phoneIndex] : "";
+                    const role = roleIndex > -1 && cols[roleIndex] ? String(cols[roleIndex]).replace(/["']/g, '').trim() : "";
+                    const personalId = idIndex > -1 && cols[idIndex] ? String(cols[idIndex]).replace(/["']/g, '').trim() : "";
+                    const phone = phoneIndex > -1 && cols[phoneIndex] ? String(cols[phoneIndex]).replace(/["']/g, '').trim() : "";
 
                     try {
                         await addDoc(collection(db, 'soldiers_roster'), {
@@ -746,9 +827,9 @@
             }
             
             if (added > 0) {
-                showToast(`הייבוא הסתיים! ${added} חיילים נוספו מהלשוניות שנבחרו.`);
+                showToast(`הייבוא הסתיים! ${added} חיילים נוספו.`);
             } else {
-                showToast("לא נמצאו נתונים לייבוא בלשוניות. ודא שיש עמודת 'שם'.", true);
+                showToast("לא נמצאו חיילים תקינים לייבוא בתוך הקובץ.", true);
             }
             
             document.getElementById('csv-file-input').value = ''; 
