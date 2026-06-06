@@ -24,10 +24,8 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* Signature Canvas */
-        #sig-canvas { border: 2px dashed #cbd5e1; border-radius: 8px; background: #fff; cursor: crosshair; touch-action: none; }
+        #sig-canvas { border: 2px dashed #94a3b8; border-radius: 8px; background: #fff; cursor: crosshair; touch-action: none; }
         
-        /* Auto Stamp */
         .auto-stamp {
             display: inline-block; border: 3px solid #dc2626; color: #dc2626; font-weight: 900; 
             padding: 8px 16px; border-radius: 8px; transform: rotate(-15deg);
@@ -35,7 +33,6 @@
             opacity: 0.8;
         }
 
-        /* מנגנון הסתרת אלמנטים של לוגיסטיקה למשתמשים רגילים */
         body:not(.is-admin) .logistics-only { display: none !important; }
 
         @media print {
@@ -155,7 +152,6 @@
 
         <!-- ================= LOGISTICS & ARMORY MODULE ================= -->
         <div id="module-logistics" class="hidden flex-grow max-w-7xl mx-auto w-full px-4 py-6 flex-col no-print">
-            
             <div class="flex gap-2 mb-6 overflow-x-auto hide-scrollbar bg-white p-2 rounded-xl shadow-sm border border-gray-100">
                 <button onclick="switchLogisticsTab('armory')" id="tab-log-armory" class="px-5 py-2.5 rounded-lg bg-blue-100 text-blue-800 font-bold transition whitespace-nowrap"><i class="fa-solid fa-gun ml-2"></i>ניהול צל"מ ומלאי גדודי</button>
                 <button onclick="switchLogisticsTab('ammo')" id="tab-log-ammo" class="px-5 py-2.5 rounded-lg text-gray-600 hover:bg-gray-100 transition whitespace-nowrap"><i class="fa-solid fa-box-archive ml-2"></i>תחמושת ושצ"ל</button>
@@ -222,20 +218,12 @@
                         </button>
                     </div>
                 </div>
-
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8" id="ammo-grid"></div>
-
                 <h3 class="text-lg font-bold text-gray-700 mb-3 border-b pb-2">יומן תנועות אחרונות (ירי/בלאי)</h3>
                 <div class="overflow-auto border border-gray-200 rounded-lg max-h-[300px]">
                     <table class="w-full text-right text-sm">
                         <thead class="bg-gray-50 text-gray-600 sticky top-0">
-                            <tr>
-                                <th class="p-3 border-b">תאריך</th>
-                                <th class="p-3 border-b">סוג תחמושת</th>
-                                <th class="p-3 border-b">כמות שנצרכה</th>
-                                <th class="p-3 border-b">סיבת דיווח / מטווח</th>
-                                <th class="p-3 border-b text-center w-16">מחק</th>
-                            </tr>
+                            <tr><th class="p-3 border-b">תאריך</th><th class="p-3 border-b">סוג תחמושת</th><th class="p-3 border-b">כמות שנצרכה</th><th class="p-3 border-b">סיבת דיווח / מטווח</th><th class="p-3 border-b text-center w-16">מחק</th></tr>
                         </thead>
                         <tbody id="ammo-logs-body" class="divide-y divide-gray-100"></tbody>
                     </table>
@@ -246,24 +234,13 @@
 
     <!-- ================= DATALISTS FOR STANDARDIZATION ================= -->
     <datalist id="standard-items-list">
-        <option value="נשק M16 קצר">
-        <option value="נשק M4">
-        <option value="נשק תבור">
-        <option value="כוונת טריג'יקון">
-        <option value="כוונת מאפרו">
-        <option value="כוונת השלכה">
-        <option value="אמרל שחם">
-        <option value="אמרל עכביש">
-        <option value="סמן לייזר ציקלופ">
+        <option value="נשק M16 קצר"><option value="נשק M4"><option value="נשק תבור">
+        <option value="כוונת טריג'יקון"><option value="כוונת מאפרו"><option value="כוונת השלכה">
+        <option value="אמרל שחם"><option value="אמרל עכביש"><option value="סמן לייזר ציקלופ">
         <option value="ערכת מפקד (משקפת, מצפן, עכבר)">
-        <option value="ווסט לוחם">
-        <option value="קסדה טקטית">
-        <option value="פלטות קרמיות (זוג)">
-        <option value="ברכיות">
-        <option value="חלפ''ס">
+        <option value="ווסט לוחם"><option value="קסדה טקטית"><option value="פלטות קרמיות (זוג)">
+        <option value="ברכיות"><option value="חלפ''ס">
     </datalist>
-
-    <datalist id="issuers-list"></datalist>
 
     <!-- ================= MODALS ================= -->
 
@@ -277,10 +254,7 @@
                 </div>
                 <div class="flex items-center gap-3">
                     <button onclick="openFormPrint('1008')" class="bg-blue-700 hover:bg-blue-600 px-3 py-2 rounded-lg text-sm font-bold shadow flex items-center gap-2 border border-blue-500">
-                        <i class="fa-solid fa-file-signature"></i> טופס 1008
-                    </button>
-                    <button onclick="openFormPrint('receipt')" class="bg-emerald-600 hover:bg-emerald-500 px-3 py-2 rounded-lg text-sm font-bold shadow flex items-center gap-2 border border-emerald-400">
-                        <i class="fa-solid fa-file-invoice"></i> טופס זיכוי
+                        <i class="fa-solid fa-file-signature"></i> הצג טופס 1008
                     </button>
                     <button onclick="closeEquipmentModal()" class="text-blue-200 hover:text-white text-2xl mr-2"><i class="fa-solid fa-xmark"></i></button>
                 </div>
@@ -288,15 +262,27 @@
             
             <div class="p-5 flex-grow overflow-y-auto bg-gray-50 flex flex-col lg:flex-row gap-5">
                 
-                <!-- Right Side: Assigning new gear (Logistics Only) -->
+                <!-- Right Side: Controls (Logistics Only) -->
                 <div class="w-full lg:w-1/3 flex flex-col gap-4 logistics-only">
+                    
+                    <!-- Global Signature & Issuer Area -->
+                    <div class="bg-white p-4 rounded-xl border-2 border-orange-200 shadow-sm">
+                        <h4 class="font-bold text-orange-800 mb-3 text-sm flex items-center gap-1"><i class="fa-solid fa-pen-nib"></i> הרשאת פעולה (חובה)</h4>
+                        <label class="block text-xs text-gray-500 mb-1">גורם מטפל (מנפק/מזכה):</label>
+                        <select id="global-issuer" class="w-full border border-gray-300 rounded-lg p-2 text-sm outline-none focus:ring-2 focus:ring-orange-400 bg-gray-50 mb-3">
+                            <!-- Populated by JS -->
+                        </select>
+                        <label class="block text-xs text-gray-500 mb-1">חתימת החייל על המסך:</label>
+                        <canvas id="sig-canvas" width="300" height="100" class="w-full h-24 mb-1"></canvas>
+                        <button onclick="clearSignature()" class="text-xs text-red-500 font-bold hover:underline">נקה חתימה</button>
+                    </div>
+
                     <div class="bg-white p-4 rounded-xl border border-blue-100 shadow-sm">
-                        <h4 class="font-bold text-blue-900 mb-3 text-sm">החתמה ממלאי גדודי:</h4>
+                        <h4 class="font-bold text-blue-900 mb-3 text-sm">החתמה ממלאי פנוי בגדוד:</h4>
                         <div class="space-y-3">
                             <select id="eq-item-select" class="w-full border border-gray-300 rounded-lg p-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"></select>
-                            <input type="text" id="eq-item-issuer" list="issuers-list" placeholder="שם המנפק (חפש...)" class="w-full border border-gray-300 rounded-lg p-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50">
-                            <button onclick="assignEquipmentToSoldier()" class="bg-blue-600 hover:bg-blue-700 text-white w-full py-2.5 rounded-lg text-sm font-bold shadow-md">
-                                החתם מהמחסן
+                            <button onclick="assignEquipmentToSoldier()" class="bg-blue-600 hover:bg-blue-700 text-white w-full py-2.5 rounded-lg text-sm font-bold shadow-md flex justify-center items-center gap-2">
+                                <i class="fa-solid fa-check"></i> החתם
                             </button>
                         </div>
                     </div>
@@ -305,59 +291,60 @@
                         <h4 class="font-bold text-emerald-900 mb-3 text-sm">יצירת פריט והחתמה ישירה:</h4>
                         <div class="space-y-3">
                             <select id="eq-new-cat" class="w-full border border-gray-300 rounded-lg p-2 text-sm outline-none bg-gray-50">
-                                <option value="נשק">נשק</option>
-                                <option value="אופטיקה">אופטיקה</option>
-                                <option value="אמרל">אמר"ל</option>
-                                <option value="כללי">צל"מ כללי</option>
+                                <option value="נשק">נשק</option><option value="אופטיקה">אופטיקה</option><option value="אמרל">אמר"ל</option><option value="כללי">צל"מ כללי</option>
                             </select>
                             <input type="text" id="eq-new-name" list="standard-items-list" placeholder="שם פריט (למשל ווסט)" class="w-full border border-gray-300 rounded-lg p-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500">
                             <input type="text" id="eq-new-serial" placeholder="מספר צ' (אם רלוונטי)" dir="ltr" class="w-full border border-gray-300 rounded-lg p-2 text-sm outline-none text-right font-mono focus:ring-2 focus:ring-emerald-500">
-                            <input type="text" id="eq-new-issuer" list="issuers-list" placeholder="שם המנפק (חפש...)" class="w-full border border-gray-300 rounded-lg p-2 text-sm outline-none focus:ring-2 focus:ring-emerald-500 bg-gray-50">
-                            
-                            <div class="mt-2">
-                                <label class="block text-xs font-bold text-gray-700 mb-1">חתימת החייל (קשקוש מסך):</label>
-                                <canvas id="sig-canvas" width="300" height="80" class="w-full h-20"></canvas>
-                                <button onclick="clearSignature()" class="text-xs text-gray-500 hover:text-red-500 mt-1">נקה חתימה</button>
-                            </div>
-
-                            <button onclick="createNewAndAssign()" class="bg-emerald-500 hover:bg-emerald-600 text-white w-full py-2.5 rounded-lg text-sm font-bold shadow-md">
-                                החתם והוסף למלאי
+                            <button onclick="createNewAndAssign()" class="bg-emerald-500 hover:bg-emerald-600 text-white w-full py-2.5 rounded-lg text-sm font-bold shadow-md flex justify-center items-center gap-2">
+                                <i class="fa-solid fa-plus"></i> צור והחתם
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Left Side: Assigned Items Table -->
-                <div class="w-full lg:flex-grow">
-                    <div class="flex justify-between items-end mb-3">
-                        <h4 class="font-bold text-gray-800 text-lg">ציוד שמונפק כרגע לחייל:</h4>
-                    </div>
-                    
-                    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm mb-4">
-                        <table class="w-full text-right text-sm">
-                            <thead class="bg-gray-50 border-b border-gray-200">
-                                <tr>
-                                    <th class="p-3 w-8 logistics-only"><input type="checkbox" id="selectAllCheckbox" onchange="toggleAllCheckboxes(this)"></th>
-                                    <th class="p-3 text-gray-600">שם פריט</th>
-                                    <th class="p-3 text-gray-600">מספר צ'</th>
-                                    <th class="p-3 text-gray-600">ת. ניפוק</th>
-                                </tr>
-                            </thead>
-                            <tbody id="eq-assigned-body" class="divide-y divide-gray-100"></tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="flex justify-between items-center bg-white p-3 rounded-xl border border-gray-200 logistics-only">
-                        <button onclick="returnSelectedItems()" class="bg-orange-100 hover:bg-orange-200 text-orange-800 px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2">
-                            <i class="fa-solid fa-arrow-rotate-left"></i> הזדכה על מסומנים
-                        </button>
+                <!-- Left Side: Data Tables -->
+                <div class="w-full lg:w-2/3 flex flex-col gap-4">
+                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4">
+                        <div class="flex justify-between items-end mb-3 border-b pb-2">
+                            <h4 class="font-bold text-gray-800 text-lg">ציוד שמונפק כרגע לחייל:</h4>
+                            <button onclick="returnSelectedItems()" class="logistics-only bg-orange-100 hover:bg-orange-200 text-orange-800 px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-2">
+                                <i class="fa-solid fa-arrow-rotate-left"></i> הזדכה על מסומנים
+                            </button>
+                        </div>
+                        <div class="overflow-auto max-h-[250px]">
+                            <table class="w-full text-right text-sm">
+                                <thead class="bg-gray-50 sticky top-0">
+                                    <tr>
+                                        <th class="p-2 w-8 logistics-only"><input type="checkbox" id="selectAllCheckbox" onchange="toggleAllCheckboxes(this)"></th>
+                                        <th class="p-2 text-gray-600">שם פריט</th>
+                                        <th class="p-2 text-gray-600">מספר צ'</th>
+                                        <th class="p-2 text-gray-600">ת. ניפוק</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="eq-assigned-body" class="divide-y divide-gray-100"></tbody>
+                            </table>
+                        </div>
                     </div>
 
-                    <h4 class="font-bold text-gray-800 text-md mt-6 mb-2">היסטוריית פריטים שזוכו:</h4>
-                    <div class="bg-gray-100 border border-gray-200 rounded-xl overflow-auto max-h-[150px]">
-                        <table class="w-full text-right text-xs text-gray-500">
-                            <tbody id="eq-returned-body" class="divide-y divide-gray-200"></tbody>
-                        </table>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Assignment History -->
+                        <div class="bg-gray-50 border border-gray-200 rounded-xl p-3 shadow-inner">
+                            <h4 class="font-bold text-gray-600 text-xs mb-2 uppercase">היסטוריית החתמות</h4>
+                            <div class="overflow-auto max-h-[150px]">
+                                <table class="w-full text-right text-xs text-gray-500">
+                                    <tbody id="eq-assigned-history-body" class="divide-y divide-gray-200"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- Return History -->
+                        <div class="bg-gray-50 border border-gray-200 rounded-xl p-3 shadow-inner">
+                            <h4 class="font-bold text-gray-600 text-xs mb-2 uppercase">היסטוריית זיכויים</h4>
+                            <div class="overflow-auto max-h-[150px]">
+                                <table class="w-full text-right text-xs text-gray-500">
+                                    <tbody id="eq-returned-history-body" class="divide-y divide-gray-200"></tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -365,13 +352,13 @@
     </div>
 
     <!-- PRINTABLE FORM 1008 & RECEIPT MODAL -->
-    <div id="modal-form-print" class="fixed inset-0 z-[60] bg-gray-600/90 hidden items-center justify-center p-4">
+    <div id="modal-form-print" class="fixed inset-0 z-[60] bg-gray-600/95 hidden items-center justify-center p-4">
         <div class="bg-white w-full max-w-3xl rounded-none sm:rounded-xl shadow-2xl flex flex-col h-[95vh] sm:h-auto max-h-full">
             <div class="p-4 bg-gray-100 border-b border-gray-300 flex justify-between items-center no-print">
                 <h2 id="print-header-title" class="font-bold text-gray-700">תצוגה מקדימה לטופס</h2>
                 <div class="flex gap-2">
                     <button onclick="shareFormAsImage()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 shadow-md">
-                        <i class="fa-brands fa-whatsapp text-lg"></i> שתף לווטסאפ (תמונה)
+                        <i class="fa-brands fa-whatsapp text-lg"></i> שתף לוואטסאפ
                     </button>
                     <button onclick="closeFormPrint()" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-bold">סגור</button>
                 </div>
@@ -389,7 +376,7 @@
                 </div>
 
                 <div class="mb-8 grid grid-cols-2 gap-4 text-lg">
-                    <div>שם החייל/ת: <span id="print-soldier-name" class="font-bold border-b border-gray-400 pb-1 min-w-[200px] inline-block"></span></div>
+                    <div>שם החייל: <span id="print-soldier-name" class="font-bold border-b border-gray-400 pb-1 min-w-[200px] inline-block"></span></div>
                     <div>מספר אישי: <span id="print-soldier-id" class="font-bold border-b border-gray-400 pb-1 min-w-[150px] inline-block"></span></div>
                 </div>
 
@@ -400,7 +387,6 @@
                             <th class="p-2 border border-black">שם הפריט / תיאור</th>
                             <th class="p-2 border border-black">מספר צ' / סידורי</th>
                             <th id="print-th-date" class="p-2 border border-black">תאריך ניפוק</th>
-                            <th class="p-2 border border-black">שם המנפק / המזכה</th>
                         </tr>
                     </thead>
                     <tbody id="print-table-body"></tbody>
@@ -414,9 +400,9 @@
                     </div>
                     <div class="relative">
                         <div class="mb-2">___________________________</div>
-                        <div class="font-bold">חתימת קצין לוגיסטיקה</div>
+                        <div id="print-issuer-role-text" class="font-bold">חתימת המנפק</div>
                         <div id="print-issuer-stamp" class="absolute bottom-6 left-1/2 transform -translate-x-1/2 auto-stamp hidden">
-                            אושר במערכת<br><span id="stamp-name" class="text-sm"></span>
+                            אושר במערכת<br><span id="stamp-name" class="text-sm"></span><br><span id="stamp-role" class="text-xs"></span>
                         </div>
                     </div>
                 </div>
@@ -424,13 +410,12 @@
         </div>
     </div>
 
-    <!-- OTHER MODALS (Armory, Ammo, etc.) - Preserved -->
+    <!-- OTHER MODALS (Add Inv, Ammo, Add Soldier, Export etc.) -->
     <div id="add-inventory-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 no-print"><div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6"><h3 class="text-xl font-bold text-gray-800 mb-4">קליטת פריט למחסן הגדוד</h3><div class="space-y-4 mb-6"><div><select id="new-inv-cat" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"><option value="נשק">נשק אישי/כיתתי</option><option value="אופטיקה">אופטיקה</option><option value="אמרל">אמר"לים</option><option value="כללי">אחר (צל"מ/רכב)</option></select></div><div><input type="text" id="new-inv-name" list="standard-items-list" placeholder="שם הפריט" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></div><div><input type="text" id="new-inv-serial" dir="ltr" placeholder="מספר צ'" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-right font-mono"></div></div><div class="flex justify-end gap-3"><button onclick="closeAddInventoryModal()" class="px-4 py-2 bg-gray-100 rounded-lg">ביטול</button><button onclick="submitNewInventoryItem()" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold">שמור במחסן</button></div></div></div>
     <div id="ammo-update-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 no-print"><div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6"><h3 class="text-xl font-bold text-gray-800 mb-4">עדכון/קליטת תחמושת</h3><div class="space-y-4 mb-6"><div><input type="text" id="upd-ammo-type" placeholder="סוג תחמושת" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></div><div><input type="number" id="upd-ammo-qty" placeholder="כמות ספירה כוללת" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500" dir="ltr"></div></div><div class="flex justify-end gap-3"><button onclick="closeAmmoUpdateModal()" class="px-4 py-2 bg-gray-100 rounded-lg">ביטול</button><button onclick="submitAmmoUpdate()" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold">עדכן</button></div></div></div>
     <div id="shoot-report-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 no-print"><div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 border-t-8 border-orange-500"><h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-fire text-orange-500"></i> דיווח ירי / בלאי</h3><div class="space-y-4 mb-6"><div><select id="shoot-ammo-type" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500"></select></div><div><input type="number" id="shoot-ammo-qty" placeholder="כמות שנורתה" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500" dir="ltr"></div><div><input type="text" id="shoot-ammo-reason" placeholder="תיאור אימון" class="w-full p-2 border rounded-lg outline-none focus:ring-2 focus:ring-orange-500"></div></div><div class="flex justify-end gap-3"><button onclick="closeShootReportModal()" class="px-4 py-2 bg-gray-100 rounded-lg">ביטול</button><button onclick="submitShootReport()" class="px-4 py-2 bg-orange-500 text-white rounded-lg font-bold">קזז מלאי</button></div></div></div>
     <div id="export-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4 no-print"><div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6"><h3 class="text-xl font-bold text-gray-800 mb-5">ייצוא דוח טווח נוכחות</h3><div class="mb-4"><input type="date" id="export-start" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></div><div class="mb-6"><input type="date" id="export-end" class="w-full px-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500"></div><div class="flex justify-end gap-3"><button onclick="closeExportModal()" class="px-4 py-2 bg-gray-100 rounded-lg">ביטול</button><button onclick="executeRangeExport()" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold">הורד</button></div></div></div>
     <div id="add-soldier-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4 no-print"><div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6"><h3 id="modal-title" class="text-xl font-bold mb-4">הוספת חייל לגדוד</h3><form id="add-soldier-form" onsubmit="submitSoldierForm(event)"><div class="mb-3"><input type="text" id="new-soldier-name" placeholder="שם מלא *" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 outline-none"></div><div class="mb-3 flex gap-3"><input type="text" id="new-soldier-id" placeholder="מספר אישי" class="w-1/2 px-3 py-2 border rounded-lg focus:ring-2 outline-none"><input type="text" id="new-soldier-phone" placeholder="טלפון" dir="ltr" class="w-1/2 px-3 py-2 border rounded-lg text-right focus:ring-2 outline-none"></div><div class="mb-3"><input type="text" id="new-soldier-role" placeholder="תפקיד" class="w-full px-3 py-2 border rounded-lg focus:ring-2 outline-none"></div><div class="mb-5"><input type="text" id="new-soldier-dept" required list="dept-options" placeholder="מחלקה *" class="w-full px-3 py-2 border rounded-lg focus:ring-2 outline-none"><datalist id="dept-options"></datalist></div><div class="flex justify-end gap-3"><button type="button" onclick="closeAddSoldierModal()" class="px-4 py-2 bg-gray-100 rounded-lg">ביטול</button><button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold">שמור</button></div></form></div></div>
-
     <div id="toast" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none z-50 flex items-center gap-2 no-print"><i class="fa-solid fa-circle-info"></i><span id="toast-msg">הודעה</span></div>
 
     <script type="module">
@@ -440,7 +425,7 @@
 
         const firebaseConfig = { apiKey: "AIzaSyCxBF1xT5n5SPR62GWkDdMerrp3QSRKQ-g", authDomain: "doh1-1cdde.firebaseapp.com", databaseURL: "https://doh1-1cdde-default-rtdb.europe-west1.firebasedatabase.app", projectId: "doh1-1cdde", storageBucket: "doh1-1cdde.firebasestorage.app", messagingSenderId: "653604638082", appId: "1:653604638082:web:73c5f6588780122cf8539b" };
         let db, auth, currentUser = null;
-        let soldiers = [], dailyStatusMap = {}, inventory = [], ammoData = {}, ammoLogs = [], returnLogs = [];
+        let soldiers = [], dailyStatusMap = {}, inventory = [], ammoData = {}, ammoLogs = [], returnLogs = [], assignLogs = [];
         let departments = new Set(["הכל"]), activeTab = "הכל", searchQuery = "", currentEditSoldierId = null, equipmentModalSoldierId = null; 
         const STREAK_STATUSES = ["נוכח", "אחרי משמרת", "הגנש", "אבטש"];
         const STATUS_OPTIONS = [ { val: "לא דווח", color: "text-gray-500 bg-gray-100", emoji: "⚪" }, { val: "נוכח", color: "text-green-800 bg-green-100", emoji: "🟢" }, { val: "אחרי משמרת", color: "text-yellow-800 bg-yellow-100", emoji: "🟡" }, { val: "חופשה", color: "text-blue-800 bg-blue-100", emoji: "🔵" }, { val: "הגנש", color: "text-orange-800 bg-orange-100", emoji: "🟠" }, { val: "רם 2", color: "text-red-800 bg-red-100", emoji: "🏥" }, { val: "גימלים", color: "text-red-900 bg-red-200", emoji: "🤒" }, { val: "אבטש", color: "text-purple-800 bg-purple-100", emoji: "🛡️" }, { val: "השתחרר", color: "text-teal-800 bg-teal-100", emoji: "✌️" }, { val: "בבית", color: "text-gray-700 bg-gray-200", emoji: "🏠" }, { val: "עריץ/נפקד", color: "text-pink-800 bg-pink-100", emoji: "❌" } ];
@@ -449,7 +434,7 @@
         let canvas, ctx, isDrawing = false;
         function initSignature() {
             canvas = document.getElementById('sig-canvas'); if(!canvas) return;
-            ctx = canvas.getContext('2d'); ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = 'black';
+            ctx = canvas.getContext('2d'); ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.strokeStyle = 'blue';
             canvas.addEventListener('mousedown', startPos); canvas.addEventListener('mouseup', endPos); canvas.addEventListener('mousemove', draw);
             canvas.addEventListener('touchstart', startPos, {passive: false}); canvas.addEventListener('touchend', endPos, {passive: false}); canvas.addEventListener('touchmove', draw, {passive: false});
         }
@@ -471,31 +456,20 @@
         window.toggleAdminMode = () => {
             const isAdm = document.body.classList.contains('is-admin');
             if (isAdm) {
-                document.body.classList.remove('is-admin');
-                localStorage.removeItem('logisticsPIN');
-                document.getElementById('admin-lock-icon').className = 'fa-solid fa-lock text-red-400';
-                showToast("מצב לוגיסטיקה ננעל", false);
+                document.body.classList.remove('is-admin'); localStorage.removeItem('logisticsPIN');
+                document.getElementById('admin-lock-icon').className = 'fa-solid fa-lock text-red-400'; showToast("מצב לוגיסטיקה ננעל", false);
             } else {
                 const pin = prompt("הכנס קוד לוגיסטיקה (ברירת מחדל: 1894):");
                 if (pin === "1894") {
-                    document.body.classList.add('is-admin');
-                    localStorage.setItem('logisticsPIN', '1894');
-                    document.getElementById('admin-lock-icon').className = 'fa-solid fa-lock-open text-green-400';
-                    showToast("מצב לוגיסטיקה נפתח!", false);
-                } else if (pin !== null) {
-                    showToast("קוד שגוי", true);
-                }
+                    document.body.classList.add('is-admin'); localStorage.setItem('logisticsPIN', '1894');
+                    document.getElementById('admin-lock-icon').className = 'fa-solid fa-lock-open text-green-400'; showToast("מצב לוגיסטיקה נפתח!", false);
+                } else if (pin !== null) showToast("קוד שגוי", true);
             }
         };
 
         async function init() {
             try {
-                if (localStorage.getItem('logisticsPIN') === '1894') {
-                    document.body.classList.add('is-admin');
-                    const icon = document.getElementById('admin-lock-icon');
-                    if(icon) icon.className = 'fa-solid fa-lock-open text-green-400';
-                }
-
+                if (localStorage.getItem('logisticsPIN') === '1894') { document.body.classList.add('is-admin'); const icon = document.getElementById('admin-lock-icon'); if(icon) icon.className = 'fa-solid fa-lock-open text-green-400'; }
                 const app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app);
                 currentUser = (await signInAnonymously(auth)).user;
                 const today = new Date(); document.getElementById('date-picker').value = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
@@ -525,6 +499,7 @@
             onSnapshot(doc(db, 'logistics', 'ammo'), (snap) => { ammoData = snap.exists() ? snap.data() : {}; renderLogisticsAmmo(); populateAmmoSelects(); });
             onSnapshot(query(collection(db, 'ammo_logs'), orderBy('date', 'desc')), (snap) => { ammoLogs = []; snap.forEach(doc => ammoLogs.push({id: doc.id, ...doc.data()})); renderLogisticsAmmo(); });
             onSnapshot(query(collection(db, 'equipment_returns'), orderBy('returnDate', 'desc')), (snap) => { returnLogs = []; snap.forEach(doc => returnLogs.push({id: doc.id, ...doc.data()})); if(equipmentModalSoldierId) renderEquipmentModal(equipmentModalSoldierId); });
+            onSnapshot(query(collection(db, 'equipment_assignments'), orderBy('assignDate', 'desc')), (snap) => { assignLogs = []; snap.forEach(doc => assignLogs.push({id: doc.id, ...doc.data()})); if(equipmentModalSoldierId) renderEquipmentModal(equipmentModalSoldierId); });
             listenToDailyStatus();
         }
 
@@ -552,7 +527,7 @@
         function renderTable() {
             const tbody = document.getElementById('soldiers-table-body'); tbody.innerHTML = ''; let f = activeTab === "הכל" ? soldiers : soldiers.filter(s => s.department === activeTab); if (searchQuery) f = f.filter(s => (s.name||"").includes(searchQuery) || (s.personalId||"").includes(searchQuery)); let rC = 0;
             if (f.length === 0) tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500">אין נתונים</td></tr>`;
-            else { f.forEach((s, idx) => { const st = dailyStatusMap[s.id] || "לא דווח"; if (st !== "לא דווח") rC++; const opt = STATUS_OPTIONS.find(o => o.val === st) || STATUS_OPTIONS[0]; const stHtml = s.streak > 0 ? `<span class="ml-2 inline-flex items-center gap-1 text-[10px] bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full border border-orange-200" title="${s.streak} ימים ברצף"><i class="fa-solid fa-fire text-orange-500"></i> ${s.streak}</span>` : ''; let sH = `<div class="flex items-center gap-2 justify-center"><button onclick="updateStatus('${s.id}', 'נוכח')" class="w-9 h-9 rounded-full flex items-center justify-center transition border focus:outline-none ${st==='נוכח'?'bg-green-500 text-white border-green-600':'bg-white text-gray-300 border-gray-200 hover:text-green-500'}"><i class="fa-solid fa-check"></i></button><select onchange="updateStatus('${s.id}', this.value)" class="w-full min-w-[120px] p-2 border rounded-lg shadow-sm text-sm outline-none ${opt.color}">`; STATUS_OPTIONS.forEach(o => sH += `<option value="${o.val}" ${o.val===st?'selected':''}>${o.emoji} ${o.val}</option>`); sH += `</select></div>`; tbody.innerHTML += `<tr class="hover:bg-blue-50/50 border-b border-gray-100"><td class="p-3 text-center text-gray-400 text-xs">${idx + 1}</td><td class="p-3 font-medium text-blue-700 hover:underline whitespace-nowrap cursor-pointer" onclick="openEquipmentModal('${s.id}')" title="לציוד חתום">${escapeHTML(s.name)}${stHtml}</td><td class="p-3">${sH}</td><td class="p-3 text-gray-600 text-xs"><span class="bg-gray-100 px-2 py-1 rounded">${escapeHTML(s.role||'-')}</span></td><td class="p-3 text-gray-600 text-xs" dir="ltr">${escapeHTML(s.phone||'-')}</td><td class="p-3 text-gray-600 text-xs">${escapeHTML(s.personalId||'-')}</td><td class="p-3 text-center"><div class="flex justify-center gap-1"><button onclick="openEquipmentModal('${s.id}')" class="text-emerald-500 hover:bg-emerald-50 p-2 rounded transition" title="1008"><i class="fa-solid fa-backpack"></i></button><button onclick="openEditSoldierModal('${s.id}')" class="text-blue-400 hover:bg-blue-50 p-2 rounded transition"><i class="fa-solid fa-pen"></i></button><button onclick="confirmDelete('${s.id}', '${escapeHTML(s.name).replace(/'/g, "\\'")}')" class="text-red-400 hover:bg-red-50 p-2 rounded transition"><i class="fa-solid fa-trash"></i></button></div></td></tr>`; }); }
+            else { f.forEach((s, idx) => { const st = dailyStatusMap[s.id] || "לא דווח"; if (st !== "לא דווח") rC++; const opt = STATUS_OPTIONS.find(o => o.val === st) || STATUS_OPTIONS[0]; const stHtml = s.streak > 0 ? `<span class="ml-2 inline-flex items-center gap-1 text-[10px] bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full border border-orange-200" title="${s.streak} ימים ברצף"><i class="fa-solid fa-fire text-orange-500"></i> ${s.streak}</span>` : ''; let sH = `<div class="flex items-center gap-2 justify-center"><button onclick="updateStatus('${s.id}', 'נוכח')" class="w-9 h-9 rounded-full flex items-center justify-center transition border focus:outline-none ${st==='נוכח'?'bg-green-500 text-white border-green-600':'bg-white text-gray-300 border-gray-200 hover:text-green-500'}"><i class="fa-solid fa-check"></i></button><select onchange="updateStatus('${s.id}', this.value)" class="w-full min-w-[120px] p-2 border rounded-lg shadow-sm text-sm outline-none ${opt.color}">`; STATUS_OPTIONS.forEach(o => sH += `<option value="${o.val}" ${o.val===st?'selected':''}>${o.emoji} ${o.val}</option>`); sH += `</select></div>`; tbody.innerHTML += `<tr class="hover:bg-blue-50/50 border-b border-gray-100"><td class="p-3 text-center text-gray-400 text-xs">${idx + 1}</td><td class="p-3 font-medium text-blue-700 hover:underline whitespace-nowrap cursor-pointer" onclick="openEquipmentModal('${s.id}')" title="לציוד חתום">${escapeHTML(s.name)}${stHtml}</td><td class="p-3">${sH}</td><td class="p-3 text-gray-600 text-xs"><span class="bg-gray-100 px-2 py-1 rounded">${escapeHTML(s.role||'-')}</span></td><td class="p-3 text-gray-600 text-xs" dir="ltr">${escapeHTML(s.phone||'-')}</td><td class="p-3 text-gray-600 text-xs">${escapeHTML(s.personalId||'-')}</td><td class="p-3 text-center"><div class="flex justify-center gap-1"><button onclick="openEquipmentModal('${s.id}')" class="text-emerald-500 hover:bg-emerald-50 p-2 rounded transition" title="טופס 1008 / אפסנאות"><i class="fa-solid fa-backpack"></i></button><button onclick="openEditSoldierModal('${s.id}')" class="text-blue-400 hover:bg-blue-50 p-2 rounded transition"><i class="fa-solid fa-pen"></i></button><button onclick="confirmDelete('${s.id}', '${escapeHTML(s.name).replace(/'/g, "\\'")}')" class="text-red-400 hover:bg-red-50 p-2 rounded transition"><i class="fa-solid fa-trash"></i></button></div></td></tr>`; }); }
             document.getElementById('total-count').textContent = f.length; document.getElementById('reported-count').textContent = `${rC} / ${f.length}`;
         }
         window.updateStatus = async (id, st) => { if(currentUser) await setDoc(doc(db, `daily_status/${document.getElementById('date-picker').value}/statuses`, id), { status: st }); };
@@ -567,15 +542,18 @@
             tb.innerHTML = h || `<tr><td colspan="6" class="p-6 text-center text-gray-400">לא נמצאו פריטים</td></tr>`;
         }
         window.openAddInventoryModal=()=>{document.getElementById('new-inv-name').value='';document.getElementById('new-inv-serial').value='';document.getElementById('add-inventory-modal').classList.remove('hidden');document.getElementById('add-inventory-modal').classList.add('flex');}; window.closeAddInventoryModal=()=>{document.getElementById('add-inventory-modal').classList.add('hidden');document.getElementById('add-inventory-modal').classList.remove('flex');};
-        window.submitNewInventoryItem=async()=>{ const c=document.getElementById('new-inv-cat').value, n=document.getElementById('new-inv-name').value.trim(), s=document.getElementById('new-inv-serial').value.trim(); if(!n||!s)return showToast("נא למלא הכל",true); if(inventory.find(i=>i.serial===s))return showToast("מס צ קיים!",true); try{ await addDoc(collection(db,'inventory'),{category:c,name:n,serial:s,status:'available',assignedTo:null,addedAt:new Date().toISOString()}); showToast("נקלט"); closeAddInventoryModal(); }catch(e){} }; window.deleteInventoryItem=async(id)=>{ if(confirm("למחוק פריט מהמחסן?")) await deleteDoc(doc(db,'inventory',id)); }; window.exportArmory=()=>{ let c="קטגוריה,שם פריט,מספר צ,סטטוס,חייל חתום\n"; inventory.forEach(i=>{const sn=i.assignedTo?(soldiers.find(s=>s.id===i.assignedTo)?.name||""):"";const st=i.status==='available'?'במחסן':'מונפק';c+=`"${i.category||''}","${i.name||''}","${i.serial||''}","${st}","${sn}"\n`;}); const u=URL.createObjectURL(new Blob(["\uFEFF"+c],{type:'text/csv;charset=utf-8;'})); const l=document.createElement("a");l.href=u;l.download="מלאי_מחסן.csv";document.body.appendChild(l);l.click();document.body.removeChild(l); }; window.importArmoryExcel=async(e)=>{ const f=e.target.files[0];if(!f)return;showToast("קורא מחסן...");const r=new FileReader(); r.onload=async(ev)=>{try{const rows=XLSX.utils.sheet_to_json(XLSX.read(new Uint8Array(ev.target.result),{type:'array'}).Sheets[XLSX.read(new Uint8Array(ev.target.result),{type:'array'}).SheetNames[0]],{header:1,defval:""});let a=0;if(rows.length>0){let ci=0,ni=1,si=2;const h=rows[0].map(x=>String(x).trim());const hc=h.findIndex(x=>x.includes('קטגוריה')),hn=h.findIndex(x=>x.includes('שם')||x.includes('פריט')),hs=h.findIndex(x=>x.includes('צ')||x.includes('סידורי'));if(hn>-1&&hs>-1){ci=Math.max(0,hc);ni=hn;si=hs;}for(let i=1;i<rows.length;i++){const n=String(rows[i][ni]||'').replace(/["']/g,'').trim(),s=String(rows[i][si]||'').replace(/["']/g,'').trim(),c=String(rows[i][ci]||'כללי').trim();if(!n||!s||n==='שם הפריט'||inventory.find(iv=>iv.serial===s))continue;await addDoc(collection(db,'inventory'),{category:c,name:n,serial:s,status:'available',assignedTo:null,addedAt:new Date().toISOString()});a++;}}showToast(`${a} פריטים נוספו.`);}catch(err){}e.target.value='';};r.readAsArrayBuffer(f); };
+        window.submitNewInventoryItem=async()=>{ const c=document.getElementById('new-inv-cat').value, n=document.getElementById('new-inv-name').value.trim(), s=document.getElementById('new-inv-serial').value.trim(); if(!n||!s)return showToast("נא למלא הכל",true); if(inventory.find(i=>i.serial===s))return showToast("מס צ קיים!",true); try{ await addDoc(collection(db,'inventory'),{category:c,name:n,serial:s,status:'available',assignedTo:null,addedAt:new Date().toISOString()}); showToast("נקלט"); closeAddInventoryModal(); }catch(e){} }; window.deleteInventoryItem=async(id)=>{ if(confirm("למחוק פריט מהמחסן?")) await deleteDoc(doc(db,'inventory',id)); }; window.exportArmory=()=>{ let c="קטגוריה,שם פריט,מספר צ,סטטוס,חייל חתום\n"; inventory.forEach(i=>{const sn=i.assignedTo?(soldiers.find(s=>s.id===i.assignedTo)?.name||""):"";const st=i.status==='available'?'במחסן':'מונפק';c+=`"${i.category||''}","${i.name||''}","${i.serial||''}","${st}","${sn}"\n`;}); const u=URL.createObjectURL(new Blob(["\uFEFF"+c],{type:'text/csv;charset=utf-8;'})); const l=document.createElement("a");l.href=u;l.download="מלאי_מחסן.csv";document.body.appendChild(l);l.click();document.body.removeChild(l); }; window.importArmoryExcel=async(e)=>{ const f=e.target.files[0];if(!f)return;showToast("קורא קובץ מחסן...");const r=new FileReader(); r.onload=async(ev)=>{try{const rows=XLSX.utils.sheet_to_json(XLSX.read(new Uint8Array(ev.target.result),{type:'array'}).Sheets[XLSX.read(new Uint8Array(ev.target.result),{type:'array'}).SheetNames[0]],{header:1,defval:""});let a=0;if(rows.length>0){let ci=0,ni=1,si=2;const h=rows[0].map(x=>String(x).trim());const hc=h.findIndex(x=>x.includes('קטגוריה')),hn=h.findIndex(x=>x.includes('שם')||x.includes('פריט')),hs=h.findIndex(x=>x.includes('צ')||x.includes('סידורי'));if(hn>-1&&hs>-1){ci=Math.max(0,hc);ni=hn;si=hs;}for(let i=1;i<rows.length;i++){const n=String(rows[i][ni]||'').replace(/["']/g,'').trim(),s=String(rows[i][si]||'').replace(/["']/g,'').trim(),c=String(rows[i][ci]||'כללי').trim();if(!n||!s||n==='שם הפריט'||inventory.find(iv=>iv.serial===s))continue;await addDoc(collection(db,'inventory'),{category:c,name:n,serial:s,status:'available',assignedTo:null,addedAt:new Date().toISOString()});a++;}}showToast(`${a} פריטים נוספו למחסן.`);}catch(err){}e.target.value='';};r.readAsArrayBuffer(f); };
 
         // ================= LOGISTICS: AMMO =================
         function renderLogisticsAmmo() { const g=document.getElementById('ammo-grid');g.innerHTML='';const t=Object.keys(ammoData);if(t.length===0)g.innerHTML=`<div class="col-span-4 p-4 text-center text-gray-500 border border-dashed rounded-lg">אין מלאי</div>`;else t.forEach(k=>{g.innerHTML+=`<div class="bg-white border border-gray-200 p-4 rounded-xl shadow-sm text-center relative group"><button onclick="deleteAmmoType('${escapeHTML(k)}')" class="absolute top-2 left-2 text-red-300 hover:text-red-500 hidden group-hover:block transition" title="מחק סוג"><i class="fa-solid fa-trash text-sm"></i></button><div class="text-gray-500 text-sm font-bold mb-1">${escapeHTML(k)}</div><div class="text-3xl font-black text-gray-800" dir="ltr">${ammoData[k]}</div></div>`;}); const lB=document.getElementById('ammo-logs-body');let lh='';ammoLogs.forEach(lg=>{lh+=`<tr><td class="p-3 text-xs text-gray-500">${new Date(lg.date).toLocaleDateString('he-IL')} ${new Date(lg.date).toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})}</td><td class="p-3 font-bold">${escapeHTML(lg.type)}</td><td class="p-3 font-mono text-red-600" dir="ltr">-${lg.amount}</td><td class="p-3 text-gray-600 text-sm">${escapeHTML(lg.reason)}</td><td class="p-3 text-center w-16"><button onclick="deleteAmmoLog('${lg.id}','${escapeHTML(lg.type)}',${lg.amount})" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button></td></tr>`;});lB.innerHTML=lh||`<tr><td colspan="5" class="p-6 text-center text-gray-400">אין תיעוד</td></tr>`; } window.deleteAmmoLog=async(id,type,qty)=>{if(confirm(`למחוק דיווח? (${qty} יוחזרו)`)){try{await deleteDoc(doc(db,'ammo_logs',id));const c=ammoData[type]||0;await setDoc(doc(db,'logistics','ammo'),{[type]:c+qty},{merge:true});showToast("נמחק ועודכן");}catch(e){}}}; window.deleteAmmoType=async(type)=>{if(confirm(`למחוק סוג ${type}?`)){const nd={...ammoData};delete nd[type];await setDoc(doc(db,'logistics','ammo'),nd);showToast("נמחק");}}; window.openAmmoUpdateModal=()=>{document.getElementById('upd-ammo-type').value='';document.getElementById('upd-ammo-qty').value='';document.getElementById('ammo-update-modal').classList.remove('hidden');document.getElementById('ammo-update-modal').classList.add('flex');}; window.closeAmmoUpdateModal=()=>{document.getElementById('ammo-update-modal').classList.add('hidden');document.getElementById('ammo-update-modal').classList.remove('flex');}; window.submitAmmoUpdate=async()=>{const t=document.getElementById('upd-ammo-type').value.trim(),q=parseInt(document.getElementById('upd-ammo-qty').value);if(!t||isNaN(q))return;try{await setDoc(doc(db,'logistics','ammo'),{[t]:q},{merge:true});closeAmmoUpdateModal();}catch(e){}}; function populateAmmoSelects(){const sl=document.getElementById('shoot-ammo-type');sl.innerHTML='<option value="">בחר...</option>';Object.keys(ammoData).forEach(t=>sl.innerHTML+=`<option value="${t}">${t} (קיים: ${ammoData[t]})</option>`);} window.openShootReportModal=()=>{document.getElementById('shoot-ammo-qty').value='';document.getElementById('shoot-ammo-reason').value='';document.getElementById('shoot-report-modal').classList.remove('hidden');document.getElementById('shoot-report-modal').classList.add('flex');}; window.closeShootReportModal=()=>{document.getElementById('shoot-report-modal').classList.add('hidden');document.getElementById('shoot-report-modal').classList.remove('flex');}; window.submitShootReport=async()=>{const t=document.getElementById('shoot-ammo-type').value,q=parseInt(document.getElementById('shoot-ammo-qty').value),r=document.getElementById('shoot-ammo-reason').value.trim();if(!t||isNaN(q)||q<=0||!r)return;const c=ammoData[t]||0;if(q>c)return showToast("אין מספיק",true);try{await setDoc(doc(db,'logistics','ammo'),{[t]:c-q},{merge:true});await addDoc(collection(db,'ammo_logs'),{type:t,amount:q,reason:r,date:new Date().toISOString()});closeShootReportModal();}catch(e){}}; window.exportAmmo=()=>{let c="סוג תחמושת,כמות במלאי\n";Object.keys(ammoData).forEach(k=>c+=`"${k}","${ammoData[k]}"\n`);const u=URL.createObjectURL(new Blob(["\uFEFF"+c],{type:'text/csv;charset=utf-8;'}));const l=document.createElement("a");l.href=u;l.download="מלאי_תחמושת.csv";document.body.appendChild(l);l.click();document.body.removeChild(l);}; window.importAmmoExcel=async(e)=>{const f=e.target.files[0];if(!f)return;showToast("קורא תחמושת...");const r=new FileReader();r.onload=async(ev)=>{try{const rows=XLSX.utils.sheet_to_json(XLSX.read(new Uint8Array(ev.target.result),{type:'array'}).Sheets[XLSX.read(new Uint8Array(ev.target.result),{type:'array'}).SheetNames[0]],{header:1,defval:""});let u=0;const up={};if(rows.length>0){for(let i=1;i<rows.length;i++){const t=String(rows[i][0]||'').trim(),q=parseInt(String(rows[i][1]||'').replace(/,/g,'').trim());if(t&&!isNaN(q)){up[t]=q;u++;}}}if(u>0){await setDoc(doc(db,'logistics','ammo'),up,{merge:true});showToast(`${u} עודכנו.`);}}catch(err){}e.target.value='';};r.readAsArrayBuffer(f);};
 
         // ================= SOLDIER EQUIPMENT MODAL (טופס 1008 + מנפקים) =================
         function populateIssuers() {
-            let opts = `<option value='טל מנחם (קל")'>טל מנחם (קל")</option><option value="קצין לוגיסטיקה (Admin)">קצין לוגיסטיקה (Admin)</option>`;
-            soldiers.filter(s => (s.department||"").includes('לוגיסטיק') || (s.department||"").includes('מפלג') || (s.department||"").includes('מפקדה')).forEach(s => { opts += `<option value="${s.name}">${s.name}</option>`; });
+            let opts = `<option value="טל מנחם|קל&quot;ג">טל מנחם (קל"ג)</option>`;
+            soldiers.filter(s => (s.department||"").includes('לוגיסטיק') || (s.department||"").includes('מפלג') || (s.department||"").includes('מפקדה')).forEach(s => { 
+                if(s.name !== "טל מנחם") opts += `<option value="${s.name}|${s.role||'סגל לוגיסטיקה'}">${s.name} (${s.role||'סגל'})</option>`; 
+            });
+            opts += `<option value="מנהל|קצין לוגיסטיקה">מנהל (קצין לוגיסטיקה)</option>`;
             return opts;
         }
 
@@ -589,10 +567,8 @@
         window.toggleAllCheckboxes = (source) => { const cbs = document.querySelectorAll('.eq-item-cb'); cbs.forEach(cb => cb.checked = source.checked); };
 
         function renderEquipmentModal(id) {
-            const issHTML = populateIssuers();
-            const e1 = document.getElementById('issuers-list'); if(e1) e1.innerHTML = issHTML;
-
-            const sl = document.getElementById('eq-item-select'); sl.innerHTML = '<option value="">בחר פריט פנוי...</option>'; const av = inventory.filter(i => i.status === 'available');
+            const issHTML = populateIssuers(); const e1 = document.getElementById('global-issuer'); if(e1) e1.innerHTML = issHTML;
+            const sl = document.getElementById('eq-item-select'); sl.innerHTML = '<option value="">בחר פריט פנוי למשיכה...</option>'; const av = inventory.filter(i => i.status === 'available');
             if(av.length === 0) sl.innerHTML = '<option value="">המחסן ריק</option>'; av.forEach(i => sl.innerHTML += `<option value="${i.id}">${i.category}: ${i.name} (צ': ${i.serial})</option>`);
             
             const tb = document.getElementById('eq-assigned-body'); const as = inventory.filter(i => i.status === 'assigned' && i.assignedTo === id);
@@ -602,69 +578,86 @@
             else { 
                 let h=''; as.forEach(i => {
                     const dt = i.assignedAt ? new Date(i.assignedAt).toLocaleDateString('he-IL') : "-";
-                    h+=`<tr>
-                        <td class="p-3 w-8 logistics-only"><input type="checkbox" class="eq-item-cb w-4 h-4" value="${i.id}"></td>
-                        <td class="p-3 font-medium text-gray-800">${escapeHTML(i.name)}</td>
-                        <td class="p-3 font-mono text-blue-600 text-sm" dir="ltr">${escapeHTML(i.serial)}</td>
-                        <td class="p-3 text-sm text-gray-600">${dt}</td>
-                    </tr>`;
+                    h+=`<tr><td class="p-2 w-8 logistics-only"><input type="checkbox" class="eq-item-cb w-4 h-4" value="${i.id}"></td><td class="p-2 font-medium text-gray-800">${escapeHTML(i.name)}</td><td class="p-2 font-mono text-blue-600 text-xs" dir="ltr">${escapeHTML(i.serial)}</td><td class="p-2 text-xs text-gray-500">${dt}</td></tr>`;
                 }); tb.innerHTML = h; 
             }
 
-            const rtb = document.getElementById('eq-returned-body'); const rets = returnLogs.filter(r => r.soldierId === id);
-            if(rets.length === 0) rtb.innerHTML = `<tr><td colspan="3" class="p-3 text-center">לא נמצאה היסטוריית זיכויים.</td></tr>`;
+            // History Tables
+            const atb = document.getElementById('eq-assigned-history-body'); const a_logs = assignLogs.filter(r => r.soldierId === id);
+            if(a_logs.length === 0) atb.innerHTML = `<tr><td colspan="3" class="p-3 text-center">אין היסטוריה.</td></tr>`;
+            else { let ah=''; a_logs.slice(0, 15).forEach(r => { ah+=`<tr><td class="p-2">${escapeHTML(r.name)}</td><td class="p-2 font-mono" dir="ltr">${escapeHTML(r.serial)}</td><td class="p-2">${new Date(r.assignDate).toLocaleDateString('he-IL')}</td></tr>`; }); atb.innerHTML = ah; }
+
+            const rtb = document.getElementById('eq-returned-history-body'); const rets = returnLogs.filter(r => r.soldierId === id);
+            if(rets.length === 0) rtb.innerHTML = `<tr><td colspan="4" class="p-3 text-center">אין היסטוריית זיכויים.</td></tr>`;
             else {
-                let rh=''; rets.slice(0, 10).forEach(r => {
+                let rh=''; rets.slice(0, 15).forEach(r => {
                     const rdt = new Date(r.returnDate).toLocaleDateString('he-IL');
-                    rh+=`<tr><td class="p-2">${escapeHTML(r.name)}</td><td class="p-2 font-mono" dir="ltr">${escapeHTML(r.serial)}</td><td class="p-2">${rdt}</td></tr>`;
+                    rh+=`<tr><td class="p-2">${escapeHTML(r.name)}</td><td class="p-2 font-mono" dir="ltr">${escapeHTML(r.serial)}</td><td class="p-2">${rdt}</td><td class="p-2 text-left logistics-only"><button onclick="deleteReturnLog('${r.id}')" class="text-red-400 hover:text-red-600" title="מחק רשומה"><i class="fa-solid fa-trash"></i></button></td></tr>`;
                 }); rtb.innerHTML = rh;
             }
         }
 
+        window.deleteReturnLog = async (logId) => { if(confirm("למחוק פריט זה מהיסטוריית הזיכויים?")) { await deleteDoc(doc(db, 'equipment_returns', logId)); showToast("התיעוד נמחק"); } };
+
         window.assignEquipmentToSoldier = async () => { 
-            if(!equipmentModalSoldierId) return; const id = document.getElementById('eq-item-select').value; const iss = document.getElementById('eq-item-issuer').value || 'טל מנחם (קל")';
-            if(!id) return; 
-            const sig = getSignatureData();
+            if(!equipmentModalSoldierId) return; 
+            const sig = getSignatureData(); if(!sig) return showToast("חובה להחתים את החייל על המסך!", true);
+            const id = document.getElementById('eq-item-select').value; if(!id) return showToast("בחר פריט", true);
+            const issVal = document.getElementById('global-issuer').value; if(!issVal) return showToast("בחר מנפק", true);
+            const [issName, issRole] = issVal.split('|');
+            
             try { 
-                await updateDoc(doc(db,'inventory',id),{status:'assigned',assignedTo:equipmentModalSoldierId,assignedAt:new Date().toISOString(), issuer: iss}); 
-                if(sig) await updateDoc(doc(db,'soldiers_roster',equipmentModalSoldierId), {lastSignature: sig});
-                showToast("הונפק"); 
+                const invItem = inventory.find(i=>i.id===id);
+                await updateDoc(doc(db,'inventory',id),{status:'assigned',assignedTo:equipmentModalSoldierId,assignedAt:new Date().toISOString(), issuer: issName, issuerRole: issRole}); 
+                await addDoc(collection(db,'equipment_assignments'), { soldierId: equipmentModalSoldierId, name: invItem.name, serial: invItem.serial, assignDate: new Date().toISOString(), issuer: issName, issuerRole: issRole, signature: sig });
+                await updateDoc(doc(db,'soldiers_roster',equipmentModalSoldierId), {lastSignature: sig});
+                showToast("הונפק בהצלחה"); clearSignature();
             } catch(e){} 
         };
         
         window.createNewAndAssign = async () => {
             if(!equipmentModalSoldierId) return;
-            const c = document.getElementById('eq-new-cat').value, n = document.getElementById('eq-new-name').value.trim(), s = document.getElementById('eq-new-serial').value.trim(), iss = document.getElementById('eq-new-issuer').value || 'טל מנחם (קל")';
+            const sig = getSignatureData(); if(!sig) return showToast("חובה להחתים את החייל על המסך!", true);
+            const c = document.getElementById('eq-new-cat').value, n = document.getElementById('eq-new-name').value.trim(), s = document.getElementById('eq-new-serial').value.trim();
+            const issVal = document.getElementById('global-issuer').value; if(!issVal) return showToast("בחר מנפק", true);
+            const [issName, issRole] = issVal.split('|');
+
             if(!n) return showToast("נא למלא שם פריט", true);
             if(s && inventory.find(i => i.serial === s)) return showToast("מספר צ' זה כבר קיים במערכת!", true);
-            const sig = getSignatureData();
+            
             try {
-                await addDoc(collection(db, 'inventory'), { category: c, name: n, serial: s, status: 'assigned', assignedTo: equipmentModalSoldierId, assignedAt: new Date().toISOString(), addedAt: new Date().toISOString(), issuer: iss });
-                if(sig) await updateDoc(doc(db,'soldiers_roster',equipmentModalSoldierId), {lastSignature: sig});
-                showToast("הפריט הונפק לחייל ונוסף למחסן"); document.getElementById('eq-new-name').value = ''; document.getElementById('eq-new-serial').value = ''; clearSignature();
+                const addRes = await addDoc(collection(db, 'inventory'), { category: c, name: n, serial: s, status: 'assigned', assignedTo: equipmentModalSoldierId, assignedAt: new Date().toISOString(), addedAt: new Date().toISOString(), issuer: issName, issuerRole: issRole });
+                await addDoc(collection(db,'equipment_assignments'), { soldierId: equipmentModalSoldierId, name: n, serial: s, assignDate: new Date().toISOString(), issuer: issName, issuerRole: issRole, signature: sig });
+                await updateDoc(doc(db,'soldiers_roster',equipmentModalSoldierId), {lastSignature: sig});
+                showToast("נוסף והונפק"); document.getElementById('eq-new-name').value = ''; document.getElementById('eq-new-serial').value = ''; clearSignature();
             } catch(e) { showToast("שגיאה", true); }
         };
 
         window.returnSelectedItems = async () => {
-            const cbs = document.querySelectorAll('.eq-item-cb:checked');
-            if(cbs.length === 0) return showToast("לא נבחרו פריטים להזדכות", true);
-            if(!confirm(`בטוח שברצונך לזכות את ${cbs.length} הפריטים המסומנים?`)) return;
+            const sig = getSignatureData(); if(!sig) return showToast("חובה להחתים את החייל על המסך לשם ביצוע זיכוי!", true);
+            const issVal = document.getElementById('global-issuer').value; if(!issVal) return showToast("בחר מזכה", true);
+            const [recName, recRole] = issVal.split('|');
             
-            showToast("מבצע זיכוי...");
+            const cbs = document.querySelectorAll('.eq-item-cb:checked');
+            if(cbs.length === 0) return showToast("לא נבחרו פריטים", true);
+            if(!confirm(`לזכות את ${cbs.length} הפריטים המסומנים?`)) return;
+            
+            const batchId = Date.now().toString(); showToast("מבצע זיכוי...");
             for(const cb of cbs) {
                 const iid = cb.value; const item = inventory.find(i=>i.id===iid);
                 if(item) {
-                    await addDoc(collection(db,'equipment_returns'), { soldierId: equipmentModalSoldierId, name: item.name, serial: item.serial, returnDate: new Date().toISOString(), returnedTo: 'מחסן' });
-                    await updateDoc(doc(db,'inventory',iid), { status:'available', assignedTo:null, assignedAt:null, issuer:null });
+                    await addDoc(collection(db,'equipment_returns'), { soldierId: equipmentModalSoldierId, name: item.name, serial: item.serial, returnDate: new Date().toISOString(), receiver: recName, receiverRole: recRole, signature: sig, batchId: batchId });
+                    await updateDoc(doc(db,'inventory',iid), { status:'available', assignedTo:null, assignedAt:null, issuer:null, issuerRole:null });
                 }
             }
-            showToast("זיכוי בוצע בהצלחה!");
+            clearSignature(); showToast("זיכוי בוצע!"); 
+            openFormPrint('receipt', batchId);
         };
 
         // --- PRINT / WHATSAPP IMAGE LOGIC ---
-        let currentPrintType = '1008'; // '1008' or 'receipt'
+        let currentPrintType = '1008';
 
-        window.openFormPrint = (type) => {
+        window.openFormPrint = (type, batchId = null) => {
             if(!equipmentModalSoldierId) return;
             currentPrintType = type;
             const s = soldiers.find(x => x.id === equipmentModalSoldierId);
@@ -678,97 +671,60 @@
             document.getElementById('print-th-date').textContent = isReceipt ? "תאריך זיכוי" : "תאריך ניפוק";
             document.getElementById('print-header-title').textContent = isReceipt ? "תצוגה מקדימה - זיכוי" : "תצוגה מקדימה - 1008";
 
-            const tb = document.getElementById('print-table-body');
-            let h = '';
+            const tb = document.getElementById('print-table-body'); let h = '';
             
             if(isReceipt) {
-                // Show Returns
-                const rets = returnLogs.filter(r => r.soldierId === equipmentModalSoldierId);
-                rets.slice(0, 15).forEach((item, index) => { // show up to 15 last returns
-                    const dt = new Date(item.returnDate).toLocaleDateString('he-IL');
-                    h += `<tr class="border-b border-gray-300">
-                        <td class="p-2 border border-black text-center">${index+1}</td>
-                        <td class="p-2 border border-black">${item.name}</td>
-                        <td class="p-2 border border-black" dir="ltr">${item.serial||'-'}</td>
-                        <td class="p-2 border border-black">${dt}</td>
-                        <td class="p-2 border border-black">הוחזר למחסן</td>
-                    </tr>`;
-                });
-                tb.innerHTML = h || `<tr><td colspan="5" class="text-center p-4 border border-black">לא נמצאו זיכויים קודמים.</td></tr>`;
+                document.getElementById('print-issuer-role-text').textContent = "חתימת המזכה";
+                let rets = returnLogs.filter(r => r.soldierId === equipmentModalSoldierId);
+                if(batchId) rets = rets.filter(r => r.batchId === batchId); // Filter to current transaction
                 
-                document.getElementById('print-soldier-sig-img').style.backgroundImage = `none`;
-                document.getElementById('print-issuer-stamp').classList.add('hidden');
+                let firstRec = 'מזכה', firstRole = 'לוגיסטיקה', currentSig = s.lastSignature;
+                rets.forEach((item, index) => {
+                    if(index === 0) { firstRec = item.receiver || 'מזכה'; firstRole = item.receiverRole || 'לוגיסטיקה'; currentSig = item.signature || s.lastSignature; }
+                    const dt = new Date(item.returnDate).toLocaleDateString('he-IL');
+                    h += `<tr class="border-b border-gray-300"><td class="p-2 border border-black text-center">${index+1}</td><td class="p-2 border border-black">${item.name}</td><td class="p-2 border border-black" dir="ltr">${item.serial||'-'}</td><td class="p-2 border border-black">${dt}</td><td class="p-2 border border-black">${item.receiver || '-'}</td></tr>`;
+                });
+                tb.innerHTML = h || `<tr><td colspan="5" class="text-center p-4 border border-black">לא בוצעו זיכויים.</td></tr>`;
+                
+                if(currentSig) document.getElementById('print-soldier-sig-img').style.backgroundImage = `url(${currentSig})`; else document.getElementById('print-soldier-sig-img').style.backgroundImage = `none`;
+                if(rets.length > 0) { document.getElementById('stamp-name').textContent = firstRec; document.getElementById('stamp-role').textContent = firstRole; document.getElementById('print-issuer-stamp').classList.remove('hidden'); } else document.getElementById('print-issuer-stamp').classList.add('hidden');
+                
             } else {
-                // Show Assigned (1008)
+                document.getElementById('print-issuer-role-text').textContent = "חתימת המנפק";
                 const as = inventory.filter(i => i.status === 'assigned' && i.assignedTo === equipmentModalSoldierId);
-                let firstIssuer = 'קצין לוגיסטיקה';
+                let firstIssuer = 'מנפק', firstRole = 'לוגיסטיקה';
                 as.forEach((item, index) => {
-                    if(index === 0 && item.issuer) firstIssuer = item.issuer;
+                    if(index === 0) { firstIssuer = item.issuer || 'מנפק'; firstRole = item.issuerRole || 'לוגיסטיקה'; }
                     const dt = item.assignedAt ? new Date(item.assignedAt).toLocaleDateString('he-IL') : "-";
-                    h += `<tr class="border-b border-gray-300">
-                        <td class="p-2 border border-black text-center">${index+1}</td>
-                        <td class="p-2 border border-black">${item.name}</td>
-                        <td class="p-2 border border-black" dir="ltr">${item.serial||'-'}</td>
-                        <td class="p-2 border border-black">${dt}</td>
-                        <td class="p-2 border border-black">${item.issuer || '-'}</td>
-                    </tr>`;
+                    h += `<tr class="border-b border-gray-300"><td class="p-2 border border-black text-center">${index+1}</td><td class="p-2 border border-black">${item.name}</td><td class="p-2 border border-black" dir="ltr">${item.serial||'-'}</td><td class="p-2 border border-black">${dt}</td><td class="p-2 border border-black">${item.issuer || '-'}</td></tr>`;
                 });
                 tb.innerHTML = h || `<tr><td colspan="5" class="text-center p-4 border border-black">אין ציוד חתום.</td></tr>`;
                 
-                // Signatures
-                if(s.lastSignature) {
-                    document.getElementById('print-soldier-sig-img').style.backgroundImage = `url(${s.lastSignature})`;
-                } else {
-                    document.getElementById('print-soldier-sig-img').style.backgroundImage = `none`;
-                }
-                
-                if(as.length > 0) {
-                    document.getElementById('stamp-name').textContent = firstIssuer;
-                    document.getElementById('print-issuer-stamp').classList.remove('hidden');
-                } else {
-                    document.getElementById('print-issuer-stamp').classList.add('hidden');
-                }
+                if(s.lastSignature) document.getElementById('print-soldier-sig-img').style.backgroundImage = `url(${s.lastSignature})`; else document.getElementById('print-soldier-sig-img').style.backgroundImage = `none`;
+                if(as.length > 0) { document.getElementById('stamp-name').textContent = firstIssuer; document.getElementById('stamp-role').textContent = firstRole; document.getElementById('print-issuer-stamp').classList.remove('hidden'); } else document.getElementById('print-issuer-stamp').classList.add('hidden');
             }
 
-            document.getElementById('modal-form-print').classList.remove('hidden');
-            document.getElementById('modal-form-print').classList.add('flex');
+            document.getElementById('modal-form-print').classList.remove('hidden'); document.getElementById('modal-form-print').classList.add('flex');
         };
 
-        window.closeFormPrint = () => {
-            document.getElementById('modal-form-print').classList.add('hidden');
-            document.getElementById('modal-form-print').classList.remove('flex');
-        };
+        window.closeFormPrint = () => { document.getElementById('modal-form-print').classList.add('hidden'); document.getElementById('modal-form-print').classList.remove('flex'); };
 
         window.shareFormAsImage = async () => {
             const target = document.getElementById('print-target-area');
-            const originalBorder = target.style.border;
-            target.style.border = '1px solid white'; // clean up for screenshot
+            const originalBorder = target.style.border; target.style.border = '1px solid white'; 
             showToast("מייצר תמונה לשיתוף...", false);
-            
             try {
-                const canvas = await html2canvas(target, {scale: 2, useCORS: true});
-                target.style.border = originalBorder;
-                
+                const canvas = await html2canvas(target, {scale: 2, useCORS: true}); target.style.border = originalBorder;
                 canvas.toBlob(async (blob) => {
-                    const fileName = (currentPrintType === '1008' ? 'טופס_1008' : 'אישור_זיכוי') + '.png';
+                    const fileName = (currentPrintType === '1008' ? 'טופס_1008_' : 'אישור_זיכוי_') + document.getElementById('print-soldier-name').textContent + '.png';
                     const file = new File([blob], fileName, { type: 'image/png' });
-                    
                     if (navigator.canShare && navigator.share) {
-                        try {
-                            await navigator.share({
-                                files: [file],
-                                title: fileName,
-                                text: 'מצורף ' + (currentPrintType === '1008' ? 'טופס 1008' : 'אישור זיכוי') + ' שלך.'
-                            });
-                        } catch (err) { }
+                        try { await navigator.share({ files: [file], title: fileName, text: 'מצורף ' + (currentPrintType === '1008' ? 'טופס 1008' : 'אישור זיכוי') + ' שלך.' }); } catch (err) { }
                     } else {
-                        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fileName; a.click();
-                        showToast("הורד למכשיר (שיתוף ישיר לא נתמך בדפדפן זה)");
+                        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fileName; a.click(); showToast("הורד למכשיר");
                     }
                 }, 'image/png');
-            } catch (err) {
-                showToast("שגיאה ביצירת התמונה", true);
-            }
+            } catch (err) { showToast("שגיאה ביצירת התמונה", true); }
         };
 
         // EXPORTS / IMPORTS / MODALS (General)
