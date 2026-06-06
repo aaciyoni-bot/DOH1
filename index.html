@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -166,26 +167,6 @@
                     <button type="submit" id="modal-submit-btn" class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition shadow-md">שמור חייל</button>
                 </div>
             </form>
-        </div>
-    </div>
-
-    <!-- Sheet Selector Modal for Excel Import -->
-    <div id="sheet-selector-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 transform transition-all max-h-[90vh] flex flex-col">
-            <div class="flex justify-between items-center mb-5">
-                <h3 class="text-xl font-bold text-gray-800">בחר לשוניות לייבוא</h3>
-                <button onclick="closeSheetSelectorModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
-            </div>
-            <p class="text-sm text-gray-600 mb-4">המערכת מצאה מספר לשוניות בקובץ. אנא סמן <strong>רק</strong> את המחלקות שתרצה לייבא (התעלם מגיליונות של סיכומי נתונים):</p>
-            
-            <div id="sheet-checkboxes" class="flex-grow overflow-y-auto mb-4 border border-gray-200 rounded-lg p-3 bg-gray-50 max-h-60 flex flex-col gap-2">
-                <!-- Checkboxes will be injected here -->
-            </div>
-            
-            <div class="flex justify-end gap-3 pt-2 border-t border-gray-100">
-                <button onclick="closeSheetSelectorModal()" class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition">ביטול</button>
-                <button onclick="confirmSheetSelection()" class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition shadow-md">ייבא נתונים</button>
-            </div>
         </div>
     </div>
 
@@ -634,29 +615,29 @@
             showToast(`הייבוא האחרון בוטל (${deletedCount} שורות נמחקו).`);
         };
 
-        // --- EXCEL & CSV IMPORT WITH FOOLPROOF PARSING ---
+        // --- EXCEL & CSV IMPORT (FILE NAME AS DEPARTMENT) ---
         
         window.processExcel = async (event) => {
             if (!currentUser) {
-                showToast("יש להתחבר תחילה למסד הנתונים.", true);
+                showToast("יש להתחבר תחילה למ מסד הנתונים.", true);
                 return;
             }
             const file = event.target.files[0];
             if (!file) return;
 
-            const isCSV = file.name.toLowerCase().endsWith('.csv');
-            let csvDeptName = "";
+            // מושך את שם הקובץ ללא הסיומת (.csv או .xlsx)
+            const baseFileName = file.name.replace(/\.[^/.]+$/, "");
             
-            if (isCSV) {
-                csvDeptName = prompt("מכיוון שזהו קובץ CSV, הקלד את שם המחלקה (לשונית) שאליה ישויכו החיילים:", "מחלקה כללית");
-                if (!csvDeptName) {
-                    event.target.value = ''; 
-                    return;
-                }
-                showToast("קורא את הקובץ... אנא המתן.");
-            } else {
-                showToast("מנתח את קובץ האקסל... מכין רשימת לשוניות.");
+            // שואל את המשתמש ומציע את שם הקובץ כברירת מחדל
+            const deptName = prompt("אנא אשר או ערוך את שם המחלקה עבור קובץ זה:", baseFileName);
+            
+            if (!deptName) {
+                event.target.value = ''; // ביטול
+                return;
             }
+
+            showToast("קורא את הקובץ... אנא המתן.");
+            const importId = Date.now();
 
             const reader = new FileReader();
             reader.onload = async (e) => {
@@ -664,174 +645,93 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, {type: 'array'});
                     
-                    if (isCSV) {
-                        // For CSV there's only 1 sheet, skip the modal
-                        processSelectedSheets(workbook, [workbook.SheetNames[0]], csvDeptName, true);
+                    let added = 0;
+                    
+                    // אנחנו קוראים רק את הלשונית הראשונה בקובץ, כי חילקת אותם לקבצים נפרדים
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const rows = XLSX.utils.sheet_to_json(worksheet, {header: 1, defval: ""});
+                    
+                    if (rows.length > 0) {
+                        let nameIndex = -1, roleIndex = -1, idIndex = -1, phoneIndex = -1;
+                        
+                        // חיפוש כותרות
+                        for (let i = 0; i < Math.min(rows.length, 30); i++) {
+                            const cols = rows[i].map(c => String(c).replace(/["']/g, '').trim());
+                            
+                            let foundName = cols.findIndex(c => c === 'שם' || c === 'שם מלא' || c === 'שם החייל' || c === 'שם פרטי');
+                            if (foundName === -1) {
+                                foundName = cols.findIndex(c => c.includes('שם'));
+                            }
+                            
+                            if (foundName !== -1) {
+                                nameIndex = foundName;
+                                roleIndex = cols.findIndex(c => c.includes('תפקיד') || c.includes('מחלקה'));
+                                idIndex = cols.findIndex(c => c.includes('מספר אישי') || c.includes('מס"א') || c.includes('אישי'));
+                                phoneIndex = cols.findIndex(c => c.includes('טלפון') || c.includes('נייד'));
+                                break;
+                            }
+                        }
+
+                        // גיבוי קשיח במידה ולא מצא כותרות
+                        if (nameIndex === -1 && rows.length > 0) {
+                            nameIndex = 0; // טור A
+                            roleIndex = 1; // טור B
+                            idIndex = 2;   // טור C
+                            phoneIndex = 3; // טור D
+                        }
+
+                        // הוספת החיילים
+                        for (let i = 0; i < rows.length; i++) {
+                            const cols = rows[i];
+                            if (cols.length <= nameIndex) continue;
+                            
+                            const nameRaw = cols[nameIndex];
+                            if (!nameRaw) continue; 
+                            
+                            const name = String(nameRaw).replace(/["']/g, '').trim();
+                            
+                            // סינון שורות זבל
+                            if (name === 'שם' || name === 'שם מלא' || name.includes('סה"כ') || name.includes('סהכ') || name === 'מפקדים' || name === 'נהגים' || name.includes('100%') || name.length < 2 || !isNaN(name)) {
+                                continue;
+                            }
+                            
+                            const role = roleIndex > -1 && cols[roleIndex] ? String(cols[roleIndex]).replace(/["']/g, '').trim() : "";
+                            const personalId = idIndex > -1 && cols[idIndex] ? String(cols[idIndex]).replace(/["']/g, '').trim() : "";
+                            const phone = phoneIndex > -1 && cols[phoneIndex] ? String(cols[phoneIndex]).replace(/["']/g, '').trim() : "";
+
+                            try {
+                                await addDoc(collection(db, 'soldiers_roster'), {
+                                    name: name,
+                                    department: deptName,
+                                    role: role,
+                                    personalId: personalId,
+                                    phone: phone,
+                                    createdAt: new Date().toISOString(),
+                                    importId: importId
+                                });
+                                added++;
+                            } catch (error) {
+                                console.error("Error adding soldier:", error);
+                            }
+                        }
+                    }
+                    
+                    if (added > 0) {
+                        showToast(`הייבוא הסתיים! ${added} חיילים נוספו למחלקת ${deptName}.`);
                     } else {
-                        // Open the visual modal to let user choose which sheets to import
-                        openSheetSelectorModal(workbook);
+                        showToast("לא נמצאו חיילים תקינים לייבוא בתוך הקובץ.", true);
                     }
                     
                 } catch (err) {
                     console.error(err);
                     showToast("שגיאה בקריאת הקובץ. ודא שזה קובץ תקין.", true);
-                    event.target.value = ''; // Reset input
                 }
+                
+                event.target.value = ''; // איפוס הקלט
             };
             
             reader.readAsArrayBuffer(file);
-        };
-
-        window.openSheetSelectorModal = (workbook) => {
-            currentWorkbook = workbook;
-            const container = document.getElementById('sheet-checkboxes');
-            container.innerHTML = '';
-            
-            workbook.SheetNames.forEach(sheetName => {
-                const label = document.createElement('label');
-                label.className = 'flex items-center gap-3 p-2 hover:bg-gray-100 rounded cursor-pointer transition border border-transparent hover:border-gray-200';
-                
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.value = sheetName;
-                checkbox.className = 'w-4 h-4 text-blue-600 rounded cursor-pointer';
-                
-                // Let's guess if it's a "junk" sheet like "100%" or numbers, uncheck by default
-                const isLikelyJunk = /^[0-9]+%?$/.test(sheetName) || sheetName.includes("סה\"כ");
-                checkbox.checked = !isLikelyJunk; 
-                
-                const span = document.createElement('span');
-                span.className = 'text-gray-700 font-medium';
-                span.textContent = sheetName;
-                
-                label.appendChild(checkbox);
-                label.appendChild(span);
-                container.appendChild(label);
-            });
-            
-            document.getElementById('sheet-selector-modal').classList.remove('hidden');
-            document.getElementById('sheet-selector-modal').classList.add('flex');
-        };
-
-        window.closeSheetSelectorModal = () => {
-            document.getElementById('sheet-selector-modal').classList.add('hidden');
-            document.getElementById('sheet-selector-modal').classList.remove('flex');
-            currentWorkbook = null;
-            document.getElementById('csv-file-input').value = '';
-        };
-
-        window.confirmSheetSelection = () => {
-            const checkboxes = document.querySelectorAll('#sheet-checkboxes input[type="checkbox"]:checked');
-            const selectedSheets = Array.from(checkboxes).map(cb => cb.value);
-            
-            if (selectedSheets.length === 0) {
-                showToast("יש לבחור לפחות לשונית אחת לייבוא.", true);
-                return;
-            }
-            
-            closeSheetSelectorModal();
-            processSelectedSheets(currentWorkbook, selectedSheets, "", false);
-        };
-
-        window.processSelectedSheets = async (workbook, selectedSheets, csvDeptName, isCSV) => {
-            showToast("מייבא את הנתונים... אנא המתן מעט.");
-            const importId = Date.now();
-            let added = 0;
-            
-            for (const sheetName of selectedSheets) {
-                const worksheet = workbook.Sheets[sheetName];
-                const rows = XLSX.utils.sheet_to_json(worksheet, {header: 1, defval: ""});
-                
-                if (rows.length === 0) continue;
-
-                let nameIndex = -1, roleIndex = -1, idIndex = -1, phoneIndex = -1;
-                
-                // --- SMARTER HEADER DETECTION ---
-                // Search up to 30 rows to find headers
-                for (let i = 0; i < Math.min(rows.length, 30); i++) {
-                    const cols = rows[i].map(c => String(c).replace(/["']/g, '').trim());
-                    
-                    // Priority 1: Exact match or obvious match
-                    let foundName = cols.findIndex(c => c === 'שם' || c === 'שם מלא' || c === 'שם החייל' || c === 'שם פרטי');
-                    
-                    // Priority 2: Fuzzy match
-                    if (foundName === -1) {
-                        foundName = cols.findIndex(c => c.includes('שם'));
-                    }
-                    
-                    if (foundName !== -1) {
-                        nameIndex = foundName;
-                        roleIndex = cols.findIndex(c => c.includes('תפקיד') || c.includes('מחלקה'));
-                        idIndex = cols.findIndex(c => c.includes('מספר אישי') || c.includes('מס"א') || c.includes('אישי'));
-                        phoneIndex = cols.findIndex(c => c.includes('טלפון') || c.includes('נייד'));
-                        break;
-                    }
-                }
-
-                // --- FOOLPROOF FALLBACK ---
-                // If it STILL couldn't find the word "שם" because of formatting or spaces, 
-                // we force the system to assume exactly what you said: A=Name, B=Role, C=ID, D=Phone.
-                if (nameIndex === -1 && rows.length > 0) {
-                    nameIndex = 0; // טור A
-                    roleIndex = 1; // טור B
-                    idIndex = 2;   // טור C
-                    phoneIndex = 3; // טור D
-                }
-
-                // Add soldiers
-                for (let i = 0; i < rows.length; i++) {
-                    const cols = rows[i];
-                    if (cols.length <= nameIndex) continue;
-                    
-                    const nameRaw = cols[nameIndex];
-                    if (!nameRaw) continue; // Skip empty
-                    
-                    const name = String(nameRaw).replace(/["']/g, '').trim();
-                    
-                    // Filter out garbage rows (titles, summaries, numbers)
-                    if (
-                        name === 'שם' || 
-                        name === 'שם מלא' ||
-                        name.includes('סה"כ') || 
-                        name.includes('סהכ') || 
-                        name === 'מפקדים' || 
-                        name === 'נהגים' || 
-                        name.includes('100%') || 
-                        name.length < 2 || 
-                        !isNaN(name) // Skip if the name is just a number
-                    ) {
-                        continue;
-                    }
-                    
-                    const finalDeptName = isCSV ? csvDeptName : sheetName;
-                    const role = roleIndex > -1 && cols[roleIndex] ? String(cols[roleIndex]).replace(/["']/g, '').trim() : "";
-                    const personalId = idIndex > -1 && cols[idIndex] ? String(cols[idIndex]).replace(/["']/g, '').trim() : "";
-                    const phone = phoneIndex > -1 && cols[phoneIndex] ? String(cols[phoneIndex]).replace(/["']/g, '').trim() : "";
-
-                    try {
-                        await addDoc(collection(db, 'soldiers_roster'), {
-                            name: name,
-                            department: finalDeptName,
-                            role: role,
-                            personalId: personalId,
-                            phone: phone,
-                            createdAt: new Date().toISOString(),
-                            importId: importId
-                        });
-                        added++;
-                    } catch (error) {
-                        console.error("Error adding soldier:", error);
-                    }
-                }
-            }
-            
-            if (added > 0) {
-                showToast(`הייבוא הסתיים! ${added} חיילים נוספו.`);
-            } else {
-                showToast("לא נמצאו חיילים תקינים לייבוא בתוך הקובץ.", true);
-            }
-            
-            document.getElementById('csv-file-input').value = ''; 
         };
 
         // --- END EXCEL IMPORT ---
