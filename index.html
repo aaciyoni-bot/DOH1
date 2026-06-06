@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -57,6 +58,12 @@
                 <button onclick="openAddSoldierModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition text-sm font-medium flex items-center gap-2">
                     <i class="fa-solid fa-user-plus"></i>
                     <span>הוסף חייל</span>
+                </button>
+                
+                <!-- Undo Import Button -->
+                <button onclick="confirmUndoImport()" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg transition text-sm font-medium flex items-center gap-2 border border-red-200" title="מחק ייבוא אחרון">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span class="hidden sm:inline">בטל ייבוא</span>
                 </button>
             </div>
 
@@ -475,6 +482,53 @@
             }
         };
 
+        window.confirmUndoImport = () => {
+            const batchIds = soldiers.map(s => s.importId).filter(id => id);
+            if (batchIds.length === 0) {
+                showToast("לא נמצאו נתוני ייבוא שאפשר לבטל.", true);
+                return;
+            }
+            const lastBatchId = Math.max(...batchIds);
+            const soldiersToDelete = soldiers.filter(s => s.importId === lastBatchId);
+
+            const confirmDiv = document.createElement('div');
+            confirmDiv.id = 'confirm-undo-modal';
+            confirmDiv.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4';
+            confirmDiv.innerHTML = `
+                <div class="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full text-center">
+                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 text-2xl">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">ביטול ייבוא אחרון</h3>
+                    <p class="text-gray-600 mb-6">האם למחוק <strong>${soldiersToDelete.length}</strong> חיילים שהתווספו בייבוא האחרון?</p>
+                    <div class="flex justify-center gap-3">
+                        <button onclick="document.getElementById('confirm-undo-modal').remove()" class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition">ביטול</button>
+                        <button onclick="executeUndoImport(${lastBatchId})" class="px-4 py-2 text-white bg-red-500 hover:bg-red-600 rounded-lg font-medium transition shadow-md">כן, מחק ייבוא</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(confirmDiv);
+        };
+
+        window.executeUndoImport = async (batchId) => {
+            if (!currentUser) return;
+            document.getElementById('confirm-undo-modal').remove();
+            
+            const soldiersToDelete = soldiers.filter(s => s.importId === batchId);
+            showToast("מוחק נתונים... אנא המתן");
+            
+            let deletedCount = 0;
+            for (const s of soldiersToDelete) {
+                try {
+                    await deleteDoc(doc(db, 'soldiers_roster', s.id));
+                    deletedCount++;
+                } catch (err) {
+                    console.error("Error deleting", err);
+                }
+            }
+            showToast(`הייבוא האחרון בוטל (${deletedCount} חיילים נמחקו).`);
+        };
+
         // Excel Import Logic (Reads ALL Tabs Automatically)
         window.processExcel = async (event) => {
             if (!currentUser) {
@@ -485,6 +539,7 @@
             if (!file) return;
 
             showToast("קורא את קובץ האקסל... אנא המתן.");
+            const importId = Date.now();
 
             const reader = new FileReader();
             reader.onload = async (e) => {
@@ -527,7 +582,8 @@
                                 await addDoc(collection(db, 'soldiers_roster'), {
                                     name: name,
                                     department: sheetName,
-                                    createdAt: new Date().toISOString()
+                                    createdAt: new Date().toISOString(),
+                                    importId: importId
                                 });
                                 added++;
                             } catch (error) {
