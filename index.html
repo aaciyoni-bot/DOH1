@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -82,12 +83,19 @@
         </div>
 
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex-grow flex flex-col overflow-hidden">
-            <!-- Tabs Navigation -->
-            <div class="border-b border-gray-200 bg-gray-50/50 overflow-x-auto">
-                <nav class="flex gap-2 px-4 py-2" id="tabs-container" aria-label="Tabs">
+            <!-- Tabs & Search Navigation -->
+            <div class="border-b border-gray-200 bg-gray-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center p-2 gap-3">
+                <!-- Tabs Navigation -->
+                <nav class="flex gap-2 px-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0 hide-scrollbar" id="tabs-container" aria-label="Tabs">
                     <!-- Tabs will be injected here -->
                     <button class="tab-active px-4 py-2 rounded-t-lg transition whitespace-nowrap">מעלים...</button>
                 </nav>
+
+                <!-- Search Bar -->
+                <div class="relative w-full sm:w-72 shrink-0 px-2 sm:px-0">
+                    <i class="fa-solid fa-magnifying-glass absolute right-5 sm:right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" id="search-input" oninput="handleSearch(event)" placeholder="חיפוש לפי שם, טלפון, מספר אישי..." class="w-full pr-10 pl-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm text-sm bg-white">
+                </div>
             </div>
 
             <!-- Table -->
@@ -112,8 +120,8 @@
             
             <!-- Summary Footer -->
             <div class="bg-gray-50 p-4 border-t border-gray-200 flex justify-between items-center text-sm">
-                <span class="text-gray-600">סה"כ במצבת: <strong id="total-count" class="text-gray-900">0</strong></span>
-                <span class="text-gray-600">דווחו היום: <strong id="reported-count" class="text-blue-600">0</strong></span>
+                <span class="text-gray-600">מציג: <strong id="total-count" class="text-gray-900">0</strong> חיילים</span>
+                <span class="text-gray-600">דווחו היום מתוכם: <strong id="reported-count" class="text-blue-600">0</strong></span>
             </div>
         </div>
     </main>
@@ -178,6 +186,7 @@
         let dailyStatusMap = {};
         let departments = new Set(["הכל", "מפלג", "אספקה"]);
         let activeTab = "הכל";
+        let searchQuery = "";
         
         let unsubSoldiers = null;
         let unsubDaily = null;
@@ -289,6 +298,11 @@
         function handleDateChange() {
             listenToDailyStatus();
         }
+        
+        window.handleSearch = (event) => {
+            searchQuery = event.target.value.trim().toLowerCase();
+            renderTable();
+        };
 
         function updateTabsUI() {
             const container = document.getElementById('tabs-container');
@@ -340,14 +354,32 @@
             const tbody = document.getElementById('soldiers-table-body');
             tbody.innerHTML = '';
 
-            const filteredSoldiers = activeTab === "הכל" 
+            // Step 1: Filter by Department
+            let filteredSoldiers = activeTab === "הכל" 
                 ? soldiers 
                 : soldiers.filter(s => s.department === activeTab);
+
+            // Step 2: Filter by Search Query
+            if (searchQuery) {
+                filteredSoldiers = filteredSoldiers.filter(s => {
+                    const name = s.name ? s.name.toLowerCase() : "";
+                    const pid = s.personalId ? s.personalId : "";
+                    const phone = s.phone ? s.phone : "";
+                    
+                    return name.includes(searchQuery) || 
+                           pid.includes(searchQuery) || 
+                           phone.includes(searchQuery);
+                });
+            }
 
             let reportedCount = 0;
 
             if (filteredSoldiers.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500 bg-gray-50 border-b border-gray-100">אין חיילים במחלקה זו.</td></tr>`;
+                if (searchQuery) {
+                    tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500 bg-gray-50 border-b border-gray-100">לא נמצאו תוצאות לחיפוש "${escapeHTML(searchQuery)}"</td></tr>`;
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-gray-500 bg-gray-50 border-b border-gray-100">אין חיילים במחלקה זו.</td></tr>`;
+                }
             } else {
                 filteredSoldiers.forEach((soldier, index) => {
                     const currentStatus = dailyStatusMap[soldier.id] || "לא דווח";
@@ -380,7 +412,7 @@
                         <td class="p-3 text-gray-600"><span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs whitespace-nowrap">${escapeHTML(role)}</span></td>
                         <td class="p-3">${selectHtml}</td>
                         <td class="p-3 text-center">
-                            <button onclick="confirmDelete('${soldier.id}', '${escapeHTML(soldier.name).replace(/'/g, "\\'")}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded transition" title="מחק חייל">
+                            <button onclick="confirmDelete('${soldier.id}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded transition" title="מחק חייל">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </td>
@@ -451,7 +483,10 @@
             }
         };
 
-        window.confirmDelete = (id, name) => {
+        window.confirmDelete = (id) => {
+            const soldier = soldiers.find(s => s.id === id);
+            const name = soldier ? soldier.name : 'חייל זה';
+
             const confirmDiv = document.createElement('div');
             confirmDiv.id = 'confirm-modal';
             confirmDiv.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4';
@@ -461,7 +496,7 @@
                         <i class="fa-solid fa-triangle-exclamation"></i>
                     </div>
                     <h3 class="text-xl font-bold text-gray-800 mb-2">מחיקת חייל</h3>
-                    <p class="text-gray-600 mb-6">האם אתה בטוח שברצונך למחוק את <strong>${name}</strong> מהמצבת? לא ניתן לבטל פעולה זו.</p>
+                    <p class="text-gray-600 mb-6">האם אתה בטוח שברצונך למחוק את <strong>${escapeHTML(name)}</strong> מהמצבת? לא ניתן לבטל פעולה זו.</p>
                     <div class="flex justify-center gap-3">
                         <button onclick="document.getElementById('confirm-modal').remove()" class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition">ביטול</button>
                         <button onclick="executeDelete('${id}')" class="px-4 py-2 text-white bg-red-500 hover:bg-red-600 rounded-lg font-medium transition shadow-md">כן, מחק חייל</button>
@@ -644,6 +679,7 @@
             STATUS_OPTIONS.forEach(opt => counts[opt.val] = 0);
             let missingNames = [];
 
+            // אנחנו מייצאים לוואטסאפ את כל המחלקה תמיד, ללא קשר לחיפוש הנוכחי.
             const filteredSoldiers = activeTab === "הכל" 
                 ? soldiers 
                 : soldiers.filter(s => s.department === activeTab);
@@ -680,6 +716,7 @@
         window.exportToCSV = () => {
             const date = document.getElementById('date-picker').value;
             
+            // ייצוא נתונים גם הוא לוקח את המחלקה במלואה ללא סינון החיפוש
             const filteredSoldiers = activeTab === "הכל" 
                 ? soldiers 
                 : soldiers.filter(s => s.department === activeTab);
