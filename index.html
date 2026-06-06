@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -19,9 +20,6 @@
         .tab-active { border-bottom: 3px solid #2563eb; color: #2563eb; font-weight: 600; }
         .tab-inactive { border-bottom: 3px solid transparent; color: #6b7280; }
         .tab-inactive:hover { color: #374151; border-bottom: 3px solid #d1d5db; }
-        
-        /* Checkbox custom style */
-        input[type="checkbox"] { accent-color: #2563eb; }
 
         /* הסתרת פס הגלילה בלשוניות */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
@@ -30,7 +28,7 @@
 </head>
 <body class="text-gray-800 antialiased min-h-screen flex flex-col">
 
-    <header class="bg-blue-900 text-white shadow-md sticky top-0 z-10">
+    <header class="bg-blue-900 text-white shadow-md sticky top-0 z-30">
         <div class="max-w-7xl mx-auto px-4 py-4 sm:flex sm:items-center sm:justify-between">
             <div class="flex items-center gap-3 mb-4 sm:mb-0">
                 <button id="back-to-home-btn" onclick="goHome()" class="hidden text-blue-200 hover:text-white transition bg-blue-800/50 hover:bg-blue-800 p-2 rounded-lg ml-2" title="חזור לתפריט הראשי">
@@ -86,9 +84,9 @@
                 </div>
 
                 <div class="flex flex-wrap gap-2 mt-2 sm:mt-0">
-                    <button onclick="exportToCSV()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition text-sm font-medium flex items-center gap-2 border border-gray-300">
+                    <button onclick="openExportModal()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition text-sm font-medium flex items-center gap-2 border border-gray-300 shadow-sm">
                         <i class="fa-solid fa-file-csv"></i>
-                        <span class="hidden sm:inline">ייצוא נתונים</span>
+                        <span class="hidden sm:inline">ייצוא דוח נוכחות</span>
                     </button>
                     
                     <button onclick="copySummary()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow transition text-sm font-medium flex items-center gap-2">
@@ -135,6 +133,32 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <div id="export-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 transform transition-all">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-xl font-bold text-gray-800">ייצוא דוח טווח נוכחות</h3>
+                <button onclick="closeExportModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <p class="text-sm text-gray-600 mb-6">בחר מאיזה עד איזה תאריך לייצא את הנתונים. קובץ האקסל יכיל עמודה נפרדת עבור כל יום בטווח שבחרת, מה שיאפשר לראות רצפי נוכחות היסטוריים בצורה מושלמת.</p>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">מתאריך:</label>
+                <input type="date" id="export-start" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="mb-6">
+                <label class="block text-gray-700 text-sm font-bold mb-2">עד תאריך (כולל):</label>
+                <input type="date" id="export-end" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <div class="flex justify-end gap-3 border-t border-gray-100 pt-4">
+                <button onclick="closeExportModal()" class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition">ביטול</button>
+                <button onclick="executeRangeExport()" class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition shadow-md flex items-center gap-2">
+                    <i class="fa-solid fa-download"></i> הורד דוח
+                </button>
+            </div>
+        </div>
     </div>
 
     <div id="add-soldier-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
@@ -184,7 +208,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, collection, onSnapshot, setDoc, deleteDoc, addDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, collection, onSnapshot, setDoc, deleteDoc, addDoc, updateDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Global State
         let db;
@@ -192,10 +216,9 @@
         let currentUser = null;
         let soldiers = [];
         let dailyStatusMap = {};
-        let departments = new Set(["הכל", "מפלג", "אספקה"]);
+        let departments = new Set(["הכל"]);
         let activeTab = "הכל";
         let searchQuery = "";
-        let currentWorkbook = null; 
         let currentEditSoldierId = null; 
         
         let unsubSoldiers = null;
@@ -216,8 +239,12 @@
             { val: "עריץ/נפקד", color: "text-pink-800 bg-pink-100 border-pink-200", emoji: "❌" }
         ];
 
+        // סטטוסים שממשיכים או סופרים כ"רצף ימי מילואים"
+        const STREAK_STATUSES = ["נוכח", "אחרי משמרת", "הגנש", "אבטש"];
+
         async function init() {
             try {
+                // נתוני ההתחברות שלך שמורים כאן!
                 const firebaseConfig = {
                     apiKey: "AIzaSyCxBF1xT5n5SPR62GWkDdMerrp3QSRKQ-g",
                     authDomain: "doh1-1cdde.firebaseapp.com",
@@ -235,7 +262,7 @@
 
                 const userCredential = await signInAnonymously(auth);
                 currentUser = userCredential.user;
-                document.getElementById('connection-status').innerHTML = '<i class="fa-solid fa-circle text-green-400 text-xs"></i> מוצפן ומחובר לענן';
+                document.getElementById('connection-status').innerHTML = '<i class="fa-solid fa-circle text-green-400 text-xs"></i> מחובר לענן';
 
                 const dateInput = document.getElementById('date-picker');
                 const today = new Date();
@@ -285,7 +312,7 @@
                 renderHomeView(); 
                 updateTabsUI();
                 updateDatalist();
-                renderTable();
+                updateStreaks(); // טעינת הרצף
             });
 
             listenToDailyStatus();
@@ -303,7 +330,7 @@
                 snapshot.forEach(doc => {
                     dailyStatusMap[doc.id] = doc.data().status;
                 });
-                renderTable();
+                updateStreaks(); // חישוב הרצף מחדש כשמשתנה סטטוס או תאריך
                 renderHomeView(); 
             });
         }
@@ -311,6 +338,58 @@
         function handleDateChange() {
             listenToDailyStatus();
         }
+
+        // === חישוב רצף ימים (Streak) ===
+        window.updateStreaks = async () => {
+            const baseDateStr = document.getElementById('date-picker').value;
+            if (!baseDateStr || !currentUser) return;
+
+            // ניצור מערך של 21 הימים האחרונים (כולל היום שנבחר) כדי לחשב רצף
+            const promises = [];
+            const dateList = [];
+            let d = new Date(baseDateStr);
+            
+            for(let i=0; i<21; i++) {
+                const ds = d.toISOString().split('T')[0];
+                dateList.push(ds);
+                promises.push(getDocs(collection(db, `daily_status/${ds}/statuses`)));
+                d.setDate(d.getDate() - 1); // הולכים יום אחורה
+            }
+
+            try {
+                const snaps = await Promise.all(promises);
+                const history = {};
+                
+                // בונים מילון של היסטוריה: [תאריך][מזהה חייל] = סטטוס
+                snaps.forEach((snap, i) => {
+                    const ds = dateList[i];
+                    history[ds] = {};
+                    snap.forEach(doc => {
+                        history[ds][doc.id] = doc.data().status;
+                    });
+                });
+
+                // מחשבים לכל חייל
+                soldiers.forEach(s => {
+                    let streak = 0;
+                    for(let i=0; i<dateList.length; i++) {
+                        const stat = history[dateList[i]][s.id] || "לא דווח";
+                        // אם הוא נמצא בסטטוס שממשיך רצף
+                        if(STREAK_STATUSES.includes(stat)) {
+                            streak++;
+                        } else {
+                            // שבר רצף - עוצרים את הספירה
+                            break; 
+                        }
+                    }
+                    s.streak = streak; // שומרים את הרצף באובייקט החייל
+                });
+            } catch (err) {
+                console.error("שגיאה בחישוב רצפים", err);
+            }
+            
+            renderTable(); // מציירים את הטבלה עם הרצפים המעודכנים
+        };
         
         window.handleSearch = (event) => {
             searchQuery = event.target.value.trim().toLowerCase();
@@ -326,7 +405,6 @@
             let deptsArray = Array.from(departments);
             deptsArray = deptsArray.filter(d => d !== "הכל").sort();
 
-            // Render specific departments first
             deptsArray.forEach(dept => {
                 const deptSoldiers = soldiers.filter(s => s.department === dept);
                 const count = deptSoldiers.length;
@@ -369,7 +447,6 @@
                 grid.appendChild(btn);
             });
 
-            // Always add "הכל" (All / Admin) button at the end
             let totalReported = 0;
             let totalPresent = 0;
             soldiers.forEach(s => {
@@ -410,13 +487,11 @@
         window.goToDepartment = (dept) => {
             activeTab = dept;
             
-            // UI Toggle
             document.getElementById('home-view').classList.add('hidden');
             document.getElementById('main-app-view').classList.remove('hidden');
             document.getElementById('main-app-view').classList.add('flex');
             document.getElementById('back-to-home-btn').classList.remove('hidden');
             
-            // Reset search and refresh
             searchQuery = "";
             document.getElementById('search-input').value = "";
             updateTabsUI();
@@ -481,12 +556,10 @@
             const tbody = document.getElementById('soldiers-table-body');
             tbody.innerHTML = '';
 
-            // Step 1: Filter by Department
             let filteredSoldiers = activeTab === "הכל" 
                 ? soldiers 
                 : soldiers.filter(s => s.department === activeTab);
 
-            // Step 2: Filter by Search Query
             if (searchQuery) {
                 filteredSoldiers = filteredSoldiers.filter(s => {
                     const name = s.name ? s.name.toLowerCase() : "";
@@ -517,7 +590,6 @@
                     
                     const activeOpt = STATUS_OPTIONS.find(o => o.val === currentStatus) || STATUS_OPTIONS[0];
                     
-                    // כפתור ה-V המהיר והרשימה הנפתחת צמודים יחד
                     let statusCellHtml = `
                         <div class="flex items-center gap-2 justify-center">
                             <button onclick="updateStatus('${soldier.id}', 'נוכח')" 
@@ -537,14 +609,23 @@
                     });
                     statusCellHtml += `</select></div>`;
 
-                    // Handling values
                     const pId = soldier.personalId || '-';
                     const phone = soldier.phone || '-';
                     const role = soldier.role || '-';
+                    
+                    // תצוגת תגית הרצף ליד שם החייל
+                    const streakCount = soldier.streak || 0;
+                    const streakHtml = streakCount > 0 ? 
+                        `<span class="ml-2 inline-flex items-center gap-1 text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-medium border border-orange-200" title="${streakCount} ימים ברצף">
+                            <i class="fa-solid fa-fire text-orange-500 text-[10px]"></i> רצף: ${streakCount}
+                        </span>` : '';
 
                     tr.innerHTML = `
                         <td class="p-3 text-center text-gray-400 font-medium">${index + 1}</td>
-                        <td class="p-3 font-medium text-gray-900 whitespace-nowrap">${escapeHTML(soldier.name)}</td>
+                        <td class="p-3 font-medium text-gray-900 whitespace-nowrap">
+                            ${escapeHTML(soldier.name)}
+                            ${streakHtml}
+                        </td>
                         <td class="p-3">${statusCellHtml}</td>
                         <td class="p-3 text-gray-600"><span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs whitespace-nowrap">${escapeHTML(role)}</span></td>
                         <td class="p-3 text-gray-600" dir="ltr" style="text-align: right;">${escapeHTML(phone)}</td>
@@ -632,7 +713,6 @@
 
             try {
                 if (currentEditSoldierId) {
-                    // Update existing soldier
                     await updateDoc(doc(db, 'soldiers_roster', currentEditSoldierId), {
                         name: name,
                         department: dept,
@@ -642,7 +722,6 @@
                     });
                     showToast(`פרטי החייל עודכנו בהצלחה`);
                 } else {
-                    // Add new soldier
                     await addDoc(collection(db, 'soldiers_roster'), {
                         name: name,
                         department: dept,
@@ -901,35 +980,97 @@
             copyToClipboard(text);
         };
 
-        window.exportToCSV = () => {
-            const date = document.getElementById('date-picker').value;
+        // === פתיחת חלון ייצוא לפי תאריכים ===
+        window.openExportModal = () => {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const todayStr = `${yyyy}-${mm}-${dd}`;
             
+            // ברירת מחדל: מ-1 לחודש עד היום
+            const firstOfMonthStr = `${yyyy}-${mm}-01`;
+            
+            document.getElementById('export-start').value = firstOfMonthStr;
+            document.getElementById('export-end').value = todayStr;
+            
+            document.getElementById('export-modal').classList.remove('hidden');
+            document.getElementById('export-modal').classList.add('flex');
+        };
+
+        window.closeExportModal = () => {
+            document.getElementById('export-modal').classList.add('hidden');
+            document.getElementById('export-modal').classList.remove('flex');
+        };
+
+        // === ביצוע ייצוא דוח פריסת נוכחות לאקסל ===
+        window.executeRangeExport = async () => {
+            const startStr = document.getElementById('export-start').value;
+            const endStr = document.getElementById('export-end').value;
+            
+            if (!startStr || !endStr) return showToast("נא לבחור תאריכי התחלה וסיום", true);
+            if (new Date(startStr) > new Date(endStr)) return showToast("תאריך ההתחלה חייב להיות לפני תאריך הסיום", true);
+
+            showToast("מושך נתונים ומכין את הדוח, אנא המתן...");
+            closeExportModal();
+
+            // 1. הכנת מערך של כל התאריכים המבוקשים
+            const dateArray = [];
+            let curr = new Date(startStr);
+            const end = new Date(endStr);
+            while (curr <= end) {
+                dateArray.push(curr.toISOString().split('T')[0]);
+                curr.setDate(curr.getDate() + 1);
+            }
+
+            // 2. משיכת הסטטוסים מהשרת לכל הימים
+            const rangeData = {};
+            for (const d of dateArray) {
+                rangeData[d] = {};
+                const snap = await getDocs(collection(db, `daily_status/${d}/statuses`));
+                snap.forEach(doc => {
+                    rangeData[d][doc.id] = doc.data().status;
+                });
+            }
+
+            // 3. בניית ה-CSV עם תמיכה מלאה בעברית לאקסל (BOM)
             const filteredSoldiers = activeTab === "הכל" 
                 ? soldiers 
                 : soldiers.filter(s => s.department === activeTab);
+            
+            let csvContent = "שם החייל,מספר אישי,טלפון,תפקיד,מחלקה";
+            
+            // הוספת עמודות תאריכים
+            dateArray.forEach(d => {
+                const parts = d.split('-');
+                csvContent += `,${parts[2]}/${parts[1]}`; // פורמט DD/MM
+            });
+            csvContent += "\n";
 
-            // בניית תוכן הקובץ ללא הקידומת הישנה
-            let csvContent = "שם החייל,מספר אישי,טלפון,תפקיד,מחלקה,סטטוס ב-" + date + "\n";
-
+            // הוספת שורות החיילים והסטטוסים
             filteredSoldiers.forEach(s => {
-                const stat = dailyStatusMap[s.id] || "לא דווח";
-                csvContent += `"${s.name || ''}","${s.personalId || ''}","${s.phone || ''}","${s.role || ''}","${s.department || ''}","${stat}"\n`;
+                let row = `"${s.name || ''}","${s.personalId || ''}","${s.phone || ''}","${s.role || ''}","${s.department || ''}"`;
+                
+                dateArray.forEach(d => {
+                    const stat = rangeData[d][s.id] || "לא דווח";
+                    row += `,"${stat}"`;
+                });
+                csvContent += row + "\n";
             });
 
-            // הפתרון המוחלט לאקסל: יצירת אובייקט Blob עם התו הנסתר \uFEFF
             const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             
             const link = document.createElement("a");
             link.setAttribute("href", url);
-            link.setAttribute("download", `דוח_1_${activeTab}_${date}.csv`);
+            link.setAttribute("download", `דוח_נוכחות_${activeTab}_${startStr}_עד_${endStr}.csv`);
             
             document.body.appendChild(link);
             link.click();
             
-            // ניקוי זיכרון
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
+            showToast("הדוח יוצא בהצלחה!");
         };
 
         function copyToClipboard(text) {
