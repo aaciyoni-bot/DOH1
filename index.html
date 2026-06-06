@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -19,6 +20,9 @@
         .tab-active { border-bottom: 3px solid #2563eb; color: #2563eb; font-weight: 600; }
         .tab-inactive { border-bottom: 3px solid transparent; color: #6b7280; }
         .tab-inactive:hover { color: #374151; border-bottom: 3px solid #d1d5db; }
+        
+        /* Checkbox custom style */
+        input[type="checkbox"] { accent-color: #2563eb; }
 
         /* הסתרת פס הגלילה בלשוניות */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
@@ -27,7 +31,7 @@
 </head>
 <body class="text-gray-800 antialiased min-h-screen flex flex-col">
 
-    <header class="bg-blue-900 text-white shadow-md sticky top-0 z-30">
+    <header class="bg-blue-900 text-white shadow-md sticky top-0 z-10">
         <div class="max-w-7xl mx-auto px-4 py-4 sm:flex sm:items-center sm:justify-between">
             <div class="flex items-center gap-3 mb-4 sm:mb-0">
                 <button id="back-to-home-btn" onclick="goHome()" class="hidden text-blue-200 hover:text-white transition bg-blue-800/50 hover:bg-blue-800 p-2 rounded-lg ml-2" title="חזור לתפריט הראשי">
@@ -96,7 +100,6 @@
             </div>
 
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex-grow flex flex-col overflow-visible">
-                
                 <div class="sticky top-[72px] sm:top-[88px] z-20 bg-white border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center p-2 gap-3 shadow-sm rounded-t-xl">
                     <nav class="flex gap-2 px-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0 hide-scrollbar" id="tabs-container" aria-label="Tabs">
                         <button class="tab-active px-4 py-2 rounded-t-lg transition whitespace-nowrap">מעלים...</button>
@@ -104,7 +107,7 @@
 
                     <div class="relative w-full sm:w-72 shrink-0 px-2 sm:px-0 mb-2 sm:mb-0">
                         <i class="fa-solid fa-magnifying-glass absolute right-5 sm:right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        <input type="text" id="search-input" oninput="handleSearch(event)" placeholder="חיפוש לפי שם, טלפון, מס אישי..." class="w-full pr-10 pl-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm text-sm bg-gray-50 focus:bg-white">
+                        <input type="text" id="search-input" oninput="handleSearch(event)" placeholder="חיפוש לפי שם, טלפון, מספר אישי..." class="w-full pr-10 pl-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm text-sm bg-gray-50 focus:bg-white">
                     </div>
                 </div>
 
@@ -190,9 +193,10 @@
         let currentUser = null;
         let soldiers = [];
         let dailyStatusMap = {};
-        let departments = new Set(["הכל"]);
+        let departments = new Set(["הכל", "מפלג", "אספקה"]);
         let activeTab = "הכל";
         let searchQuery = "";
+        let currentWorkbook = null; 
         let currentEditSoldierId = null; 
         
         let unsubSoldiers = null;
@@ -215,7 +219,6 @@
 
         async function init() {
             try {
-                // נתוני ההתחברות שלך שמורים כאן!
                 const firebaseConfig = {
                     apiKey: "AIzaSyCxBF1xT5n5SPR62GWkDdMerrp3QSRKQ-g",
                     authDomain: "doh1-1cdde.firebaseapp.com",
@@ -233,7 +236,7 @@
 
                 const userCredential = await signInAnonymously(auth);
                 currentUser = userCredential.user;
-                document.getElementById('connection-status').innerHTML = '<i class="fa-solid fa-circle text-green-400 text-xs"></i> מחובר לענן';
+                document.getElementById('connection-status').innerHTML = '<i class="fa-solid fa-circle text-green-400 text-xs"></i> מוצפן ומחובר לענן';
 
                 const dateInput = document.getElementById('date-picker');
                 const today = new Date();
@@ -324,6 +327,7 @@
             let deptsArray = Array.from(departments);
             deptsArray = deptsArray.filter(d => d !== "הכל").sort();
 
+            // Render specific departments first
             deptsArray.forEach(dept => {
                 const deptSoldiers = soldiers.filter(s => s.department === dept);
                 const count = deptSoldiers.length;
@@ -366,6 +370,7 @@
                 grid.appendChild(btn);
             });
 
+            // Always add "הכל" (All / Admin) button at the end
             let totalReported = 0;
             let totalPresent = 0;
             soldiers.forEach(s => {
@@ -477,10 +482,12 @@
             const tbody = document.getElementById('soldiers-table-body');
             tbody.innerHTML = '';
 
+            // Step 1: Filter by Department
             let filteredSoldiers = activeTab === "הכל" 
                 ? soldiers 
                 : soldiers.filter(s => s.department === activeTab);
 
+            // Step 2: Filter by Search Query
             if (searchQuery) {
                 filteredSoldiers = filteredSoldiers.filter(s => {
                     const name = s.name ? s.name.toLowerCase() : "";
@@ -531,6 +538,7 @@
                     });
                     statusCellHtml += `</select></div>`;
 
+                    // Handling values
                     const pId = soldier.personalId || '-';
                     const phone = soldier.phone || '-';
                     const role = soldier.role || '-';
@@ -625,6 +633,7 @@
 
             try {
                 if (currentEditSoldierId) {
+                    // Update existing soldier
                     await updateDoc(doc(db, 'soldiers_roster', currentEditSoldierId), {
                         name: name,
                         department: dept,
@@ -634,6 +643,7 @@
                     });
                     showToast(`פרטי החייל עודכנו בהצלחה`);
                 } else {
+                    // Add new soldier
                     await addDoc(collection(db, 'soldiers_roster'), {
                         name: name,
                         department: dept,
@@ -899,21 +909,28 @@
                 ? soldiers 
                 : soldiers.filter(s => s.department === activeTab);
 
-            let csvContent = "data:text/csv;charset=utf-8,%EF%BB%BF"; // BOM for Hebrew
-            csvContent += "שם החייל,מספר אישי,טלפון,תפקיד,מחלקה,סטטוס ב-" + date + "\n";
+            // בניית תוכן הקובץ ללא הקידומת הישנה
+            let csvContent = "שם החייל,מספר אישי,טלפון,תפקיד,מחלקה,סטטוס ב-" + date + "\n";
 
             filteredSoldiers.forEach(s => {
                 const stat = dailyStatusMap[s.id] || "לא דווח";
                 csvContent += `"${s.name || ''}","${s.personalId || ''}","${s.phone || ''}","${s.role || ''}","${s.department || ''}","${stat}"\n`;
             });
 
-            const encodedUri = encodeURI(csvContent);
+            // הפתרון המוחלט לאקסל: יצירת אובייקט Blob עם התו הנסתר \uFEFF
+            const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            
             const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
+            link.setAttribute("href", url);
             link.setAttribute("download", `דוח_1_${activeTab}_${date}.csv`);
+            
             document.body.appendChild(link);
             link.click();
+            
+            // ניקוי זיכרון
             document.body.removeChild(link);
+            URL.revokeObjectURL(url);
         };
 
         function copyToClipboard(text) {
