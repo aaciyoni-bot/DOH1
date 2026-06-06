@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -5,7 +6,6 @@
     <title>מערכת דוח 1 - מילואים</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- הוספת ספרייה לקריאת קבצי אקסל מרובי-לשוניות -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap');
@@ -20,14 +20,15 @@
         .tab-active { border-bottom: 3px solid #2563eb; color: #2563eb; font-weight: 600; }
         .tab-inactive { border-bottom: 3px solid transparent; color: #6b7280; }
         .tab-inactive:hover { color: #374151; border-bottom: 3px solid #d1d5db; }
-        
-        /* Checkbox custom style */
-        input[type="checkbox"] { accent-color: #2563eb; }
+
+        /* הסתרת פס הגלילה בלשוניות */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="text-gray-800 antialiased min-h-screen flex flex-col">
 
-    <header class="bg-blue-900 text-white shadow-md sticky top-0 z-10">
+    <header class="bg-blue-900 text-white shadow-md sticky top-0 z-30">
         <div class="max-w-7xl mx-auto px-4 py-4 sm:flex sm:items-center sm:justify-between">
             <div class="flex items-center gap-3 mb-4 sm:mb-0">
                 <button id="back-to-home-btn" onclick="goHome()" class="hidden text-blue-200 hover:text-white transition bg-blue-800/50 hover:bg-blue-800 p-2 rounded-lg ml-2" title="חזור לתפריט הראשי">
@@ -48,7 +49,6 @@
     </header>
 
     <div class="flex-grow flex flex-col w-full">
-        <!-- Home View (Landing Page) -->
         <div id="home-view" class="max-w-5xl mx-auto w-full px-4 py-12 flex-grow flex flex-col items-center justify-center animate-fade-in">
             <div class="text-center mb-10">
                 <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-3">ברוכים הבאים למערכת הדיווח</h2>
@@ -56,79 +56,86 @@
             </div>
             
             <div id="departments-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-4xl">
-                <!-- Department buttons will be injected here -->
                 <div class="p-8 text-center text-gray-500 bg-white rounded-xl shadow-sm border border-gray-100 col-span-full">
                     טוען נתונים...
                 </div>
             </div>
         </div>
 
-        <!-- Main App View (Table & Actions) -->
         <main id="main-app-view" class="hidden flex-grow max-w-7xl mx-auto w-full px-4 py-6 flex-col">
             
-            <!-- Action Buttons Row -->
-            <div class="flex flex-wrap gap-3 justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6">
+            <div class="flex flex-wrap gap-3 justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6 relative z-10">
+                <div class="flex flex-wrap gap-2">
+                    <input type="file" id="csv-file-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="processExcel(event)">
+                    <button onclick="document.getElementById('csv-file-input').click()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition text-sm font-medium flex items-center gap-2">
+                        <i class="fa-solid fa-file-import"></i>
+                        <span>ייבוא מקובץ (CSV/אקסל)</span>
+                    </button>
 
-            <div class="flex flex-wrap gap-2 mt-2 sm:mt-0">
-                <!-- Export to Excel/CSV -->
-                <button onclick="exportToCSV()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition text-sm font-medium flex items-center gap-2 border border-gray-300">
-                    <i class="fa-solid fa-file-csv"></i>
-                    <span class="hidden sm:inline">ייצוא נתונים</span>
-                </button>
-                
-                <!-- WhatsApp Summary -->
-                <button onclick="copySummary()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow transition text-sm font-medium flex items-center gap-2">
-                    <i class="fa-brands fa-whatsapp text-lg"></i>
-                    <span>העתק דיווח לוואטסאפ</span>
-                </button>
-            </div>
-        </div>
+                    <button onclick="openAddSoldierModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition text-sm font-medium flex items-center gap-2">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span>הוסף חייל</span>
+                    </button>
+                    
+                    <button onclick="confirmUndoImport()" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg transition text-sm font-medium flex items-center gap-2 border border-red-200" title="מחק ייבוא אחרון">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span class="hidden sm:inline">בטל ייבוא</span>
+                    </button>
+                </div>
 
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex-grow flex flex-col overflow-hidden">
-            <!-- Tabs & Search Navigation -->
-            <div class="border-b border-gray-200 bg-gray-50/50 flex flex-col sm:flex-row justify-between items-start sm:items-center p-2 gap-3">
-                <!-- Tabs Navigation -->
-                <nav class="flex gap-2 px-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0 hide-scrollbar" id="tabs-container" aria-label="Tabs">
-                    <!-- Tabs will be injected here -->
-                    <button class="tab-active px-4 py-2 rounded-t-lg transition whitespace-nowrap">מעלים...</button>
-                </nav>
-
-                <!-- Search Bar -->
-                <div class="relative w-full sm:w-72 shrink-0 px-2 sm:px-0">
-                    <i class="fa-solid fa-magnifying-glass absolute right-5 sm:right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" id="search-input" oninput="handleSearch(event)" placeholder="חיפוש לפי שם, טלפון, מספר אישי..." class="w-full pr-10 pl-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm text-sm bg-white">
+                <div class="flex flex-wrap gap-2 mt-2 sm:mt-0">
+                    <button onclick="exportToCSV()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition text-sm font-medium flex items-center gap-2 border border-gray-300">
+                        <i class="fa-solid fa-file-csv"></i>
+                        <span class="hidden sm:inline">ייצוא נתונים</span>
+                    </button>
+                    
+                    <button onclick="copySummary()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow transition text-sm font-medium flex items-center gap-2">
+                        <i class="fa-brands fa-whatsapp text-lg"></i>
+                        <span>העתק דיווח לוואטסאפ</span>
+                    </button>
                 </div>
             </div>
 
-            <!-- Table -->
-            <div class="flex-grow overflow-auto table-container relative">
-                <table class="w-full text-right border-collapse min-w-[800px]">
-                    <thead class="bg-gray-50 text-gray-600 sticky top-0 z-10 shadow-sm text-sm">
-                        <tr>
-                            <th class="p-3 font-semibold w-12 text-center">#</th>
-                            <th class="p-3 font-semibold">שם החייל</th>
-                            <th class="p-3 font-semibold w-56 text-center">סטטוס יומי</th>
-                            <th class="p-3 font-semibold">תפקיד</th>
-                            <th class="p-3 font-semibold">טלפון</th>
-                            <th class="p-3 font-semibold">מספר אישי</th>
-                            <th class="p-3 font-semibold w-20 text-center">פעולות</th>
-                        </tr>
-                    </thead>
-                    <tbody id="soldiers-table-body" class="divide-y divide-gray-100 bg-white text-sm">
-                        <tr><td colspan="7" class="p-8 text-center text-gray-500">טוען נתונים מהשרת...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Summary Footer -->
-            <div class="bg-gray-50 p-4 border-t border-gray-200 flex justify-between items-center text-sm">
-                <span class="text-gray-600">מציג: <strong id="total-count" class="text-gray-900">0</strong> חיילים</span>
-                <span class="text-gray-600">דווחו היום מתוכם: <strong id="reported-count" class="text-blue-600">0</strong></span>
-            </div>
-        </div>
-    </main>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex-grow flex flex-col overflow-visible">
+                
+                <div class="sticky top-[72px] sm:top-[88px] z-20 bg-white border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center p-2 gap-3 shadow-sm rounded-t-xl">
+                    <nav class="flex gap-2 px-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0 hide-scrollbar" id="tabs-container" aria-label="Tabs">
+                        <button class="tab-active px-4 py-2 rounded-t-lg transition whitespace-nowrap">מעלים...</button>
+                    </nav>
 
-    <!-- Add/Edit Soldier Modal -->
+                    <div class="relative w-full sm:w-72 shrink-0 px-2 sm:px-0 mb-2 sm:mb-0">
+                        <i class="fa-solid fa-magnifying-glass absolute right-5 sm:right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" id="search-input" oninput="handleSearch(event)" placeholder="חיפוש לפי שם, טלפון, מס אישי..." class="w-full pr-10 pl-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm text-sm bg-gray-50 focus:bg-white">
+                    </div>
+                </div>
+
+                <div class="flex-grow overflow-auto table-container relative z-0">
+                    <table class="w-full text-right border-collapse min-w-[800px]">
+                        <thead class="bg-gray-50 text-gray-600 text-sm">
+                            <tr>
+                                <th class="p-3 font-semibold w-12 text-center border-b border-gray-200">#</th>
+                                <th class="p-3 font-semibold border-b border-gray-200">שם החייל</th>
+                                <th class="p-3 font-semibold w-56 text-center border-b border-gray-200">סטטוס יומי</th>
+                                <th class="p-3 font-semibold border-b border-gray-200">תפקיד</th>
+                                <th class="p-3 font-semibold border-b border-gray-200">טלפון</th>
+                                <th class="p-3 font-semibold border-b border-gray-200">מספר אישי</th>
+                                <th class="p-3 font-semibold w-20 text-center border-b border-gray-200">פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody id="soldiers-table-body" class="divide-y divide-gray-100 bg-white text-sm">
+                            <tr><td colspan="7" class="p-8 text-center text-gray-500">טוען נתונים מהשרת...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="bg-gray-50 p-4 border-t border-gray-200 flex justify-between items-center text-sm rounded-b-xl">
+                    <span class="text-gray-600">מציג: <strong id="total-count" class="text-gray-900">0</strong> חיילים</span>
+                    <span class="text-gray-600">דווחו היום מתוכם: <strong id="reported-count" class="text-blue-600">0</strong></span>
+                </div>
+            </div>
+        </main>
+    </div>
+
     <div id="add-soldier-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6 transform transition-all max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-5">
@@ -158,8 +165,7 @@
                     <label class="block text-gray-700 text-sm font-bold mb-2">מחלקה (לשונית) *</label>
                     <input type="text" id="new-soldier-dept" required list="dept-options" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="למשל: מפלג, אספקה...">
                     <datalist id="dept-options">
-                        <!-- Options generated dynamically -->
-                    </datalist>
+                        </datalist>
                 </div>
                 <div class="flex justify-end gap-3">
                     <button type="button" onclick="closeAddSoldierModal()" class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition">ביטול</button>
@@ -169,7 +175,6 @@
         </div>
     </div>
 
-    <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none z-50 flex items-center gap-2">
         <i class="fa-solid fa-circle-info"></i>
         <span id="toast-msg">הודעה</span>
@@ -186,10 +191,9 @@
         let currentUser = null;
         let soldiers = [];
         let dailyStatusMap = {};
-        let departments = new Set(["הכל", "מפלג", "אספקה"]);
+        let departments = new Set(["הכל"]);
         let activeTab = "הכל";
         let searchQuery = "";
-        let currentWorkbook = null; 
         let currentEditSoldierId = null; 
         
         let unsubSoldiers = null;
@@ -212,6 +216,7 @@
 
         async function init() {
             try {
+                // נתוני ההתחברות שלך שמורים כאן!
                 const firebaseConfig = {
                     apiKey: "AIzaSyCxBF1xT5n5SPR62GWkDdMerrp3QSRKQ-g",
                     authDomain: "doh1-1cdde.firebaseapp.com",
@@ -229,7 +234,7 @@
 
                 const userCredential = await signInAnonymously(auth);
                 currentUser = userCredential.user;
-                document.getElementById('connection-status').innerHTML = '<i class="fa-solid fa-circle text-green-400 text-xs"></i>   מוצפן מחובר לענן';
+                document.getElementById('connection-status').innerHTML = '<i class="fa-solid fa-circle text-green-400 text-xs"></i> מחובר לענן';
 
                 const dateInput = document.getElementById('date-picker');
                 const today = new Date();
@@ -276,7 +281,7 @@
                 
                 soldiers.sort((a, b) => a.name.localeCompare(b.name, 'he'));
                 
-                renderHomeView(); // Update landing page buttons
+                renderHomeView(); 
                 updateTabsUI();
                 updateDatalist();
                 renderTable();
@@ -298,7 +303,7 @@
                     dailyStatusMap[doc.id] = doc.data().status;
                 });
                 renderTable();
-                renderHomeView(); // Update the dashboard cards in real time
+                renderHomeView(); 
             });
         }
 
@@ -320,7 +325,6 @@
             let deptsArray = Array.from(departments);
             deptsArray = deptsArray.filter(d => d !== "הכל").sort();
 
-            // Render specific departments first
             deptsArray.forEach(dept => {
                 const deptSoldiers = soldiers.filter(s => s.department === dept);
                 const count = deptSoldiers.length;
@@ -363,7 +367,6 @@
                 grid.appendChild(btn);
             });
 
-            // Always add "הכל" (All / Admin) button at the end with full stats
             let totalReported = 0;
             let totalPresent = 0;
             soldiers.forEach(s => {
@@ -475,12 +478,10 @@
             const tbody = document.getElementById('soldiers-table-body');
             tbody.innerHTML = '';
 
-            // Step 1: Filter by Department
             let filteredSoldiers = activeTab === "הכל" 
                 ? soldiers 
                 : soldiers.filter(s => s.department === activeTab);
 
-            // Step 2: Filter by Search Query
             if (searchQuery) {
                 filteredSoldiers = filteredSoldiers.filter(s => {
                     const name = s.name ? s.name.toLowerCase() : "";
@@ -514,7 +515,6 @@
                     // כפתור ה-V המהיר והרשימה הנפתחת צמודים יחד
                     let statusCellHtml = `
                         <div class="flex items-center gap-2 justify-center">
-                            <!-- כפתור V מהיר -->
                             <button onclick="updateStatus('${soldier.id}', 'נוכח')" 
                                     class="shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200 border shadow-sm focus:outline-none 
                                     ${currentStatus === 'נוכח' ? 'bg-green-500 text-white border-green-600 ring-2 ring-green-200/50' : 'bg-white text-gray-300 border-gray-200 hover:bg-green-50 hover:text-green-500 hover:border-green-300'}" 
@@ -522,7 +522,6 @@
                                 <i class="fa-solid fa-check text-lg"></i>
                             </button>
                             
-                            <!-- בחירת סיבת היעדרות / סטטוס אחר -->
                             <select onchange="updateStatus('${soldier.id}', this.value)" 
                                     class="w-full min-w-[120px] p-2 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 text-sm appearance-none cursor-pointer text-center outline-none transition ${activeOpt.color}">
                     `;
@@ -533,12 +532,10 @@
                     });
                     statusCellHtml += `</select></div>`;
 
-                    // Handling values
                     const pId = soldier.personalId || '-';
                     const phone = soldier.phone || '-';
                     const role = soldier.role || '-';
 
-                    // הזרקת השורה עם הסדר החדש של העמודות
                     tr.innerHTML = `
                         <td class="p-3 text-center text-gray-400 font-medium">${index + 1}</td>
                         <td class="p-3 font-medium text-gray-900 whitespace-nowrap">${escapeHTML(soldier.name)}</td>
@@ -629,7 +626,6 @@
 
             try {
                 if (currentEditSoldierId) {
-                    // Update existing soldier
                     await updateDoc(doc(db, 'soldiers_roster', currentEditSoldierId), {
                         name: name,
                         department: dept,
@@ -639,7 +635,6 @@
                     });
                     showToast(`פרטי החייל עודכנו בהצלחה`);
                 } else {
-                    // Add new soldier
                     await addDoc(collection(db, 'soldiers_roster'), {
                         name: name,
                         department: dept,
@@ -662,10 +657,7 @@
             }
         };
 
-        window.confirmDelete = (id) => {
-            const soldier = soldiers.find(s => s.id === id);
-            const name = soldier ? soldier.name : 'חייל זה';
-
+        window.confirmDelete = (id, name) => {
             const confirmDiv = document.createElement('div');
             confirmDiv.id = 'confirm-modal';
             confirmDiv.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4';
@@ -749,20 +741,17 @@
         
         window.processExcel = async (event) => {
             if (!currentUser) {
-                showToast("יש להתחבר תחילה למ מסד הנתונים.", true);
+                showToast("יש להתחבר תחילה למסד הנתונים.", true);
                 return;
             }
             const file = event.target.files[0];
             if (!file) return;
 
-            // מושך את שם הקובץ ללא הסיומת (.csv או .xlsx)
             const baseFileName = file.name.replace(/\.[^/.]+$/, "");
-            
-            // שואל את המשתמש ומציע את שם הקובץ כברירת מחדל
             const deptName = prompt("אנא אשר או ערוך את שם המחלקה עבור קובץ זה:", baseFileName);
             
             if (!deptName) {
-                event.target.value = ''; // ביטול
+                event.target.value = ''; 
                 return;
             }
 
@@ -777,7 +766,6 @@
                     
                     let added = 0;
                     
-                    // אנחנו קוראים רק את הלשונית הראשונה בקובץ, כי חילקת אותם לקבצים נפרדים
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
                     const rows = XLSX.utils.sheet_to_json(worksheet, {header: 1, defval: ""});
@@ -785,7 +773,6 @@
                     if (rows.length > 0) {
                         let nameIndex = -1, roleIndex = -1, idIndex = -1, phoneIndex = -1;
                         
-                        // חיפוש כותרות
                         for (let i = 0; i < Math.min(rows.length, 30); i++) {
                             const cols = rows[i].map(c => String(c).replace(/["']/g, '').trim());
                             
@@ -803,15 +790,10 @@
                             }
                         }
 
-                        // גיבוי קשיח במידה ולא מצא כותרות
                         if (nameIndex === -1 && rows.length > 0) {
-                            nameIndex = 0; // טור A
-                            roleIndex = 1; // טור B
-                            idIndex = 2;   // טור C
-                            phoneIndex = 3; // טור D
+                            nameIndex = 0; roleIndex = 1; idIndex = 2; phoneIndex = 3;
                         }
 
-                        // הוספת החיילים
                         for (let i = 0; i < rows.length; i++) {
                             const cols = rows[i];
                             if (cols.length <= nameIndex) continue;
@@ -821,7 +803,6 @@
                             
                             const name = String(nameRaw).replace(/["']/g, '').trim();
                             
-                            // סינון שורות זבל
                             if (name === 'שם' || name === 'שם מלא' || name.includes('סה"כ') || name.includes('סהכ') || name === 'מפקדים' || name === 'נהגים' || name.includes('100%') || name.length < 2 || !isNaN(name)) {
                                 continue;
                             }
@@ -879,7 +860,6 @@
             STATUS_OPTIONS.forEach(opt => counts[opt.val] = 0);
             let missingNames = [];
 
-            // אנחנו מייצאים לוואטסאפ את כל המחלקה תמיד, ללא קשר לחיפוש הנוכחי.
             const filteredSoldiers = activeTab === "הכל" 
                 ? soldiers 
                 : soldiers.filter(s => s.department === activeTab);
