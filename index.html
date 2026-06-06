@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -5,6 +6,8 @@
     <title>מערכת דוח 1 - מילואים</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- הוספת ספרייה לקריאת קבצי אקסל מרובי-לשוניות -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Rubik', sans-serif; background-color: #f3f4f6; }
@@ -44,11 +47,11 @@
         <!-- Action Buttons Row -->
         <div class="flex flex-wrap gap-3 justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6">
             <div class="flex flex-wrap gap-2">
-                <!-- Import CSV Button -->
-                <input type="file" id="csv-file-input" accept=".csv" class="hidden" onchange="processCSV(event)">
+                <!-- Import Excel Button -->
+                <input type="file" id="csv-file-input" accept=".xlsx, .xls, .csv" class="hidden" onchange="processExcel(event)">
                 <button onclick="document.getElementById('csv-file-input').click()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition text-sm font-medium flex items-center gap-2">
                     <i class="fa-solid fa-file-import"></i>
-                    <span>ייבוא מאקסל (CSV)</span>
+                    <span>ייבוא מאקסל (.xlsx)</span>
                 </button>
 
                 <!-- Add Soldier Button -->
@@ -451,9 +454,9 @@
                     </div>
                     <h3 class="text-xl font-bold text-gray-800 mb-2">מחיקת חייל</h3>
                     <p class="text-gray-600 mb-6">האם אתה בטוח שברצונך למחוק את <strong>${name}</strong> מהמצבת? לא ניתן לבטל פעולה זו.</p>
-                    <div class="flex gap-3 justify-center">
-                        <button onclick="document.getElementById('confirm-modal').remove()" class="px-5 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition">ביטול</button>
-                        <button onclick="executeDelete('${id}')" class="px-5 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg font-medium transition shadow-md">כן, מחק</button>
+                    <div class="flex justify-center gap-3">
+                        <button onclick="document.getElementById('confirm-modal').remove()" class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition">ביטול</button>
+                        <button onclick="executeDelete('${id}')" class="px-4 py-2 text-white bg-red-500 hover:bg-red-600 rounded-lg font-medium transition shadow-md">כן, מחק חייל</button>
                     </div>
                 </div>
             `;
@@ -473,7 +476,8 @@
             }
         };
 
-        window.processCSV = async (event) => {
+        // Excel Import Logic (Reads ALL Tabs Automatically)
+        window.processExcel = async (event) => {
             if (!currentUser) {
                 showToast("יש להתחבר תחילה למסד הנתונים.", true);
                 return;
@@ -481,57 +485,73 @@
             const file = event.target.files[0];
             if (!file) return;
 
+            showToast("קורא את קובץ האקסל... אנא המתן.");
+
             const reader = new FileReader();
             reader.onload = async (e) => {
-                const text = e.target.result;
-                const lines = text.split('\n');
-                let nameIndex = -1;
-                let deptIndex = -1;
-                
-                // Scan header
-                for (let i = 0; i < Math.min(lines.length, 30); i++) {
-                    const cols = lines[i].split(',').map(c => c.trim().replace(/"/g, ''));
-                    if (cols.includes('שם')) {
-                        nameIndex = cols.indexOf('שם');
-                        deptIndex = cols.includes('מחלקה') ? cols.indexOf('מחלקה') : cols.indexOf('תפקיד');
-                        break;
-                    }
-                }
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    
+                    let added = 0;
+                    
+                    // Loop through EVERY tab (sheet) in the Excel file
+                    for (const sheetName of workbook.SheetNames) {
+                        const worksheet = workbook.Sheets[sheetName];
+                        const rows = XLSX.utils.sheet_to_json(worksheet, {header: 1, defval: ""});
+                        
+                        if (rows.length === 0) continue;
 
-                if (nameIndex === -1) {
-                    showToast("לא נמצאה עמודת 'שם' בקובץ ה-CSV. אנא ודא שהקובץ תקין.", true);
-                    return;
-                }
+                        let nameIndex = -1;
+                        
+                        // Find "שם" column in this specific tab
+                        for (let i = 0; i < Math.min(rows.length, 30); i++) {
+                            const cols = rows[i].map(c => String(c).trim());
+                            if (cols.includes('שם')) {
+                                nameIndex = cols.indexOf('שם');
+                                break;
+                            }
+                        }
 
-                showToast("מייבא נתונים... אנא המתן.");
-                const soldiersRef = collection(db, 'soldiers_roster');
-                
-                let added = 0;
-                for (let i = 0; i < lines.length; i++) {
-                    const cols = lines[i].split(',').map(c => c.trim().replace(/"/g, ''));
-                    const name = cols[nameIndex];
-                    
-                    if (!name || name === 'שם' || name.includes('סה"כ')) continue;
-                    
-                    const dept = (deptIndex !== -1 && cols[deptIndex]) ? cols[deptIndex] : 'כללי';
-                    
-                    try {
-                        await addDoc(soldiersRef, {
-                            name: name,
-                            department: dept,
-                            createdAt: new Date().toISOString()
-                        });
-                        added++;
-                    } catch (error) {
-                        console.error("Error adding row:", error);
+                        if (nameIndex === -1) continue; // Skip tab if no name column found
+
+                        // Add soldiers from this tab
+                        for (let i = 0; i < rows.length; i++) {
+                            const cols = rows[i].map(c => String(c).trim());
+                            if (cols.length <= nameIndex) continue;
+                            
+                            const name = cols[nameIndex];
+                            if (!name || name === 'שם' || name.includes('סה"כ')) continue;
+                            
+                            // MAGIC: The name of the Tab (sheetName) becomes the Department!
+                            try {
+                                await addDoc(collection(db, 'soldiers_roster'), {
+                                    name: name,
+                                    department: sheetName,
+                                    createdAt: new Date().toISOString()
+                                });
+                                added++;
+                            } catch (error) {
+                                console.error("Error adding soldier:", error);
+                            }
+                        }
                     }
+                    
+                    if (added > 0) {
+                        showToast(`הייבוא הסתיים! ${added} חיילים נוספו מכל הלשוניות.`);
+                    } else {
+                        showToast("לא נמצאו נתונים לייבוא. ודא שיש עמודת 'שם'.", true);
+                    }
+                    
+                } catch (err) {
+                    console.error(err);
+                    showToast("שגיאה בקריאת הקובץ. ודא שזה קובץ אקסל תקין.", true);
                 }
                 
-                showToast(`הייבוא הסתיים! ${added} חיילים נוספו.`);
-                event.target.value = '';
+                event.target.value = ''; // Reset input
             };
             
-            reader.readAsText(file);
+            reader.readAsArrayBuffer(file);
         };
 
         window.copySummary = () => {
