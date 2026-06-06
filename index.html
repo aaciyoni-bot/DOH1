@@ -56,7 +56,6 @@
 
     <div class="flex-grow flex flex-col w-full relative">
 
-        <!-- ================= ATTENDANCE MODULE ================= -->
         <div id="module-attendance" class="flex-grow flex flex-col w-full">
             <div id="home-view" class="max-w-5xl mx-auto w-full px-4 py-12 flex-grow flex flex-col items-center justify-center animate-fade-in">
                 <div class="text-center mb-10">
@@ -128,7 +127,6 @@
             </main>
         </div>
 
-        <!-- ================= LOGISTICS & ARMORY MODULE ================= -->
         <div id="module-logistics" class="hidden flex-grow max-w-7xl mx-auto w-full px-4 py-6 flex-col">
             
             <div class="flex gap-2 mb-6 overflow-x-auto hide-scrollbar bg-white p-2 rounded-xl shadow-sm border border-gray-100">
@@ -136,7 +134,6 @@
                 <button onclick="switchLogisticsTab('ammo')" id="tab-log-ammo" class="px-5 py-2.5 rounded-lg text-gray-600 hover:bg-gray-100 transition whitespace-nowrap"><i class="fa-solid fa-box-archive ml-2"></i>תחמושת ושצ"ל</button>
             </div>
 
-            <!-- Armory Tab -->
             <div id="logistics-tab-armory" class="bg-white rounded-xl shadow-sm border border-gray-100 flex-grow flex flex-col p-5">
                 <div class="flex justify-between items-center mb-6 border-b pb-4">
                     <h2 class="text-xl font-bold text-gray-800">מחסן צל"מ וציוד ממוספר</h2>
@@ -181,7 +178,6 @@
                 </div>
             </div>
 
-            <!-- Ammo Tab -->
             <div id="logistics-tab-ammo" class="hidden bg-white rounded-xl shadow-sm border border-gray-100 flex-grow flex flex-col p-5">
                 <div class="flex justify-between items-center mb-6 border-b pb-4">
                     <h2 class="text-xl font-bold text-gray-800">ניהול תחמושת ומלאי מתכלה</h2>
@@ -209,6 +205,7 @@
                                 <th class="p-3 border-b">סוג תחמושת</th>
                                 <th class="p-3 border-b">כמות שנצרכה</th>
                                 <th class="p-3 border-b">סיבת דיווח / מטווח</th>
+                                <th class="p-3 border-b text-center w-16">מחק</th>
                             </tr>
                         </thead>
                         <tbody id="ammo-logs-body" class="divide-y divide-gray-100"></tbody>
@@ -218,9 +215,6 @@
         </div>
     </div>
 
-    <!-- ================= MODALS ================= -->
-
-    <!-- SOLDIER EQUIPMENT MODAL -->
     <div id="equipment-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full flex flex-col max-h-[90vh] overflow-hidden">
             <div class="bg-blue-900 text-white p-5 flex justify-between items-center">
@@ -267,7 +261,6 @@
         </div>
     </div>
 
-    <!-- ADD INVENTORY ITEM MODAL -->
     <div id="add-inventory-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6">
             <h3 class="text-xl font-bold text-gray-800 mb-4">קליטת פריט ממוספר למחסן</h3>
@@ -297,7 +290,6 @@
         </div>
     </div>
 
-    <!-- UPDATE AMMO MODAL -->
     <div id="ammo-update-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6">
             <h3 class="text-xl font-bold text-gray-800 mb-4">עדכון/קליטת תחמושת</h3>
@@ -318,7 +310,6 @@
         </div>
     </div>
 
-    <!-- REPORT SHOOTING MODAL -->
     <div id="shoot-report-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 border-t-8 border-orange-500">
             <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-fire text-orange-500"></i> דיווח ירי / בלאי</h3>
@@ -343,7 +334,6 @@
         </div>
     </div>
 
-    <!-- EXPORT MODAL -->
     <div id="export-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6">
             <div class="flex justify-between items-center mb-5">
@@ -365,7 +355,6 @@
         </div>
     </div>
 
-    <!-- ADD SOLDIER MODAL -->
     <div id="add-soldier-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
         <div class="bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
             <h3 id="modal-title" class="text-xl font-bold mb-4">הוספת חייל</h3>
@@ -388,7 +377,6 @@
         </div>
     </div>
 
-    <!-- TOAST -->
     <div id="toast" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none z-50 flex items-center gap-2">
         <i class="fa-solid fa-circle-info"></i>
         <span id="toast-msg">הודעה</span>
@@ -677,9 +665,31 @@
                 </div>`;
             });
             const lB = document.getElementById('ammo-logs-body'); let lh = '';
-            ammoLogs.forEach(lg => { lh += `<tr><td class="p-3 text-xs text-gray-500">${new Date(lg.date).toLocaleDateString('he-IL')} ${new Date(lg.date).toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})}</td><td class="p-3 font-bold">${escapeHTML(lg.type)}</td><td class="p-3 font-mono text-red-600" dir="ltr">-${lg.amount}</td><td class="p-3 text-gray-600 text-sm">${escapeHTML(lg.reason)}</td></tr>`; });
-            lB.innerHTML = lh || `<tr><td colspan="4" class="p-6 text-center text-gray-400">אין תיעוד</td></tr>`;
+            ammoLogs.forEach(lg => { 
+                lh += `<tr>
+                    <td class="p-3 text-xs text-gray-500">${new Date(lg.date).toLocaleDateString('he-IL')} ${new Date(lg.date).toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})}</td>
+                    <td class="p-3 font-bold">${escapeHTML(lg.type)}</td>
+                    <td class="p-3 font-mono text-red-600" dir="ltr">-${lg.amount}</td>
+                    <td class="p-3 text-gray-600 text-sm">${escapeHTML(lg.reason)}</td>
+                    <td class="p-3 text-center w-16">
+                        <button onclick="deleteAmmoLog('${lg.id}', '${escapeHTML(lg.type)}', ${lg.amount})" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>`; 
+            });
+            lB.innerHTML = lh || `<tr><td colspan="5" class="p-6 text-center text-gray-400">אין תיעוד</td></tr>`;
         }
+
+        window.deleteAmmoLog = async (id, type, qty) => {
+            if(confirm(`למחוק את הדיווח? (${qty} יוחזרו למלאי התחמושת הראשי של ${type})`)) {
+                try {
+                    await deleteDoc(doc(db, 'ammo_logs', id));
+                    const c = ammoData[type] || 0;
+                    await setDoc(doc(db, 'logistics', 'ammo'), { [type]: c + qty }, {merge: true});
+                    showToast("הדיווח נמחק והמלאי עודכן");
+                } catch(e) { showToast("שגיאה במחיקה", true); }
+            }
+        };
+
         window.deleteAmmoType = async (type) => {
             if(confirm(`למחוק לחלוטין את התחמושת מסוג ${type}?`)) { const nd={...ammoData}; delete nd[type]; await setDoc(doc(db,'logistics','ammo'), nd); showToast("נמחק"); }
         };
