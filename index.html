@@ -402,7 +402,7 @@
                     <div class="border-b-2 border-black pb-4 mb-6 flex justify-between items-end">
                         <div>
                             <h1 id="print-doc-number" class="text-3xl font-black mb-1">טופס 1008</h1>
-                            <h2 id="print-doc-title" class="text-xl font-bold">תעודת השאלת ציוד אישי - גדוד 1894</h2>
+                            <h2 id="print-doc-title" class="text-xl font-bold">תעודת השאלת ציוד אישי - גדוד 1854</h2>
                         </div>
                         <div class="text-left text-sm">
                             <div>תאריך הפקה: <span id="print-date" class="font-bold"></span></div>
@@ -652,12 +652,12 @@
                 switchAppModule('attendance');
             } else {
                 // Login
-                const pid = prompt("הכנס מספר אישי לזיהוי מנפק (או '1894' לגישת מנהל ראשי):");
+                const pid = prompt("הכנס מספר אישי לזיהוי מנפק :");
                 if(!pid) return;
                 
                 let user;
-                if(pid === "1894") {
-                    user = { id: "admin", name: "טל מנחם", role: "קצין לוגיסטיקה", personalId: "1894", logisticsPassword: "1" }; // ברירת מחדל לאדמין גלובלי
+                if(pid === "1854") {
+                    user = { id: "admin", name: "טל מנחם", role: "קצין לוגיסטיקה", personalId: "1854", logisticsPassword: "1" }; // ברירת מחדל לאדמין גלובלי
                 } else {
                     user = soldiers.find(s => s.personalId === pid && (s.department.includes('לוגיסטיק') || s.department.includes('מפלג') || s.department.includes('מפקדה')));
                 }
@@ -1000,7 +1000,7 @@
             
             const isReceipt = (type === 'receipt');
             document.getElementById('print-doc-number').textContent = isReceipt ? "אישור זיכוי ציוד" : "טופס 1008";
-            document.getElementById('print-doc-title').textContent = isReceipt ? "תעודת החזרת ציוד למחסן הגדודי" : "תעודת השאלת ציוד אישי - גדוד 1894";
+            document.getElementById('print-doc-title').textContent = isReceipt ? "תעודת החזרת ציוד למחסן הגדודי" : "תעודת השאלת ציוד אישי - גדוד 1854";
             document.getElementById('print-th-date').textContent = isReceipt ? "תאריך זיכוי" : "תאריך ניפוק";
             document.getElementById('print-header-title').textContent = isReceipt ? "תצוגה מקדימה - זיכוי" : "תצוגה מקדימה - 1008";
 
