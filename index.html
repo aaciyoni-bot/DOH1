@@ -111,7 +111,7 @@
                 </button>
                 <i class="fa-solid fa-shield-halved text-3xl text-blue-300"></i>
                 <div>
-                    <h1 class="text-2xl font-bold tracking-tight">מערכת גדודית מתקדמת</h1>
+                    <h1 class="text-lg sm:text-2xl font-bold tracking-tight leading-tight">מערכת גדודית מתקדמת <span id="hdr-bn" class="text-blue-300 font-black"></span></h1>
                     <div class="flex items-center gap-2 mt-1">
                         <i id="admin-lock-icon" class="fa-solid fa-lock text-red-400 cursor-pointer" onclick="toggleAdminMode()" title="התחברות לוגיסטיקה (לחץ כאן)"></i>
                         <p class="text-green-400 text-xs" id="connection-status">מחובר בהצפנה מקצה לקצה</p>
@@ -444,14 +444,14 @@
                 </div>
             </div>
             
-            <div id="print-target-area" class="bg-white flex-grow overflow-y-auto text-black font-serif relative flex flex-col justify-between">
+            <div id="print-target-area" class="bg-white flex-grow overflow-y-auto text-black font-serif relative flex flex-col justify-between p-6 sm:p-10">
                 <div>
-                    <div class="border-b-2 border-black pb-4 mb-6 flex justify-between items-end">
+                    <div class="border-b-2 border-black pb-4 mb-6 flex flex-wrap justify-between items-end gap-3">
                         <div>
-                            <h1 id="print-doc-number" class="text-3xl font-black mb-1">טופס 1008</h1>
-                            <h2 id="print-doc-title" class="text-xl font-bold">תעודת השאלת ציוד אישי - גדוד 1854</h2>
+                            <h1 id="print-doc-number" class="text-2xl sm:text-3xl font-black mb-1">טופס 1008</h1>
+                            <h2 id="print-doc-title" class="text-base sm:text-xl font-bold">תעודת השאלת ציוד אישי</h2>
                         </div>
-                        <div class="text-left text-sm">
+                        <div class="text-left text-xs sm:text-sm">
                             <div>תאריך הפקה: <span id="print-date" class="font-bold"></span></div>
                             <div id="print-avatar-container" class="mt-2 hidden">
                                 <img id="print-avatar-img" src="" class="w-16 h-16 rounded-full border border-black object-cover inline-block">
@@ -459,7 +459,7 @@
                         </div>
                     </div>
 
-                    <div class="mb-8 grid grid-cols-2 gap-4 text-lg">
+                    <div class="mb-8 grid grid-cols-1 sm:grid-cols-2 gap-4 text-base sm:text-lg">
                         <div>שם החייל/ת: <span id="print-soldier-name" class="font-bold border-b border-gray-400 pb-1 min-w-[200px] inline-block"></span></div>
                         <div>מספר אישי: <span id="print-soldier-id" class="font-bold border-b border-gray-400 pb-1 min-w-[150px] inline-block"></span></div>
                     </div>
@@ -607,19 +607,34 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, collection, onSnapshot, setDoc, getDoc, deleteDoc, addDoc, updateDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc as _doc, collection as _collection, onSnapshot, setDoc, getDoc, deleteDoc, addDoc, updateDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // FIREBASE CONFIG
-        const firebaseConfig = { 
-            apiKey: "AIzaSyCxBF1xT5n5SPR62GWkDdMerrp3QSRKQ-g", 
-            authDomain: "doh1-1cdde.firebaseapp.com", 
-            databaseURL: "https://doh1-1cdde-default-rtdb.europe-west1.firebasedatabase.app", 
-            projectId: "doh1-1cdde", 
-            storageBucket: "doh1-1cdde.firebasestorage.app", 
-            messagingSenderId: "653604638082", 
-            appId: "1:653604638082:web:73c5f6588780122cf8539b" 
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxBF1xT5n5SPR62GWkDdMerrp3QSRKQ-g",
+            authDomain: "doh1-1cdde.firebaseapp.com",
+            databaseURL: "https://doh1-1cdde-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "doh1-1cdde",
+            storageBucket: "doh1-1cdde.firebasestorage.app",
+            messagingSenderId: "653604638082",
+            appId: "1:653604638082:web:73c5f6588780122cf8539b"
         };
-        
+
+        // ====== ריבוי-גדודים (Multi-battalion isolation) ======
+        // כל גדוד מקבל קישור משלו: ?gdud=1894 — והנתונים שלו מבודדים לחלוטין.
+        // גדוד 1854 (ברירת מחדל) ממשיך עם שמות האוספים המקוריים כדי לא לפגוע בנתונים החיים.
+        const BN = ((new URLSearchParams(location.search).get('gdud') || '1854').replace(/[^0-9A-Za-z]/g, '') || '1854');
+        const NS = (BN === '1854') ? '' : `b${BN}_`;   // קידומת לשם האוסף הראשי בלבד
+        // עוטפים את collection/doc כך שכל אוסף עליון מקבל קידומת של הגדוד.
+        function collection(dbRef, path, ...rest) {
+            const parts = String(path).split('/'); parts[0] = NS + parts[0];
+            return _collection(dbRef, parts.join('/'), ...rest);
+        }
+        function doc(dbRef, path, ...rest) {
+            const parts = String(path).split('/'); parts[0] = NS + parts[0];
+            return _doc(dbRef, parts.join('/'), ...rest);
+        }
+
         let db, auth, currentUser = null;
         let soldiers = [], dailyStatusMap = {}, inventory = [], ammoData = {}, ammoLogs = [], returnLogs = [], assignLogs = [];
         let departments = new Set(["הכל"]), activeTab = "הכל", searchQuery = "";
@@ -703,8 +718,9 @@
                 if(!pid) return;
                 
                 let user;
-                if(pid === "1854") {
-                    user = { id: "admin", name: "טל מנחם", role: "קצין לוגיסטיקה", personalId: "1854", logisticsPassword: "1" }; // ברירת מחדל לאדמין גלובלי
+                if(pid === "1854" || pid === BN) {
+                    // מנהל בוטסטראפ לכל גדוד: מספר הגדוד עצמו + סיסמה "1" (או מפתח-על 1854/1)
+                    user = { id: "admin", name: "מנהל לוגיסטיקה", role: "קצין לוגיסטיקה", personalId: pid, logisticsPassword: "1" };
                 } else {
                     user = soldiers.find(s => s.personalId === pid && (s.department.includes('לוגיסטיק') || s.department.includes('מפלג') || s.department.includes('מפקדה')));
                 }
@@ -743,8 +759,13 @@
 
         // --- INIT & LISTENERS ---
         async function init() {
+            // תצוגת מספר הגדוד בכל המקומות הרלוונטיים
+            document.getElementById('hdr-bn').textContent = `· גדוד ${BN}`;
+            document.title = `מערכת גדודית ${BN}`;
+            const pdt = document.getElementById('print-doc-title');
+            if (pdt) pdt.textContent = `תעודת השאלת ציוד אישי - גדוד ${BN}`;
             try {
-                const app = initializeApp(firebaseConfig); 
+                const app = initializeApp(firebaseConfig);
                 auth = getAuth(app); 
                 db = getFirestore(app);
                 currentUser = (await signInAnonymously(auth)).user;
@@ -1047,7 +1068,7 @@
             
             const isReceipt = (type === 'receipt');
             document.getElementById('print-doc-number').textContent = isReceipt ? "אישור זיכוי ציוד" : "טופס 1008";
-            document.getElementById('print-doc-title').textContent = isReceipt ? "תעודת החזרת ציוד למחסן הגדודי" : "תעודת השאלת ציוד אישי - גדוד 1854";
+            document.getElementById('print-doc-title').textContent = isReceipt ? `תעודת החזרת ציוד למחסן הגדודי - גדוד ${BN}` : `תעודת השאלת ציוד אישי - גדוד ${BN}`;
             document.getElementById('print-th-date').textContent = isReceipt ? "תאריך זיכוי" : "תאריך ניפוק";
             document.getElementById('print-header-title').textContent = isReceipt ? "תצוגה מקדימה - זיכוי" : "תצוגה מקדימה - 1008";
 
