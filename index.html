@@ -139,10 +139,19 @@
 
         <div id="module-attendance" class="flex-grow flex flex-col w-full">
             <div id="home-view" class="max-w-5xl mx-auto w-full px-4 py-12 flex-grow flex flex-col items-center justify-center animate-fade-in no-print">
-                <div class="text-center mb-10">
-                    <h2 class="text-3xl font-bold text-gray-800 mb-3">דוח נוכחות גדודי</h2>
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-3">דוח נוכחות גדודי</h2>
                     <p class="text-gray-500">אנא בחר את המחלקה שלך כדי להתחיל בדיווח נוכחות</p>
                 </div>
+
+                <button onclick="openPersonalArea()" class="mb-8 group w-full max-w-md bg-gradient-to-l from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white rounded-2xl shadow-md hover:shadow-lg transition-all p-4 flex items-center justify-center gap-3">
+                    <i class="fa-solid fa-id-card-clip text-2xl"></i>
+                    <div class="text-right">
+                        <div class="font-bold text-lg leading-tight">האזור האישי שלי</div>
+                        <div class="text-emerald-100 text-xs">צפייה בציוד שחתמתי עליו וטופס 1008 — ללא הדפסה</div>
+                    </div>
+                </button>
+
                 <div id="departments-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-4xl">
                     <div class="p-8 text-center text-gray-500 bg-white rounded-xl shadow-sm border border-gray-100 col-span-full">טוען נתונים...</div>
                 </div>
@@ -332,6 +341,9 @@
                     </div>
                 </div>
                 <div class="modal-head-actions flex items-center gap-3">
+                    <button onclick="copyPersonalLink()" class="logistics-only bg-emerald-700 hover:bg-emerald-600 px-3 py-2 rounded-lg text-sm font-bold shadow flex items-center gap-2 border border-emerald-500" title="העתק קישור אישי לשליחה לחייל">
+                        <i class="fa-solid fa-link"></i> <span class="hidden sm:inline">קישור אישי</span>
+                    </button>
                     <button onclick="openFormPrint('1008')" class="bg-blue-700 hover:bg-blue-600 px-3 py-2 rounded-lg text-sm font-bold shadow flex items-center gap-2 border border-blue-500">
                         <i class="fa-solid fa-file-signature"></i> טופס 1008
                     </button>
@@ -635,6 +647,28 @@
             return _doc(dbRef, parts.join('/'), ...rest);
         }
 
+        // ====== אזור אישי לחייל (Personal area) ======
+        // כניסה במספר אישי, או קישור ישיר ?soldier=<מספר אישי> שנפתח אוטומטית ומסתנכרן חי.
+        const SOLDIER_PARAM = (new URLSearchParams(location.search).get('soldier') || '').trim();
+        let personalParamHandled = false;
+
+        window.openPersonalArea = () => {
+            const pid = prompt("הזן את המספר האישי שלך כדי לצפות בכרטיס האישי:");
+            if (pid === null) return;
+            const key = pid.trim();
+            if (!key) return;
+            const s = soldiers.find(x => (x.personalId || '').trim() === key);
+            if (!s) return showToast("לא נמצא חייל עם מספר אישי זה", true);
+            openEquipmentModal(s.id);
+        };
+
+        window.copyPersonalLink = () => {
+            const s = soldiers.find(x => x.id === equipmentModalSoldierId);
+            if (!s || !(s.personalId || '').trim()) return showToast("לחייל אין מספר אישי — הוסף מספר כדי ליצור קישור", true);
+            const url = `${location.origin}${location.pathname}?gdud=${encodeURIComponent(BN)}&soldier=${encodeURIComponent(s.personalId.trim())}`;
+            copyToClipboard(url, "הקישור האישי הועתק — שלח אותו לחייל");
+        };
+
         let db, auth, currentUser = null;
         let soldiers = [], dailyStatusMap = {}, inventory = [], ammoData = {}, ammoLogs = [], returnLogs = [], assignLogs = [];
         let departments = new Set(["הכל"]), activeTab = "הכל", searchQuery = "";
@@ -815,8 +849,13 @@
                     const d=doc.data(); soldiers.push({ id:doc.id, ...d }); 
                     if(d.department) departments.add(d.department); 
                 }); 
-                soldiers.sort((a, b)=>a.name.localeCompare(b.name,'he')); 
-                updateTabsUI(); updateDatalist(); updateStreaks(); checkAdminState(); 
+                soldiers.sort((a, b)=>a.name.localeCompare(b.name,'he'));
+                updateTabsUI(); updateDatalist(); updateStreaks(); checkAdminState();
+                // קישור אישי (?soldier=...) — פותח אוטומטית את הכרטיס של החייל ברגע שהמצבת נטענה
+                if (SOLDIER_PARAM && !personalParamHandled) {
+                    const sp = soldiers.find(x => (x.personalId || '').trim() === SOLDIER_PARAM);
+                    if (sp) { personalParamHandled = true; openEquipmentModal(sp.id); }
+                }
             });
             
             onSnapshot(collection(db, 'inventory'), (snap) => { 
