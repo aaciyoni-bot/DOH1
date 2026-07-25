@@ -1,7 +1,12 @@
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <meta name="theme-color" content="#1e3a8a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>מערכת לוגיסטיקה גדודית</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -37,6 +42,48 @@
 
         /* מנגנון הסתרת אלמנטים של לוגיסטיקה למשתמשים רגילים */
         body:not(.is-admin) .logistics-only { display: none !important; }
+
+        /* ====== התאמה למובייל: הפיכת טבלאות לכרטיסיות ====== */
+        @media (max-width: 767px) {
+            /* טבלאות נתונים הופכות לכרטיסיות במקום גלילה אופקית */
+            .responsive-table { min-width: 0 !important; }
+            .responsive-table thead { display: none; }
+            .responsive-table tbody,
+            .responsive-table tr,
+            .responsive-table td { display: block; width: 100%; }
+            .responsive-table tr {
+                margin-bottom: 12px; border: 1px solid #e5e7eb; border-radius: 14px;
+                padding: 10px 14px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            }
+            .responsive-table td {
+                padding: 6px 0 !important; border: none !important; text-align: right !important;
+                white-space: normal !important;
+            }
+            .responsive-table td::before {
+                content: attr(data-label); display: block; font-weight: 600;
+                color: #6b7280; font-size: 11px; margin-bottom: 3px;
+            }
+            /* תאים ללא תווית (אינדקס/תמונה) — בלי כותרת */
+            .responsive-table td[data-label=""]::before,
+            .responsive-table td:not([data-label])::before { display: none; }
+            .responsive-table td[data-label=""] { padding: 2px 0 !important; }
+            .responsive-table .cell-actions { display: flex; gap: 8px; padding-top: 8px !important; border-top: 1px dashed #f0f0f0 !important; margin-top: 4px; }
+            .responsive-table .cell-actions button { flex: 1; }
+            /* פקדי סטטוס תופסים רוחב מלא ונוחים למגע */
+            .responsive-table select { width: 100% !important; min-height: 44px; font-size: 15px; }
+            .responsive-table .status-cell > div { width: 100%; }
+
+            /* מרווחים קומפקטיים יותר בכותרת במובייל */
+            header h1 { font-size: 1.15rem !important; }
+            #main-app-view, #module-logistics { padding-left: 12px; padding-right: 12px; }
+            /* טפסי מודאל — גלילה נוחה ורוחב מלא */
+            #equipment-modal .modal-head-actions { flex-wrap: wrap; gap: 6px; }
+        }
+
+        /* כפתורי מגע גדולים מספיק בכל מסך */
+        @media (max-width: 767px) {
+            button, select, input[type="date"] { min-height: 40px; }
+        }
 
         /* הגדרות הדפסה נקיות */
         @media print {
@@ -126,7 +173,7 @@
                 </div>
 
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 flex-grow flex flex-col overflow-visible">
-                    <div class="sticky top-[120px] sm:top-[124px] z-20 bg-white border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center p-2 gap-3 shadow-sm rounded-t-xl">
+                    <div class="sm:sticky sm:top-[124px] z-20 bg-white border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center p-2 gap-3 shadow-sm rounded-t-xl">
                         <nav class="flex gap-2 px-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0 hide-scrollbar" id="tabs-container"></nav>
                         <div class="relative w-full sm:w-72 shrink-0 px-2 sm:px-0 mb-2 sm:mb-0">
                             <i class="fa-solid fa-magnifying-glass absolute right-5 sm:right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
@@ -135,7 +182,7 @@
                     </div>
 
                     <div class="flex-grow overflow-auto table-container relative z-0">
-                        <table class="w-full text-right border-collapse min-w-[850px]">
+                        <table class="responsive-table w-full text-right border-collapse min-w-[850px]">
                             <thead class="bg-gray-50 text-gray-600 text-sm">
                                 <tr>
                                     <th class="p-3 font-semibold w-12 text-center border-b border-gray-200">#</th>
@@ -196,8 +243,8 @@
                     </select>
                 </div>
 
-                <div class="overflow-auto border border-gray-200 rounded-lg max-h-[500px]">
-                    <table class="w-full text-right text-sm border-collapse">
+                <div class="overflow-auto sm:border border-gray-200 rounded-lg max-h-[500px]">
+                    <table class="responsive-table w-full text-right text-sm border-collapse">
                         <thead class="bg-gray-50 text-gray-600 sticky top-0 z-10 shadow-sm">
                             <tr>
                                 <th class="p-3 border-b">קטגוריה</th>
@@ -232,8 +279,8 @@
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8" id="ammo-grid"></div>
 
                 <h3 class="text-lg font-bold text-gray-700 mb-3 border-b pb-2">יומן תנועות אחרונות (ירי/בלאי)</h3>
-                <div class="overflow-auto border border-gray-200 rounded-lg max-h-[300px]">
-                    <table class="w-full text-right text-sm">
+                <div class="overflow-auto sm:border border-gray-200 rounded-lg max-h-[300px]">
+                    <table class="responsive-table w-full text-right text-sm">
                         <thead class="bg-gray-50 text-gray-600 sticky top-0">
                             <tr>
                                 <th class="p-3 border-b">תאריך</th>
@@ -272,7 +319,7 @@
 
     <div id="equipment-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 no-print">
         <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full flex flex-col max-h-[95vh] overflow-hidden">
-            <div class="bg-blue-900 text-white p-4 flex justify-between items-center">
+            <div class="bg-blue-900 text-white p-4 flex flex-wrap justify-between items-center gap-3">
                 <div class="flex items-center gap-4">
                     <div class="relative group cursor-pointer w-12 h-12 rounded-full bg-gray-200 border-2 border-white overflow-hidden flex items-center justify-center shadow" onclick="document.getElementById('avatar-upload').click()" title="העלה תמונה לחייל">
                         <img id="eq-avatar-img" src="" class="hidden w-full h-full object-cover">
@@ -284,7 +331,7 @@
                         <p class="text-blue-200 text-sm mt-1" id="eq-soldier-name">שם החייל</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-3">
+                <div class="modal-head-actions flex items-center gap-3">
                     <button onclick="openFormPrint('1008')" class="bg-blue-700 hover:bg-blue-600 px-3 py-2 rounded-lg text-sm font-bold shadow flex items-center gap-2 border border-blue-500">
                         <i class="fa-solid fa-file-signature"></i> טופס 1008
                     </button>
@@ -852,15 +899,15 @@
                     const avImg = s.avatar ? `<img src="${s.avatar}" class="w-8 h-8 rounded-full object-cover border border-gray-300">` : `<div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500"><i class="fa-solid fa-user text-xs"></i></div>`;
                     
                     tbody.innerHTML += `<tr class="hover:bg-blue-50/50 border-b border-gray-100">
-                        <td class="p-3 text-center text-gray-400 text-xs">${idx + 1}</td>
-                        <td class="p-3 text-center">${avImg}</td>
-                        <td class="p-3 font-medium text-blue-700 hover:underline whitespace-nowrap cursor-pointer" onclick="openEquipmentModal('${s.id}')">${escapeHTML(s.name)}${stHtml}</td>
-                        <td class="p-3">${sH}</td>
-                        <td class="p-3 text-gray-600 text-xs"><span class="bg-gray-100 px-2 py-1 rounded">${escapeHTML(s.role||'-')}</span></td>
-                        <td class="p-3 text-gray-600 text-xs" dir="ltr">${escapeHTML(s.phone||'-')}</td>
-                        <td class="p-3 text-gray-600 text-xs">${escapeHTML(s.personalId||'-')}</td>
-                        <td class="p-3 text-center">
-                            <div class="flex justify-center gap-1">
+                        <td class="p-3 text-center text-gray-400 text-xs" data-label="">${idx + 1}</td>
+                        <td class="p-3 text-center" data-label="">${avImg}</td>
+                        <td class="p-3 font-medium text-blue-700 hover:underline sm:whitespace-nowrap cursor-pointer text-base sm:text-sm" data-label="שם החייל" onclick="openEquipmentModal('${s.id}')">${escapeHTML(s.name)}${stHtml}</td>
+                        <td class="p-3 status-cell" data-label="סטטוס יומי">${sH}</td>
+                        <td class="p-3 text-gray-600 text-xs" data-label="תפקיד"><span class="bg-gray-100 px-2 py-1 rounded">${escapeHTML(s.role||'-')}</span></td>
+                        <td class="p-3 text-gray-600 text-xs" dir="ltr" data-label="טלפון">${escapeHTML(s.phone||'-')}</td>
+                        <td class="p-3 text-gray-600 text-xs" data-label="מספר אישי">${escapeHTML(s.personalId||'-')}</td>
+                        <td class="p-3 text-center cell-actions" data-label="">
+                            <div class="flex justify-center gap-1 w-full">
                                 <button onclick="openEquipmentModal('${s.id}')" class="text-emerald-500 hover:bg-emerald-50 p-2 rounded transition" title="1008"><i class="fa-solid fa-backpack"></i></button>
                                 <button onclick="openEditSoldierModal('${s.id}')" class="text-blue-400 hover:bg-blue-50 p-2 rounded transition"><i class="fa-solid fa-pen"></i></button>
                                 <button onclick="confirmDelete('${s.id}', '${escapeHTML(s.name).replace(/'/g, "\\'")}')" class="text-red-400 hover:bg-red-50 p-2 rounded transition"><i class="fa-solid fa-trash"></i></button>
@@ -880,7 +927,7 @@
             let a=0, as=0; inventory.forEach(i => { if(i.status === 'available') a++; if(i.status === 'assigned') as++; });
             document.getElementById('armory-stats').innerHTML = `<div class="bg-blue-50 p-3 rounded-lg border border-blue-100 text-center"><div class="text-xs text-blue-600 font-bold mb-1">סה"כ פריטים</div><div class="text-2xl font-black text-blue-900">${inventory.length}</div></div><div class="bg-green-50 p-3 rounded-lg border border-green-100 text-center"><div class="text-xs text-green-600 font-bold mb-1">זמינים בגדוד</div><div class="text-2xl font-black text-green-900">${a}</div></div><div class="bg-orange-50 p-3 rounded-lg border border-orange-100 text-center"><div class="text-xs text-orange-600 font-bold mb-1">מונפקים</div><div class="text-2xl font-black text-orange-900">${as}</div></div>`;
             let h = ''; 
-            inventory.filter(i => { if(fSt !== 'all' && i.status !== fSt) return false; if(term) return (i.serial||"").includes(term) || (i.name||"").includes(term) || (i.assignedTo ? (soldiers.find(s=>s.id===i.assignedTo)?.name || "") : "").includes(term); return true; }).forEach(i => { const sN = i.assignedTo ? (soldiers.find(s=>s.id===i.assignedTo)?.name || "-") : "-"; const bdg = i.status === 'available' ? `<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">במחסן</span>` : `<span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs">מונפק</span>`; h += `<tr class="hover:bg-gray-50"><td class="p-3 text-xs text-gray-500">${escapeHTML(i.category)}</td><td class="p-3 font-bold">${escapeHTML(i.name)}</td><td class="p-3 font-mono text-blue-600" dir="ltr">${escapeHTML(i.serial)}</td><td class="p-3">${bdg}</td><td class="p-3 text-sm">${escapeHTML(sN)}</td><td class="p-3 text-center">${i.status === 'available' ? `<button onclick="deleteInventoryItem('${i.id}')" class="text-red-400 hover:text-red-600 p-1"><i class="fa-solid fa-trash"></i></button>` : `<span class="text-gray-400 text-xs">בשימוש</span>`}</td></tr>`; }); 
+            inventory.filter(i => { if(fSt !== 'all' && i.status !== fSt) return false; if(term) return (i.serial||"").includes(term) || (i.name||"").includes(term) || (i.assignedTo ? (soldiers.find(s=>s.id===i.assignedTo)?.name || "") : "").includes(term); return true; }).forEach(i => { const sN = i.assignedTo ? (soldiers.find(s=>s.id===i.assignedTo)?.name || "-") : "-"; const bdg = i.status === 'available' ? `<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">במחסן</span>` : `<span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs">מונפק</span>`; h += `<tr class="hover:bg-gray-50"><td class="p-3 text-xs text-gray-500" data-label="קטגוריה">${escapeHTML(i.category)}</td><td class="p-3 font-bold" data-label="שם הפריט">${escapeHTML(i.name)}</td><td class="p-3 font-mono text-blue-600" dir="ltr" data-label="מספר צ'">${escapeHTML(i.serial)}</td><td class="p-3" data-label="סטטוס">${bdg}</td><td class="p-3 text-sm" data-label="חייל חתום">${escapeHTML(sN)}</td><td class="p-3 text-center" data-label="פעולות">${i.status === 'available' ? `<button onclick="deleteInventoryItem('${i.id}')" class="text-red-400 hover:text-red-600 p-1"><i class="fa-solid fa-trash"></i></button>` : `<span class="text-gray-400 text-xs">בשימוש</span>`}</td></tr>`; });
             tb.innerHTML = h || `<tr><td colspan="6" class="p-6 text-center text-gray-400">לא נמצאו פריטים</td></tr>`;
         }
         
@@ -892,7 +939,7 @@
         window.exportArmory=()=>{ let c="קטגוריה,שם פריט,מספר צ,סטטוס,חייל חתום\n"; inventory.forEach(i=>{const sn=i.assignedTo?(soldiers.find(s=>s.id===i.assignedTo)?.name||""):"";const st=i.status==='available'?'במחסן':'מונפק';c+=`"${i.category||''}","${i.name||''}","${i.serial||''}","${st}","${sn}"\n`;}); const u=URL.createObjectURL(new Blob(["\uFEFF"+c],{type:'text/csv;charset=utf-8;'})); const l=document.createElement("a");l.href=u;l.download="מלאי_מחסן.csv";document.body.appendChild(l);l.click();document.body.removeChild(l); }; 
         window.importArmoryExcel=async(e)=>{ const f=e.target.files[0];if(!f)return;showToast("קורא קובץ מחסן...");const r=new FileReader(); r.onload=async(ev)=>{try{const rows=XLSX.utils.sheet_to_json(XLSX.read(new Uint8Array(ev.target.result),{type:'array'}).Sheets[XLSX.read(new Uint8Array(ev.target.result),{type:'array'}).SheetNames[0]],{header:1,defval:""});let a=0;if(rows.length>0){let ci=0,ni=1,si=2;const h=rows[0].map(x=>String(x).trim());const hc=h.findIndex(x=>x.includes('קטגוריה')),hn=h.findIndex(x=>x.includes('שם')||x.includes('פריט')),hs=h.findIndex(x=>x.includes('צ')||x.includes('סידורי'));if(hn>-1&&hs>-1){ci=Math.max(0,hc);ni=hn;si=hs;}for(let i=1;i<rows.length;i++){const n=String(rows[i][ni]||'').replace(/["']/g,'').trim(),s=String(rows[i][si]||'').replace(/["']/g,'').trim(),c=String(rows[i][ci]||'כללי').trim();if(!n||!s||n==='שם הפריט'||inventory.find(iv=>iv.serial===s))continue;await addDoc(collection(db,'inventory'),{category:c,name:n,serial:s,status:'available',assignedTo:null,addedAt:new Date().toISOString()});a++;}}showToast(`${a} פריטים נוספו למחסן.`);}catch(err){}e.target.value='';};r.readAsArrayBuffer(f); };
 
-        function renderLogisticsAmmo() { const g=document.getElementById('ammo-grid');g.innerHTML='';const t=Object.keys(ammoData);if(t.length===0)g.innerHTML=`<div class="col-span-4 p-4 text-center text-gray-500 border border-dashed rounded-lg">אין מלאי</div>`;else t.forEach(k=>{g.innerHTML+=`<div class="bg-white border border-gray-200 p-4 rounded-xl shadow-sm text-center relative group"><button onclick="deleteAmmoType('${escapeHTML(k)}')" class="absolute top-2 left-2 text-red-300 hover:text-red-500 hidden group-hover:block transition" title="מחק סוג"><i class="fa-solid fa-trash text-sm"></i></button><div class="text-gray-500 text-sm font-bold mb-1">${escapeHTML(k)}</div><div class="text-3xl font-black text-gray-800" dir="ltr">${ammoData[k]}</div></div>`;}); const lB=document.getElementById('ammo-logs-body');let lh='';ammoLogs.forEach(lg=>{lh+=`<tr><td class="p-3 text-xs text-gray-500">${new Date(lg.date).toLocaleDateString('he-IL')} ${new Date(lg.date).toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})}</td><td class="p-3 font-bold">${escapeHTML(lg.type)}</td><td class="p-3 font-mono text-red-600" dir="ltr">-${lg.amount}</td><td class="p-3 text-gray-600 text-sm">${escapeHTML(lg.reason)}</td><td class="p-3 text-center w-16"><button onclick="deleteAmmoLog('${lg.id}','${escapeHTML(lg.type)}',${lg.amount})" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button></td></tr>`;});lB.innerHTML=lh||`<tr><td colspan="5" class="p-6 text-center text-gray-400">אין תיעוד</td></tr>`; } 
+        function renderLogisticsAmmo() { const g=document.getElementById('ammo-grid');g.innerHTML='';const t=Object.keys(ammoData);if(t.length===0)g.innerHTML=`<div class="col-span-4 p-4 text-center text-gray-500 border border-dashed rounded-lg">אין מלאי</div>`;else t.forEach(k=>{g.innerHTML+=`<div class="bg-white border border-gray-200 p-4 rounded-xl shadow-sm text-center relative group"><button onclick="deleteAmmoType('${escapeHTML(k)}')" class="absolute top-2 left-2 text-red-300 hover:text-red-500 hidden group-hover:block transition" title="מחק סוג"><i class="fa-solid fa-trash text-sm"></i></button><div class="text-gray-500 text-sm font-bold mb-1">${escapeHTML(k)}</div><div class="text-3xl font-black text-gray-800" dir="ltr">${ammoData[k]}</div></div>`;}); const lB=document.getElementById('ammo-logs-body');let lh='';ammoLogs.forEach(lg=>{lh+=`<tr><td class="p-3 text-xs text-gray-500" data-label="תאריך">${new Date(lg.date).toLocaleDateString('he-IL')} ${new Date(lg.date).toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})}</td><td class="p-3 font-bold" data-label="סוג תחמושת">${escapeHTML(lg.type)}</td><td class="p-3 font-mono text-red-600" dir="ltr" data-label="כמות שנצרכה">-${lg.amount}</td><td class="p-3 text-gray-600 text-sm" data-label="סיבה / מטווח">${escapeHTML(lg.reason)}</td><td class="p-3 text-center w-16" data-label="פעולות"><button onclick="deleteAmmoLog('${lg.id}','${escapeHTML(lg.type)}',${lg.amount})" class="text-red-400 hover:text-red-600"><i class="fa-solid fa-trash"></i></button></td></tr>`;});lB.innerHTML=lh||`<tr><td colspan="5" class="p-6 text-center text-gray-400">אין תיעוד</td></tr>`; } 
         window.deleteAmmoLog=async(id,type,qty)=>{if(confirm(`למחוק דיווח? (${qty} יוחזרו)`)){try{await deleteDoc(doc(db,'ammo_logs',id));const c=ammoData[type]||0;await setDoc(doc(db,'logistics','ammo'),{[type]:c+qty},{merge:true});showToast("נמחק ועודכן");}catch(e){}}}; 
         window.deleteAmmoType=async(type)=>{if(confirm(`למחוק סוג ${type}?`)){const nd={...ammoData};delete nd[type];await setDoc(doc(db,'logistics','ammo'),nd);showToast("נמחק");}}; 
         window.openAmmoUpdateModal=()=>{document.getElementById('upd-ammo-type').value='';document.getElementById('upd-ammo-qty').value='';document.getElementById('ammo-update-modal').classList.remove('hidden');document.getElementById('ammo-update-modal').classList.add('flex');}; 
@@ -1059,5 +1106,3 @@
     </script>
 </body>
 </html>
-
-```
